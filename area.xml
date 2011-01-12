@@ -4,12 +4,12 @@
   <regional>
     <name>龙南</name>
     <datafile>addresslist_ln</datafile>
-    <valid>0</valid>
+    <valid>1</valid>
   </regional>
   <regional>
     <name>八百垧</name>
     <datafile>addresslist_bbs</datafile>
-    <valid>1</valid>
+    <valid>0</valid>
   </regional>
   <regional>
     <name>乘风</name>

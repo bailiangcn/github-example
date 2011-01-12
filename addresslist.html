@@ -8,37 +8,96 @@
 <META NAME="Description" CONTENT="">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <script language="JavaScript" type="text/javascript">
-//定义了城市的二维数组，里面的顺序跟省份的顺序是相同的。通过selectedIndex获得省份的下标值来得到相应的城市数组
-function getCity(){
-       //获得省份下拉框的对象
-        var sltProvince=document.form1.province;
-       //获得城市下拉框的对象
-         var sltCity=document.form1.city;
-         alert(sltProvince.options[sltProvince.selectedIndex].text)
-         
-       //得到对应省份的城市数组
-         var provinceCity=city[sltProvince.selectedIndex - 1];
- 
-         //清空城市下拉框，仅留提示选项
-         sltCity.length=1;
- 
-         //将城市数组中的值填充到城市下拉框中
-         for(var i=0;i<provinceCity.length;i++){
-             sltCity[i+1]=new Option(provinceCity[i],provinceCity[i]);
-         }
-     }
+//通过读取xml文件，设置区域、小区、楼号
+function getCommunity(){
+       //获得区域下拉框的对象
+         var sltregional=document.form1.regional;
+       //获得小区下拉框的对象
+         var sltcommunity=document.form1.community;
+       //获得楼号下拉框的对象
+         var slthouse=document.form1.house;
+         //清空小区、楼号下拉框，仅留提示选项
+         sltcommunity.length=1;
+         slthouse.length=1;
+         //取得小区xml文件名，生成小区选择列表
+         var xmlfilename=sltregional.options[sltregional.selectedIndex].value+".xml";
+         if (window.XMLHttpRequest)
+			  {// code for IE7+, Firefox, Chrome, Opera, Safari
+				  xmlhttp=new XMLHttpRequest();
+			  }
+			else
+			  {// code for IE6, IE5
+				  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+			  }
+			xmlhttp.open("GET",xmlfilename,false);
+			xmlhttp.send();
+			xmlDoc=xmlhttp.responseXML;
+			var x=xmlDoc.getElementsByTagName("community");
+						  
+			//生成小区的选择菜单
+			for (i=0;i<x.length;i++)
+			  {
+						txt=x[i].getAttribute("name");
+				  		var option=document.createElement("option");
+						option.text = txt; 
+						option.value = txt;
+						sltcommunity.options.add(option);	  
+				}
+       }
+function getHouse(){
+       //获得区域下拉框的对象
+         var sltregional=document.form1.regional;
+       //获得小区下拉框的对象
+         var sltcommunity=document.form1.community;
+       //获得楼号下拉框的对象
+         var slthouse=document.form1.house;
+         //清空楼号下拉框，仅留提示选项
+         slthouse.length=1;
+         //取得小区xml文件名，生成小区选择列表
+         var xmlfilename=sltregional.options[sltregional.selectedIndex].value+".xml";
+         if (window.XMLHttpRequest)
+			  {// code for IE7+, Firefox, Chrome, Opera, Safari
+				  xmlhttp=new XMLHttpRequest();
+			  }
+         else
+			  {// code for IE6, IE5
+				  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+			  }
+	    	xmlhttp.open("GET",xmlfilename,false);
+			xmlhttp.send();
+			xmlDoc=xmlhttp.responseXML;
+            //取得选择的小区名称,生成楼号列表
+			var x=xmlDoc.getElementsByTagName("community")[sltcommunity.selectedIndex-1].childNodes;
+						  
+			//生成楼号的选择菜单
+			for (i=0;i<x.length;i++)
+			  {
+                  if (x[i].nodeType==1)
+                  {
+						txt=x[i].textContent;
+				  		var option=document.createElement("option");
+						option.text = txt; 
+						option.value = txt;
+						slthouse.options.add(option);	  
+                    }
+				}
+       }
 </script>
 </HEAD>
 <body>
 <FORM METHOD=POST ACTION="" name="form1">
-      <SELECT NAME="province" onChange="getCity()">
-          <OPTION VALUE="0">请选择所在区域 </OPTION>
+      <SELECT NAME="regional" onChange="getCommunity()">
+          <OPTION VALUE="0">请选择区域 </OPTION>
       </SELECT>
-      <SELECT NAME="city">
-          <OPTION VALUE="0">请选择所在小区 </OPTION>
+      <SELECT NAME="community" onChange="getHouse()">
+          <OPTION VALUE="0">请选择小区 </OPTION>
+      </SELECT>
+      <SELECT NAME="house">
+          <OPTION VALUE="0">请选择楼号 </OPTION>
       </SELECT>
 </FORM>
 <script language="JavaScript" type="text/javascript">
+	//打开area.xml文件，读取区域列表
 	if (window.XMLHttpRequest)
 	  {// code for IE7+, Firefox, Chrome, Opera, Safari
 	  xmlhttp=new XMLHttpRequest();
@@ -59,7 +118,7 @@ function getCity(){
 				var option=document.createElement("option");
 				option.text = x[i].getElementsByTagName("name")[0].childNodes[0].nodeValue; 
 				option.value = x[i].getElementsByTagName("datafile")[0].childNodes[0].nodeValue;
-				document.form1.province.options.add(option);	  
+				document.form1.regional.options.add(option);	  
 		  }
 	  }
 </script>
