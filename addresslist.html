@@ -1,13 +1,88 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
 <html>
 <HEAD>
-<TITLE> 地址选择 </TITLE>
-<meta name="generator" content="Bluefish 1.0.7">
-<meta name="author" content="bl">
-<META NAME="Keywords" CONTENT="">
-<META NAME="Description" CONTENT="">
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <TITLE> 地址选择 </TITLE>
+    <meta name="generator" content="Bluefish 1.0.7">
+    <meta name="author" content="bl">
+    <META NAME="Keywords" CONTENT="">
+    <META NAME="Description" CONTENT="">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style type="text/css">
+        body{font:12px "宋体"}
+        .selector{width:120px;height:20px;border:1px solid #36c;position:relative}
+        .selector input{width:90px;border:0;font-size:12px;padding-left:3px}
+        .selector ul{width:120px;margin:0;padding:0;position:absolute;left:-1px;top:20px;border:1px solid #36c;list-style:none;display:none}
+        .selector li a{width:120px;line-height:24px;display:block;color:#000;background:#fff;text-decoration:none;text-indent:10px}
+        .selector li a:hover{background:#ccc}
+        .selector .arr{position:absolute;right:0;top:0}
+    </style>
+</HEAD>
+<body>
+<FORM METHOD=POST ACTION="" name="form1">
+      <SELECT NAME="regional" onChange="getCommunity()">
+          <OPTION VALUE="0">请选择区域 </OPTION>
+      </SELECT>-
+      <SELECT NAME="community" onChange="getHouse()">
+          <OPTION VALUE="0">请选择小区 </OPTION>
+      </SELECT>-
+      <SELECT NAME="house">
+          <OPTION VALUE="0">请选择楼号 </OPTION>
+      </SELECT>
+    <div class="selector">
+        <input type="text" name="unit" id="unit"><img src="select.gif" id="SelectorArr" class="arr">
+        <ul id="SelectorOptions">
+            <li><a href="javascript:void(0)">1单元</a></li>
+            <li><a href="javascript:void(0)">2单元</a></li>
+            <li><a href="javascript:void(0)">3单元</a></li>
+            <li><a href="javascript:void(0)">4单元</a></li>
+            <li><a href="javascript:void(0)">5单元</a></li>
+        </ul>
+    </div>
+      <SELECT NAME="layer">
+          <OPTION VALUE="0">请选择层位 </OPTION>
+      </SELECT>
+
+</FORM>
 <script language="JavaScript" type="text/javascript">
+	//打开area.xml文件，读取区域列表
+	if (window.XMLHttpRequest)
+	  {// code for IE7+, Firefox, Chrome, Opera, Safari
+	  xmlhttp=new XMLHttpRequest();
+	  }
+	else
+	  {// code for IE6, IE5
+	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	  }
+	xmlhttp.open("GET","area.xml",false);
+	xmlhttp.send();
+	xmlDoc=xmlhttp.responseXML;
+	var x=xmlDoc.getElementsByTagName("regional");
+	//生成区域的选择菜单
+	for (i=0;i<x.length;i++)
+	  {
+		  if (x[i].getElementsByTagName("valid")[0].childNodes[0].nodeValue==1)
+		  {
+				var option=document.createElement("option");
+				option.text = x[i].getElementsByTagName("name")[0].childNodes[0].nodeValue; 
+				option.value = x[i].getElementsByTagName("datafile")[0].childNodes[0].nodeValue;
+				document.form1.regional.options.add(option);	  
+		  }
+	  }
+
+    function G(id){
+        return document.getElementById(id);
+    }
+    var SelectorOptions = G("SelectorOptions");
+    var items = SelectorOptions.getElementsByTagName("A");
+    G("SelectorArr").onclick = function(){
+        SelectorOptions.style.display = SelectorOptions.style.display == "block" ? "none" : "block";
+    }
+    for(var i=0; i<items.length; i++){
+        items[i].onclick = function(){
+            document.form1.unit.value = this.innerHTML;
+            SelectorOptions.style.display = "none";
+        }
+    }
 //通过读取xml文件，设置区域、小区、楼号
 function getCommunity(){
        //获得区域下拉框的对象
@@ -82,45 +157,6 @@ function getHouse(){
                     }
 				}
        }
-</script>
-</HEAD>
-<body>
-<FORM METHOD=POST ACTION="" name="form1">
-      <SELECT NAME="regional" onChange="getCommunity()">
-          <OPTION VALUE="0">请选择区域 </OPTION>
-      </SELECT>
-      <SELECT NAME="community" onChange="getHouse()">
-          <OPTION VALUE="0">请选择小区 </OPTION>
-      </SELECT>
-      <SELECT NAME="house">
-          <OPTION VALUE="0">请选择楼号 </OPTION>
-      </SELECT>
-</FORM>
-<script language="JavaScript" type="text/javascript">
-	//打开area.xml文件，读取区域列表
-	if (window.XMLHttpRequest)
-	  {// code for IE7+, Firefox, Chrome, Opera, Safari
-	  xmlhttp=new XMLHttpRequest();
-	  }
-	else
-	  {// code for IE6, IE5
-	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-	  }
-	xmlhttp.open("GET","area.xml",false);
-	xmlhttp.send();
-	xmlDoc=xmlhttp.responseXML;
-	var x=xmlDoc.getElementsByTagName("regional");
-	//生成区域的选择菜单
-	for (i=0;i<x.length;i++)
-	  {
-		  if (x[i].getElementsByTagName("valid")[0].childNodes[0].nodeValue==1)
-		  {
-				var option=document.createElement("option");
-				option.text = x[i].getElementsByTagName("name")[0].childNodes[0].nodeValue; 
-				option.value = x[i].getElementsByTagName("datafile")[0].childNodes[0].nodeValue;
-				document.form1.regional.options.add(option);	  
-		  }
-	  }
 </script>
 </body>
 </html>
