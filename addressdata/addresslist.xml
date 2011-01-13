@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 整转小区地址列表-->
+<!--龙南地区-->
+<address>
+    <community name="龙岗">
+      <service phone="13339505100">
+        <house>2-1</house>
+        <house>2-2</house>
+      </service>
+      <service phone="13339505101">
+        <house>2-3</house>
+        <house>2-4</house>
+      </service>
+    </community>
+</address>

@@ -2,45 +2,68 @@
 <html>
 <HEAD>
     <TITLE> 地址选择 </TITLE>
-    <meta name="generator" content="Bluefish 1.0.7">
     <meta name="author" content="bl">
-    <META NAME="Keywords" CONTENT="">
-    <META NAME="Description" CONTENT="">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <style type="text/css">
-        body{font:12px "宋体"}
-        .selector{width:120px;height:20px;border:1px solid #36c;position:relative}
-        .selector input{width:90px;border:0;font-size:12px;padding-left:3px}
-        .selector ul{width:120px;margin:0;padding:0;position:absolute;left:-1px;top:20px;border:1px solid #36c;list-style:none;display:none}
-        .selector li a{width:120px;line-height:24px;display:block;color:#000;background:#fff;text-decoration:none;text-indent:10px}
-        .selector li a:hover{background:#ccc}
-        .selector .arr{position:absolute;right:0;top:0}
-    </style>
 </HEAD>
 <body>
-<FORM METHOD=POST ACTION="" name="form1">
+<FORM METHOD=POST ACTION="get_address.py" name="form2">
+	<textarea name="message"  rows="2" cols="58"></textarea>
+    </br>用户电话：
+	<textarea name="phone"  rows="1" cols="30"></textarea>
+	<button name="resetbutton" type="reset">清除</button>
+	 <input type="submit" value="发送">
+</FORM>
+<FORM  name="form1">
       <SELECT NAME="regional" onChange="getCommunity()">
           <OPTION VALUE="0">请选择区域 </OPTION>
-      </SELECT>-
+      </SELECT>
       <SELECT NAME="community" onChange="getHouse()">
           <OPTION VALUE="0">请选择小区 </OPTION>
-      </SELECT>-
-      <SELECT NAME="house">
+      </SELECT>
+      <SELECT NAME="house" onChange="makeMessage()">
           <OPTION VALUE="0">请选择楼号 </OPTION>
       </SELECT>
-    <div class="selector">
-        <input type="text" name="unit" id="unit"><img src="select.gif" id="SelectorArr" class="arr">
-        <ul id="SelectorOptions">
-            <li><a href="javascript:void(0)">1单元</a></li>
-            <li><a href="javascript:void(0)">2单元</a></li>
-            <li><a href="javascript:void(0)">3单元</a></li>
-            <li><a href="javascript:void(0)">4单元</a></li>
-            <li><a href="javascript:void(0)">5单元</a></li>
-        </ul>
-    </div>
-      <SELECT NAME="layer">
-          <OPTION VALUE="0">请选择层位 </OPTION>
+      </br>
+      <SELECT NAME="unit" onChange="makeMessage()">
+          <OPTION VALUE="0">请选择单元 </OPTION>
+          <OPTION VALUE="1">一单元</OPTION>
+          <OPTION VALUE="2">二单元</OPTION>
+          <OPTION VALUE="3">三单元</OPTION>
+          <OPTION VALUE="4">四单元 </OPTION>
+          <OPTION VALUE="5">五单元 </OPTION>
+          <OPTION VALUE="6">六单元 </OPTION>
+          <OPTION VALUE="7">七单元</OPTION>
+          <OPTION VALUE="8">八单元</OPTION>
+          <OPTION VALUE="9">九单元</OPTION>
+          <OPTION VALUE="10">十单元 </OPTION>
       </SELECT>
+      <SELECT NAME="layer" onChange="makeMessage()">
+          <OPTION VALUE="0">请选择楼层 </OPTION>
+          <OPTION VALUE="1">一层</OPTION>
+          <OPTION VALUE="2">二层</OPTION>
+          <OPTION VALUE="3">三层</OPTION>
+          <OPTION VALUE="4">四层 </OPTION>
+          <OPTION VALUE="5">五层 </OPTION>
+          <OPTION VALUE="6">六层 </OPTION>
+          <OPTION VALUE="7">七层</OPTION>
+          <OPTION VALUE="8">八层</OPTION>
+          <OPTION VALUE="9">九层</OPTION>
+          <OPTION VALUE="10">十层 </OPTION>
+      </SELECT>
+      <SELECT NAME="number" onChange="makeMessage()">
+          <OPTION VALUE="0">请选择门牌 </OPTION>
+          <OPTION VALUE="1">01</OPTION>
+          <OPTION VALUE="2">02</OPTION>
+          <OPTION VALUE="3">03</OPTION>
+          <OPTION VALUE="4">04</OPTION>
+          <OPTION VALUE="5">05</OPTION>
+          <OPTION VALUE="6">06</OPTION>
+          <OPTION VALUE="7">07</OPTION>
+          <OPTION VALUE="8">08</OPTION>
+          <OPTION VALUE="9">09</OPTION>
+          <OPTION VALUE="10">10</OPTION>
+      </SELECT>
+     
 
 </FORM>
 <script language="JavaScript" type="text/javascript">
@@ -53,7 +76,7 @@
 	  {// code for IE6, IE5
 	  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
 	  }
-	xmlhttp.open("GET","area.xml",false);
+	xmlhttp.open("GET","./addressdata/area.xml",false);
 	xmlhttp.send();
 	xmlDoc=xmlhttp.responseXML;
 	var x=xmlDoc.getElementsByTagName("regional");
@@ -63,26 +86,14 @@
 		  if (x[i].getElementsByTagName("valid")[0].childNodes[0].nodeValue==1)
 		  {
 				var option=document.createElement("option");
-				option.text = x[i].getElementsByTagName("name")[0].childNodes[0].nodeValue; 
-				option.value = x[i].getElementsByTagName("datafile")[0].childNodes[0].nodeValue;
+                option.text = x[i].getElementsByTagName("name")[0]
+                    .childNodes[0].nodeValue; 
+                option.value = x[i].getElementsByTagName("datafile")[0]
+                    .childNodes[0].nodeValue;
 				document.form1.regional.options.add(option);	  
 		  }
 	  }
 
-    function G(id){
-        return document.getElementById(id);
-    }
-    var SelectorOptions = G("SelectorOptions");
-    var items = SelectorOptions.getElementsByTagName("A");
-    G("SelectorArr").onclick = function(){
-        SelectorOptions.style.display = SelectorOptions.style.display == "block" ? "none" : "block";
-    }
-    for(var i=0; i<items.length; i++){
-        items[i].onclick = function(){
-            document.form1.unit.value = this.innerHTML;
-            SelectorOptions.style.display = "none";
-        }
-    }
 //通过读取xml文件，设置区域、小区、楼号
 function getCommunity(){
        //获得区域下拉框的对象
@@ -95,7 +106,8 @@ function getCommunity(){
          sltcommunity.length=1;
          slthouse.length=1;
          //取得小区xml文件名，生成小区选择列表
-         var xmlfilename=sltregional.options[sltregional.selectedIndex].value+".xml";
+         var xmlfilename="./addressdata/"+
+             sltregional.options[sltregional.selectedIndex].value+".xml";
          if (window.XMLHttpRequest)
 			  {// code for IE7+, Firefox, Chrome, Opera, Safari
 				  xmlhttp=new XMLHttpRequest();
@@ -118,6 +130,7 @@ function getCommunity(){
 						option.value = txt;
 						sltcommunity.options.add(option);	  
 				}
+			makeMessage();
        }
 function getHouse(){
        //获得区域下拉框的对象
@@ -129,7 +142,8 @@ function getHouse(){
          //清空楼号下拉框，仅留提示选项
          slthouse.length=1;
          //取得小区xml文件名，生成小区选择列表
-         var xmlfilename=sltregional.options[sltregional.selectedIndex].value+".xml";
+         var xmlfilename="./addressdata/"+sltregional.
+             options[sltregional.selectedIndex].value+".xml";
          if (window.XMLHttpRequest)
 			  {// code for IE7+, Firefox, Chrome, Opera, Safari
 				  xmlhttp=new XMLHttpRequest();
@@ -142,7 +156,8 @@ function getHouse(){
 			xmlhttp.send();
 			xmlDoc=xmlhttp.responseXML;
             //取得选择的小区名称,生成楼号列表
-			var x=xmlDoc.getElementsByTagName("community")[sltcommunity.selectedIndex-1].childNodes;
+            var x=xmlDoc.getElementsByTagName("community")
+                [sltcommunity.selectedIndex-1].childNodes;
 						  
 			//生成楼号的选择菜单
 			for (i=0;i<x.length;i++)
@@ -156,7 +171,31 @@ function getHouse(){
 						slthouse.options.add(option);	  
                     }
 				}
+			makeMessage();
        }
+//生成短信字符串
+function makeMessage(){
+    var tamess="";
+    if (document.form1.regional.selectedIndex != 0){ //选择了大区
+        if (document.form1.community.selectedIndex != 0){//选择了小区
+            tamess += document.form1.community.value;
+            if (document.form1.house.selectedIndex != 0){//选择了楼号
+                tamess += document.form1.house.value + "号楼";
+                if (document.form1.unit.selectedIndex != 0){//选择了单元
+                    tamess += document.form1.unit.value + "单元";
+                    if (document.form1.layer.selectedIndex != 0){//选择了层位
+                        tamess += document.form1.layer.value + "层";
+                    if (document.form1.number.selectedIndex != 0)
+                        {//选择了门牌
+                            tamess += document.form1.number.value + "室";
+                        }
+                    }
+                }
+            }
+        }
+	}
+    document.form2.message.value=tamess;
+}
 </script>
 </body>
 </html>
