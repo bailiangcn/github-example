@@ -1,1 +1,19 @@
-hello world
+安装指南：
+环境要求：
+    python 2.6.5 (已测试，其他版本未确认)
+1、下载Karrigell 3.1.1
+    http://sourceforge.net/projects/karrigell/files/Full%20package/Karrigell-3.1.1/Karrigell-3.1.1.tar.gz/download
+    tar zxvf Karrigell-3.1.1.tar.gz
+2、配置根目录(把/home/bl/www目录作为网站的根目录)
+    进入karrigell解压目录，Karrigell/data/www/conf.py
+    在文件开头有一行
+        root_dir = os.path.join(server_dir,"www")
+    更改为
+        root_dir = "/home/bl/www"
+3、下载git源码
+    git clone git@github.com:bailiangcn/githum-example www
+    cd /home/bl/www
+    ln -s addresslist.html index.html
+4、启动Karrigell
+    sudo python Karrigell
+
