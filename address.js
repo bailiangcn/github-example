@@ -54,11 +54,13 @@ function getCommunity(){
 						  
     //生成小区的选择菜单
     for (i=0;i<x.length;i++) {
-        txt=x[i].getAttribute("name");
-        var option=document.createElement("option");
-        option.text = txt; 
-        option.value = txt;
-        sltcommunity.options.add(option);	  
+        if (x[i].nodeType==1){
+            txt=x[i].getAttribute("name");
+            var option=document.createElement("option");
+            option.text = txt; 
+            option.value = txt;
+            sltcommunity.options.add(option);	  
+        }
     }
     makeMessage();
 }
@@ -90,13 +92,27 @@ function getHouse(){
     //取得选择的小区名称,生成楼号列表
     var x=xmlDoc.getElementsByTagName("community")
         [sltcommunity.selectedIndex-1].childNodes;
+    var y;
+    var txt="";
+    var phone="";
     //生成楼号的选择菜单
     for (i=0;i<x.length;i++) {
         if (x[i].nodeType==1){
-            txt=x[i].textContent;
+            y=x[i].childNodes;
+            for (j=0;j<y.length;j++){
+                if (y[j].nodeType==1){
+                    switch (y[j].nodeName){
+                        case "number":
+                            txt=x[i].childNodes[j].textContent;
+                            break;
+                        case "service":
+                            phone=x[i].childNodes[j].textContent;
+                    } 
+                }
+            }
             var option=document.createElement("option");
             option.text = txt; 
-            option.value = txt;
+            option.value = phone;
             slthouse.options.add(option);	  
         }
     }
@@ -107,11 +123,13 @@ function getHouse(){
 function makeMessage(){
     var tamess="";
     var tempnum=0;
+    var selectnum=0;
     if (document.form1.regional.selectedIndex != 0){ //选择了大区
         if (document.form1.community.selectedIndex != 0){//选择了小区
             tamess += document.form1.community.value+" ";
             if (document.form1.house.selectedIndex != 0){//选择了楼号
-                tamess += document.form1.house.value + "号楼 ";
+                selectnum=document.form1.house.selectedIndex;
+                tamess += document.form1.house.options[selectnum].text + "号楼 ";
                 if (document.form1.unit.selectedIndex != 0){//选择了单元
                     tempnum=Number(document.form1.unit.value) +countUnit();
                     tamess += tempnum+ "单元 ";
