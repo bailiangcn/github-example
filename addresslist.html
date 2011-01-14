@@ -1,83 +1,92 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
 <html>
-<HEAD>
-    <TITLE> 地址选择 </TITLE>
-    <meta name="author" content="bl">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-</HEAD>
-<body onload="document.form1.reset()">
-<FORM METHOD=POST ACTION="get_address.py" name="form2">
-    <textarea name="message"  rows="2" cols="58"></textarea>
-    <br/>用户电话：
-    <textarea name="phone"  rows="1" cols="30"></textarea>
-    <button name="resetbutton" type="reset">清除</button>
-    <input type="hidden"  name="servicephone" value="123">
-    <input type="submit" value="发送">
-</FORM>
-<FORM  name="form1">
-    <SELECT NAME="regional" onChange="getCommunity()">
-      <OPTION VALUE="0">请选择区域 </OPTION>
-    </SELECT>
-    <SELECT NAME="community" onChange="getHouse()">
-      <OPTION VALUE="0">请选择小区 </OPTION>
-    </SELECT>
-    <SELECT NAME="house" onChange="makeMessage()">
-      <OPTION VALUE="0">请选择楼号 </OPTION>
-    </SELECT>
-    <br/>
-    <div id="unitdec" >+0</div>
-    <input type="checkbox" name="unitdec1" onClick="makeMessage()" />
-    <input type="checkbox" name="unitdec2" onClick="makeMessage()"/>
-    <input type="checkbox" name="unitdec3" onClick="makeMessage()"/>
-    <div id="layerdec" >+0</div>
-    <input type="checkbox" name="layerdec1" onClick="makeMessage()"/>
-    <input type="checkbox" name="layerdec2" onClick="makeMessage()"/>
-    <input type="checkbox" name="layerdec3" onClick="makeMessage()"/>
-    <div id="numberdec" >+0</div>
-    <input type="checkbox" name="numberdec1" onClick="makeMessage()"/>
-    <input type="checkbox" name="numberdec2" onClick="makeMessage()"/>
-    <input type="checkbox" name="numberdec3" onClick="makeMessage()"/>
-    <br/>
-    <SELECT NAME="unit" onChange="makeMessage()">
-        <OPTION VALUE="0">请选择单元 </OPTION>
-        <OPTION VALUE="1">一单元</OPTION>
-        <OPTION VALUE="2">二单元</OPTION>
-        <OPTION VALUE="3">三单元</OPTION>
-        <OPTION VALUE="4">四单元 </OPTION>
-        <OPTION VALUE="5">五单元 </OPTION>
-        <OPTION VALUE="6">六单元 </OPTION>
-        <OPTION VALUE="7">七单元</OPTION>
-        <OPTION VALUE="8">八单元</OPTION>
-        <OPTION VALUE="9">九单元</OPTION>
-        <OPTION VALUE="10">十单元 </OPTION>
-    </SELECT>
-    <SELECT NAME="layer" onChange="makeMessage()">
-        <OPTION VALUE="0">请选择楼层 </OPTION>
-        <OPTION VALUE="1">一层</OPTION>
-        <OPTION VALUE="2">二层</OPTION>
-        <OPTION VALUE="3">三层</OPTION>
-        <OPTION VALUE="4">四层 </OPTION>
-        <OPTION VALUE="5">五层 </OPTION>
-        <OPTION VALUE="6">六层 </OPTION>
-        <OPTION VALUE="7">七层</OPTION>
-        <OPTION VALUE="8">八层</OPTION>
-        <OPTION VALUE="9">九层</OPTION>
-        <OPTION VALUE="10">十层 </OPTION>
-    </SELECT>
-    <SELECT NAME="number" onChange="makeMessage()">
-        <OPTION VALUE="0">请选择门牌 </OPTION>
-        <OPTION VALUE="1">01</OPTION>
-        <OPTION VALUE="2">02</OPTION>
-        <OPTION VALUE="3">03</OPTION>
-        <OPTION VALUE="4">04</OPTION>
-        <OPTION VALUE="5">05</OPTION>
-        <OPTION VALUE="6">06</OPTION>
-        <OPTION VALUE="7">07</OPTION>
-        <OPTION VALUE="8">08</OPTION>
-        <OPTION VALUE="9">09</OPTION>
-        <OPTION VALUE="10">10</OPTION>
-    </SELECT>
-</FORM>
-<script language="JavaScript" src="address.js"></script>
-</body>
+    <HEAD>
+        <TITLE> 地址选择 </TITLE>
+        <meta name="author" content="bl">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="stylesheet" type="text/css" href="addresslist.css" />
+    </HEAD>
+    <body onload="document.form1.reset()">
+        <div class="container">
+            <div class="header"><h1 class="header">大庆油田数字电视报修</h1></div>
+            <FORM METHOD=POST ACTION="get_address.py" name="form2" id="form2">
+                <textarea name="message"  rows="2" id="message"></textarea>
+                <br/><div id="usercall">用户电话：
+                    <textarea name="phone"  rows="1" cols="30" id="userphone"></textarea>
+                <button name="resetbutton" type="reset">清除</button>
+                <input type="hidden"  name="servicephone" value="123">
+                <input type="submit" value="发送">
+                </div>
+            </FORM>
+            <FORM  name="form1" id="form1">
+                <SELECT NAME="regional" onChange="getCommunity()" id="regional">
+                    <OPTION VALUE="0">请选择区域 </OPTION>
+                </SELECT>
+                <SELECT NAME="community" onChange="getHouse()" id="community">
+                    <OPTION VALUE="0">请选择小区 </OPTION>
+                </SELECT>
+                <SELECT NAME="house" onChange="makeMessage()" id="house">
+                    <OPTION VALUE="0">请选择楼号 </OPTION>
+                </SELECT>
+                <div class="checkgroup">
+                <SELECT NAME="unit" onChange="makeMessage()">
+                    <OPTION VALUE="0">请选择单元 </OPTION>
+                    <OPTION VALUE="1">一单元</OPTION>
+                    <OPTION VALUE="2">二单元</OPTION>
+                    <OPTION VALUE="3">三单元</OPTION>
+                    <OPTION VALUE="4">四单元 </OPTION>
+                    <OPTION VALUE="5">五单元 </OPTION>
+                    <OPTION VALUE="6">六单元 </OPTION>
+                    <OPTION VALUE="7">七单元</OPTION>
+                    <OPTION VALUE="8">八单元</OPTION>
+                    <OPTION VALUE="9">九单元</OPTION>
+                    <OPTION VALUE="10">十单元 </OPTION>
+                </SELECT>
+                <span id="unitdec" >+0</span>
+                <input type="checkbox" name="unitdec1" onClick="makeMessage()" />
+                <input type="checkbox" name="unitdec2" onClick="makeMessage()"/>
+                <input type="checkbox" name="unitdec3" onClick="makeMessage()"/>
+                </div>
+                <div class="checkgroup">
+                <SELECT NAME="layer" onChange="makeMessage()">
+                    <OPTION VALUE="0">请选择楼层 </OPTION>
+                    <OPTION VALUE="1">一层</OPTION>
+                    <OPTION VALUE="2">二层</OPTION>
+                    <OPTION VALUE="3">三层</OPTION>
+                    <OPTION VALUE="4">四层 </OPTION>
+                    <OPTION VALUE="5">五层 </OPTION>
+                    <OPTION VALUE="6">六层 </OPTION>
+                    <OPTION VALUE="7">七层</OPTION>
+                    <OPTION VALUE="8">八层</OPTION>
+                    <OPTION VALUE="9">九层</OPTION>
+                    <OPTION VALUE="10">十层 </OPTION>
+                </SELECT>
+                <span id="layerdec" >+0</span>
+                <input type="checkbox" name="layerdec1" onClick="makeMessage()"/>
+                <input type="checkbox" name="layerdec2" onClick="makeMessage()"/>
+                <input type="checkbox" name="layerdec3" onClick="makeMessage()"/>
+                </div>
+                <div class="checkgroup">
+                <SELECT NAME="number" onChange="makeMessage()">
+                    <OPTION VALUE="0">请选择门牌 </OPTION>
+                    <OPTION VALUE="1">01</OPTION>
+                    <OPTION VALUE="2">02</OPTION>
+                    <OPTION VALUE="3">03</OPTION>
+                    <OPTION VALUE="4">04</OPTION>
+                    <OPTION VALUE="5">05</OPTION>
+                    <OPTION VALUE="6">06</OPTION>
+                    <OPTION VALUE="7">07</OPTION>
+                    <OPTION VALUE="8">08</OPTION>
+                    <OPTION VALUE="9">09</OPTION>
+                    <OPTION VALUE="10">10</OPTION>
+                </SELECT>
+                <span id="numberdec" >+0</span>
+                <input type="checkbox" name="numberdec1" onClick="makeMessage()"/>
+                <input type="checkbox" name="numberdec2" onClick="makeMessage()"/>
+                <input type="checkbox" name="numberdec3" onClick="makeMessage()"/>
+                </div>
+            </FORM>
+            <script language="JavaScript" src="address.js"></script>
+        </div>
+    </body>
 </html>
