@@ -16,14 +16,14 @@ import pickle
 #
 def outputhtml():
     #写入html文件头
-    htmlhead ='''<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet href="treestyles.css" type="text/css"?>
+    htmlhead ='''<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet href="../treestyles.css" type="text/css"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xml:lang="fi" xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" >
 	<title>大故障用户数量统计</title>
-	<link rel="stylesheet" href="javaver.html_files/treestyles.css" type="text/css"/>
-	<script type="text/javascript" src="javaver.html_files/marktree.js" ></script>
+	<link rel="stylesheet" href="../javaver.html_files/treestyles.css" type="text/css"/>
+	<script type="text/javascript" src="../javaver.html_files/marktree.js" ></script>
 </head>
 
 <body>
