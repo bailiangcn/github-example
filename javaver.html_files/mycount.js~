@@ -1,0 +1,49 @@
+
+function resetAll() {
+     var el = [], 
+        _el = document.getElementsByTagName('*'); 
+    for (var i=0; i<_el.length; i++ ) { 
+       if (_el[i].className == 'mycheck' ) { 
+           _el[i].checked = false; 
+        } 
+   } 
+
+}
+
+
+function countuser()
+{
+	num=0
+	var cb=document.getElementsByName("cb0")
+	for (i=0;i<cb.length; i++)
+	{
+		if (cb[i].checked)
+		{
+			num=num+parseInt(cb[i].value)
+		
+		}
+	}	
+	document.getElementById("countnum").value=num	
+}
+function setcheck(ckname,oksta)
+{
+
+	var cb=document.getElementsByName(ckname)
+	for (i=0;i<cb.length;i++)
+	{
+		cb[i].checked=oksta
+	}
+}
+function checkchang(ck)
+{
+	var numobj=document.getIlementsById("countnum")
+	if ck.checked
+	{
+		numobj.value += ck.value
+	}
+	else
+	{
+		numobj.value -= ck.value
+	}
+
+}
