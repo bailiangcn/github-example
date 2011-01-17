@@ -9,7 +9,7 @@
   <regional>
     <name>八百垧</name>
     <datafile>addresslist_bbs</datafile>
-    <valid>0</valid>
+    <valid>1</valid>
   </regional>
   <regional>
     <name>乘风</name>
@@ -22,7 +22,7 @@
     <valid>1</valid>
   </regional>
   <regional>
-    <name>龙岗</name>
+    <name>龙岗</name>   
     <datafile>addresslist_lg</datafile>
     <valid>1</valid>
   </regional>
@@ -34,11 +34,6 @@
   <regional>
     <name>银浪</name>
     <datafile>addresslist_yl</datafile>
-    <valid>1</valid>
-  </regional>
-  <regional>
-    <name>张铁匠</name>
-    <datafile>addresslist_ztj</datafile>
     <valid>1</valid>
   </regional>
 </address>
