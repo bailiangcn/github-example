@@ -5,7 +5,7 @@
     <community name="奥林国际">
         <house>
             <number>D-01</number>
-            <service>12345</service>
+            <service></service>
         </house>
         <house>
             <number>D-02</number>

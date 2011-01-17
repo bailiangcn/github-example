@@ -3,7 +3,7 @@
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
 # Last Change:  2011年01月15日 19时24分20秒
 """
-构造freemind格式XML文件
+通过xml文件构造地址，用于给各楼进行分工
 """
 __revision__ = '0.1'
 
@@ -24,18 +24,21 @@ def outputhtml():
         <title>楼区派工</title>
         <link rel="stylesheet" href="../javaver.html_files/treestyles.css"
             type="text/css"/>
-        <script type="text/javascript" src="../javaver.html_files/marktree.js" >
+        <script type="text/javascript" 
+        src="../javaver.html_files/marktree.js" >
         </script>
     </head>
     <body>
-        <div class="basetop">'''
+        <div class="basetop"><input type="checkbox" name="showall" />
+        <span id="showall">显示所有组</span>
+    '''
 
-    htmlhead2='''<input type="button" name="reset" value="重置"  onclick="resetAll()" />
-            <input type="text" id="countnum" value="0" size="5" 
-                maxlength="8" readonly="readonly" />
-            <a href="#" onclick="expandAll(document.getElementById('base'))"> 展开</a>
-             - <a href="#" onclick="collapseAll(document.getElementById('base'))">
-                 折叠</a>
+    htmlhead2='''
+            <a href="#" onclick="resetAll()" > 重置</a> - <a href="#" 
+            <a href="#" onclick="expandAll(document.getElementById('base'))" >
+            展开</a> - <a href="#" 
+            onclick="collapseAll(document.getElementById('base'))"
+            > 折叠</a>
         </div>
         <div id="base" class="basetext">
              <ul>
@@ -53,10 +56,14 @@ def outputhtml():
     root = dom0.documentElement
     childs= root.getElementsByTagName("team")
     str1 = '<input type="button"  value="组'
-    str2 = '" serid ="1" onclick="countuser()" />'
+    str2 = '" serid ="'
+    str3 = '" id="serid'
+    str4 = '" onclick="dividework(this)" />'
 
     for child in childs:
-        print "%s%s%s\r\n" % (str1,  child.getAttribute("id").encode("utf-8") , str2)
+        serid = child.getAttribute("id").encode("utf-8")
+        print "%s%s%s%s%s%s%s\r\n" % (str1,  
+                 serid,str2, serid, str3, serid, str4)
     print "%s" % htmlhead2 
 
     
@@ -71,15 +78,18 @@ def outputhtml():
         if child.getElementsByTagName("valid")[0].firstChild.data == "1":
             nodestr = ''
             #如果该区域有效, <valid>==1
-            regionalname = child.getElementsByTagName("name")[0].firstChild.data
-            regionalfilename = child.getElementsByTagName("datafile")[0].firstChild.data
+            regionalname = child.getElementsByTagName("name"
+                    )[0].firstChild.data
+            regionalfilename = child.getElementsByTagName("datafile"
+                    )[0].firstChild.data
             #打开相应区域的xml文件
             filename = u"../addressdata/"+ regionalfilename + u".xml"
             dom2 = parse(REL(filename))
             root2 = dom2.documentElement
             childs2 = root2.getElementsByTagName("community")
 
-            str1 = '\n\n<!--    新的区域开始   -->\n\n <li class="exp" style="" id="B'
+            str1 = ('\n\n<!--    新的区域开始   -->\n\n '
+                    '<li class="exp" style="" id="B')
             str2 = '"> <span style="">'
             str3 = '</span>\n<ul class="sub">\n'
             nodestr += str1 +str(regionnum) + str2 + regionalname.encode(
@@ -90,18 +100,21 @@ def outputhtml():
                 communityname = child2.getAttribute("name")
                 nodestr = ''
 
-                str1 = '\n<!--    新的小区开始   -->\n<li class="exp" style="" id="C'
+                str1 = ('\n<!--    新的小区开始   -->\n'
+                    '<li class="exp" style="" id="C')
                 str2 = '"> \n\t<input type="checkbox" name="c000" value="cb'
                 str3 = ('" onchange="setcheck(this.value,this.checked)" '
                     'class="mycheck" />\n\t<span style="">')
                 str4 = '</span>\n\t<ul class="sub">'
-                nodestr   += str1 +str(communitynum) + str2 + str(communitynum
-                        ) + str3 + communityname.encode('utf-8') + str4
+                nodestr   += ''.join((str1, str(communitynum), str2, 
+                    str(communitynum), str3, communityname.encode('utf-8'), str4))
                 print nodestr
                 houses= child2.getElementsByTagName("house")
                 for house in houses: #取每栋楼
-                    housename  = house.getElementsByTagName("number")[0].firstChild.data
-                    if house.getElementsByTagName("service")[0].childNodes.length >0:
+                    housename  = house.getElementsByTagName("number"
+                            )[0].firstChild.data
+                    if house.getElementsByTagName("service"
+                            )[0].childNodes.length >0:
                         houseservice = house.getElementsByTagName(
                                 "service")[0].firstChild.data
                     else:
@@ -109,16 +122,21 @@ def outputhtml():
 
                     str1 = ('<span style=display:inline-block>'
                             '<input type="checkbox" name="cb' )
-                    str2 =   str(communitynum) + '" value="'    
-                    str3=    ('" class="mycheck" id="build" onchange="checkchang(this)"'
+                    str2 = str(communitynum) + '" value="'    
+                    str3 =  ('" class="mycheck" id="build')
+                    str4 = ('" onchange="checkchang(this)"'
                             '/>\n\t<span style="">')
-                    str4 = '&nbsp;&nbsp;&nbsp;&nbsp;</span></span>\n'
-                    nodestr  = str1 + str2  + houseservice  + str3+ housename + str4
+                    str5 = '</span><span id="house'
+                    str6 = '">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>\n'
+                    nodestr = ''.join((str1,str2,houseservice,
+                        str3,str(housenum), str4, housename, str5, 
+                        str(housenum), str6))
 
                     print nodestr
+                    housenum  += 1 
                 print "</ul> </li>"
 
-            communitynum += 1 
+                communitynum += 1 
             print "</ul> </li>"
     footstr = ' </li> </ul></li> </ul>  </li> </ul> </div> </body> </html>'
     print "%s" % footstr

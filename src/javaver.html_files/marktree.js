@@ -473,8 +473,6 @@ function presstest (evt) {
 
 function resetAll() {
 //清除页面所有已经选择的checkbox
-	var numobj=document.getElementById("countnum");
-	numobj.value=0
      var el = [], 
         _el = document.getElementsByTagName('*'); 
     for (var i=0; i<_el.length; i++ ) { 
@@ -485,7 +483,25 @@ function resetAll() {
 	return true;
 };
 
+function dividework(obj)
+//给各组分派工作
+{
+	var _el = document.getElementsByTagName('*'); 
+    for (var i=0; i<_el.length; i++ ) { 
+       if (_el[i].className == 'mycheck' && _el[i].name !='c000' && _el[i].checked == true ) { 
+           _el[i].value=obj.getAttribute('serid');
+           _textid="house"+_el[i].id.substring(5);
+           _textobj=document.getElementById(_textid);
+           _textobj.textContent="("+_el[i].value+")";
+           _el[i].checked=false;
 
+           
+        } 
+   } 
+	
+	document.getElementById("countnum").value=num;	
+		return true;
+}
 function countuser()
 //计算所有选择的楼的用户数
 {
