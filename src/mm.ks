@@ -30,7 +30,6 @@ def outputhtml():
     <body>
         <div class="basetop">'''
 
-            #<input type="button"  value="组1" serid ="1" onclick="countuser()" />
     htmlhead2='''<input type="button" name="reset" value="重置"  onclick="resetAll()" />
             <input type="text" id="countnum" value="0" size="5" 
                 maxlength="8" readonly="readonly" />
@@ -45,8 +44,20 @@ def outputhtml():
                      <ul class="subexp"> 
     <!--下面由软件自动生成  -->
     '''
-    print "%s%s" % (htmlhead1 , htmlhead2)
+
+    #读入有多少个组xml
+    print "%s" % htmlhead1 
     #打开豫先存储的楼区域信息
+    #RESPONSE['Content-Type']='text/plain'
+    dom0 = parse(REL("../addressdata/service.xml"))
+    root = dom0.documentElement
+    childs= root.getElementsByTagName("team")
+    str1 = '<input type="button"  value="组'
+    str2 = '" serid ="1" onclick="countuser()" />'
+
+    for child in childs:
+        print "%s%s%s\r\n" % (str1,  child.getAttribute("id").encode("utf-8") , str2)
+    print "%s" % htmlhead2 
 
     
     regionnum = 0
@@ -56,7 +67,6 @@ def outputhtml():
     dom1 = parse(REL("../addressdata/area.xml"))
     root = dom1.documentElement
     childs= root.getElementsByTagName("regional")
-    #RESPONSE['Content-Type']='text/plain'
     for child in childs:
         if child.getElementsByTagName("valid")[0].firstChild.data == "1":
             nodestr = ''
@@ -72,7 +82,8 @@ def outputhtml():
             str1 = '\n\n<!--    新的区域开始   -->\n\n <li class="exp" style="" id="B'
             str2 = '"> <span style="">'
             str3 = '</span>\n<ul class="sub">\n'
-            nodestr   += str1 +str(regionnum)  + str2 + regionalname.encode('utf-8') + str3
+            nodestr += str1 +str(regionnum) + str2 + regionalname.encode(
+                    'utf-8') + str3
             regionnum += 1 
             print nodestr
             for child2 in childs2: #取小区
@@ -81,8 +92,8 @@ def outputhtml():
 
                 str1 = '\n<!--    新的小区开始   -->\n<li class="exp" style="" id="C'
                 str2 = '"> \n\t<input type="checkbox" name="c000" value="cb'
-                str3 = ('" onchange="setcheck(this.value,this.checked)" class="mycheck" '
-                        '/>\n\t<span style="">')
+                str3 = ('" onchange="setcheck(this.value,this.checked)" '
+                    'class="mycheck" />\n\t<span style="">')
                 str4 = '</span>\n\t<ul class="sub">'
                 nodestr   += str1 +str(communitynum) + str2 + str(communitynum
                         ) + str3 + communityname.encode('utf-8') + str4
@@ -96,12 +107,13 @@ def outputhtml():
                     else:
                         houseservice = ''
 
-                    str1 = '<input type="checkbox" name="cb'  + str(communitynum)
-                    str2 = ('" value="' ' houseservice ' 
-                            '" class="mycheck" id="build" onchange="checkchang(this)"'
+                    str1 = ('<span style=display:inline-block>'
+                            '<input type="checkbox" name="cb' )
+                    str2 =   str(communitynum) + '" value="'    
+                    str3=    ('" class="mycheck" id="build" onchange="checkchang(this)"'
                             '/>\n\t<span style="">')
-                    str3 = '&nbsp;&nbsp;&nbsp;&nbsp;</span>\n'
-                    nodestr  = str1 + str2 + housename + str3
+                    str4 = '&nbsp;&nbsp;&nbsp;&nbsp;</span></span>\n'
+                    nodestr  = str1 + str2  + houseservice  + str3+ housename + str4
 
                     print nodestr
                 print "</ul> </li>"
