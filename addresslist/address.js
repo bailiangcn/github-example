@@ -153,7 +153,7 @@ function countUnit(){
     if (document.form1.unitdec1.checked){res+=1}
     if (document.form1.unitdec2.checked){res+=1}
     if (document.form1.unitdec3.checked){res+=1}
-    document.all.unitdec.innerHTML="+"+res*10;
+    document.getElementById("unitdec").innerHTML="+"+res*10;
     return res*10;
 }
 //计算层位基数加10
@@ -162,7 +162,7 @@ function countLayer(){
     if (document.form1.layerdec1.checked){res+=1}
     if (document.form1.layerdec2.checked){res+=1}
     if (document.form1.layerdec3.checked){res+=1}
-    document.all.layerdec.innerHTML="+"+res*10;
+    document.getElementById("layerdec").innerHTML="+"+res*10;
     return res*10;
 }
 //计算门牌基数加10
@@ -171,6 +171,6 @@ function countNumber(){
     if (document.form1.numberdec1.checked){res+=1}
     if (document.form1.numberdec2.checked){res+=1}
     if (document.form1.numberdec3.checked){res+=1}
-    document.all.numberdec.innerHTML="+"+res*10;
+    document.getElementById("numberdec").innerHTML="+"+res*10;
     return res*10;
 }
