@@ -1,16 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月15日 19时24分20秒
+# Last Change:  2011年01月18日 17时57分46秒
+
 """
+
 通过xml文件构造地址，用于给各楼进行分工
+函数outputhtml()用于karrigell调用，暂时不支持unittest
+
 """
 __revision__ = '0.1'
 
 from xml.dom.minidom import parse
 
 #
-## 生成用于用户数统计的html 文件
+## 生成用于用户派工的html 文件
 #
 def outputhtml():
     #写入html文件头
@@ -29,7 +33,8 @@ def outputhtml():
         </script>
     </head>
     <body>
-        <div class="basetop"><input id="showall" type="checkbox" name="showall" onclick="showall(this)"/>
+        <div class="basetop"><input id="showall" 
+        type="checkbox" name="showall" onclick="showall(this)"/>
         <span id="showall">显示所有组</span>
     '''
 
@@ -47,11 +52,12 @@ def outputhtml():
                      <ul class="subexp"> 
     <!--下面由软件自动生成  -->
     '''
+    print "%s" % htmlhead1 
 
     #读入有多少个组xml
-    print "%s" % htmlhead1 
-    #打开豫先存储的楼区域信息
+    #打开豫先存储的楼区域信息、服务信息
     #RESPONSE['Content-Type']='text/plain'
+    #处理服务信息
     dom0 = parse(REL("../addressdata/service.xml"))
     root = dom0.documentElement
     childs= root.getElementsByTagName("team")
@@ -60,13 +66,14 @@ def outputhtml():
     str3 = '" id="serid'
     str4 = '" onclick="dividework(this)" />'
 
+    #生成服务组的按钮组
     for child in childs:
         serid = child.getAttribute("id").encode("utf-8")
         print "%s%s%s%s%s%s%s\r\n" % (str1,  
                  serid,str2, serid, str3, serid, str4)
     print "%s" % htmlhead2 
 
-    
+    #读取区域信息，根据文件名读取相应区域的xml文件
     regionnum = 0
     communitynum = 0
     housenum = 0
@@ -146,6 +153,7 @@ def outputhtml():
 #
 ##自动调用测试用例，请输入测试用例名
 #
+
 def testmain():
     import unittest
     import sys
@@ -156,5 +164,5 @@ def testmain():
     suite = unittest.defaultTestLoader.loadTestsFromTestCase(simpleTest)
     result = unittest.TextTestRunner(verbosity=3).run(suite)
 if __name__=='__main__':
-    #testmain()
-    outputhtml()
+    testmain()
+    #outputhtml()
