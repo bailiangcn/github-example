@@ -487,35 +487,40 @@ function dividework(obj)
 //给各组分派工作
 {
 	var _el = document.getElementsByTagName('*'); 
-    for (var i=0; i<_el.length; i++ ) { 
-       if (_el[i].className == 'mycheck' && _el[i].name !='c000' && _el[i].checked == true ) { 
-           _el[i].value=obj.getAttribute('serid');
-           _textid="house"+_el[i].id.substring(5);
-           _textobj=document.getElementById(_textid);
-           _textobj.textContent="("+_el[i].value+")";
-           _el[i].checked=false;
+    var showbool=document.getElementById('showall').checked;
 
-           
+    for (var i=0; i<_el.length; i++ ) { 
+       if (_el[i].className == 'mycheck' && _el[i].checked == true ) { 
+           if ( _el[i].name !='c000'){
+               _el[i].value=obj.getAttribute('serid');
+               _textid="house"+_el[i].id.substring(5);
+               _textobj=document.getElementById(_textid);
+               _textobj.textContent="("+_el[i].value+")";
+               if (!showbool){ //如果不显示所有组
+                   _el[i].parentNode.style.display='none';
+               }
+           }
+           _el[i].checked=false;
         } 
    } 
 	
-	document.getElementById("countnum").value=num;	
 		return true;
 }
-function countuser()
-//计算所有选择的楼的用户数
+function showall(obj)
+//显示所有楼，包括已经分配的
 {
-	var num=0;
-	var el = [], 
-        _el = document.getElementsByTagName('*'); 
+    if (obj.checked){
+        disstr='inline-block';}
+    else{
+        disstr='none';
+    }
+    var _el = document.getElementsByTagName('*'); 
     for (var i=0; i<_el.length; i++ ) { 
-       if (_el[i].className == 'mycheck' && _el[i].name !='c000' && _el[i].checked == true ) { 
-          num=num+parseInt(_el[i].value); 
+       if (_el[i].className == 'housegroup' && _el[i].childNodes[0].value!='') { 
+          _el[i].style.display=disstr;
         } 
    } 
-	
-	document.getElementById("countnum").value=num;	
-		return true;
+    return true;
 };
 
 function setcheck(ckname,oksta)
@@ -527,7 +532,6 @@ function setcheck(ckname,oksta)
 	{
 		cb[i].checked=oksta;
 	}
-	countuser();
 		return true;
 };
 
@@ -535,15 +539,6 @@ function setcheck(ckname,oksta)
 function checkchang(ck)
 //当单个楼改变选择后，重新计算用户数
 {
-	var numobj=document.getElementById("countnum");
-	if (ck.checked)
-	{
-		numobj.value = parseInt(numobj.value)+parseInt(ck.value);
-	}
-	else
-	{
-		numobj.value = parseInt(numobj.value)-parseInt(ck.value);
-	}
 	var cb=document.getElementsByName('c000');
 //如果小区被选中，当前楼被取消，取消小区的选中
 	for (i=0;i<cb.length;i++)

@@ -29,7 +29,7 @@ def outputhtml():
         </script>
     </head>
     <body>
-        <div class="basetop"><input type="checkbox" name="showall" />
+        <div class="basetop"><input id="showall" type="checkbox" name="showall" onclick="showall(this)"/>
         <span id="showall">显示所有组</span>
     '''
 
@@ -120,13 +120,13 @@ def outputhtml():
                     else:
                         houseservice = ''
 
-                    str1 = ('<span style=display:inline-block>'
+                    str1 = ('<span class="housegroup" style=display:inline-block >'
                             '<input type="checkbox" name="cb' )
                     str2 = str(communitynum) + '" value="'    
                     str3 =  ('" class="mycheck" id="build')
-                    str4 = ('" onchange="checkchang(this)"'
+                    str4 = ('" "'
                             '/>\n\t<span style="">')
-                    str5 = '</span><span id="house'
+                    str5 = '</span><span class="houseser" id="house'
                     str6 = '">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>\n'
                     nodestr = ''.join((str1,str2,houseservice,
                         str3,str(housenum), str4, housename, str5, 
