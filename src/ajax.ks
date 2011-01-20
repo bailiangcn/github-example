@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月17日 23时55分42秒
+# Last Change:  2011年01月20日 21时54分06秒
 
 
 """docstring
@@ -10,7 +10,6 @@
 __revision__ = '0.1'
 
 def ajax(num):
-    localnum  = int(num)  + 1
-    print "ajax is ok  "  + str(localnum)
+    print "ajax is ok :%s "  % num
 
 

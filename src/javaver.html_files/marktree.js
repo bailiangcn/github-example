@@ -488,23 +488,62 @@ function dividework(obj)
 {
 	var _el = document.getElementsByTagName('*'); 
     var showbool=document.getElementById('showall').checked;
+    var resultstr='';
 
     for (var i=0; i<_el.length; i++ ) { 
        if (_el[i].className == 'mycheck' && _el[i].checked == true ) { 
            if ( _el[i].name !='c000'){
+               //_el[i].value、serid表示组号
                _el[i].value=obj.getAttribute('serid');
-               _textid="house"+_el[i].id.substring(5);
+               //houseid表示楼号id
+               houseid=_el[i].id.substring(5);
+               regid=_el[i].parentNode.getAttribute('regid');
+               _textid="house"+houseid;
                _textobj=document.getElementById(_textid);
                _textobj.textContent="("+_el[i].value+")";
                if (!showbool){ //如果不显示所有组
                    _el[i].parentNode.style.display='none';
                }
+               //生成xml字符串用于提交服务器
+               if (resultstr==''){
+                   resultstr+='<root>' ;}
+               resultstr += '<house id="'+houseid+
+                   '" regid="'+regid+'" serid="'+_el[i].value+'"/>';
            }
            _el[i].checked=false;
         } 
    } 
-	
-		return true;
+   if (resultstr!=''){
+       resultstr+='</root>';
+       startRequest(resultstr);
+   }
+   return true;
+}
+var xmlHttp;
+function createXMLHttpRequest() {
+    if (window.ActiveXObject) {
+          xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+    } else if (window.XMLHttpRequest) {
+          xmlHttp = new XMLHttpRequest();
+    }
+}
+function startRequest(obj) {
+    createXMLHttpRequest();
+    xmlHttp.onreadystatechange = handleStateChange;   
+    var localurl=document.location.href;
+    alert(localurl);
+    var qurl = "../ajax.ks/ajax?num="+obj;//发送请求到的URL地址
+    xmlHttp.open("GET", qurl, true);
+    xmlHttp.send();
+}
+function handleStateChange() {        
+    if(xmlHttp.readyState == 4) {                
+        if(xmlHttp.status == 200) {
+            res=xmlHttp.responseText;
+            //document.getElementById('count').setAttribute('clickCount') = res;          
+            //document.getElementById('txt').innerHTML = res;          
+         }
+    }
 }
 function showall(obj)
 //显示所有楼，包括已经分配的

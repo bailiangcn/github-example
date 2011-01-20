@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月18日 17时57分46秒
+# Last Change:  2011年01月20日 20时48分18秒
 
 """
 
@@ -76,7 +76,6 @@ def outputhtml():
     #读取区域信息，根据文件名读取相应区域的xml文件
     regionnum = 0
     communitynum = 0
-    housenum = 0
     
     dom1 = parse(REL("../addressdata/area.xml"))
     root = dom1.documentElement
@@ -88,6 +87,8 @@ def outputhtml():
             regionalname = child.getElementsByTagName("name"
                     )[0].firstChild.data
             regionalfilename = child.getElementsByTagName("datafile"
+                    )[0].firstChild.data
+            regionalid = child.getElementsByTagName("id"
                     )[0].firstChild.data
             #打开相应区域的xml文件
             filename = u"../addressdata/"+ regionalfilename + u".xml"
@@ -126,8 +127,11 @@ def outputhtml():
                                 "service")[0].firstChild.data
                     else:
                         houseservice = ''
+                    houseid = house.getElementsByTagName("id"
+                            )[0].firstChild.data
 
-                    str1 = ('<span class="housegroup" style=display:inline-block >'
+                    str0 = '<span class="housegroup" regid="' 
+                    str1 = ('" style=display:inline-block >'
                             '<input type="checkbox" name="cb' )
                     str2 = str(communitynum) + '" value="'    
                     str3 =  ('" class="mycheck" id="build')
@@ -135,12 +139,11 @@ def outputhtml():
                             '/>\n\t<span style="">')
                     str5 = '</span><span class="houseser" id="house'
                     str6 = '">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>\n'
-                    nodestr = ''.join((str1,str2,houseservice,
-                        str3,str(housenum), str4, housename, str5, 
-                        str(housenum), str6))
+                    nodestr = ''.join((str0,regionalid, str1,str2,houseservice,
+                        str3,houseid, str4, housename, str5, 
+                        houseid, str6))
 
                     print nodestr
-                    housenum  += 1 
                 print "</ul> </li>"
 
                 communitynum += 1 
