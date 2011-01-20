@@ -1,46 +1,44 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<!-- 整转区域列表-->
-<address>
+<?xml version="1.0" encoding="utf-8"?><!-- 整转区域列表--><address>
   <regional>
     <name>龙南</name>
     <datafile>addresslist_ln</datafile>
     <valid>1</valid>
-    <id></id>
+    <id>1</id>
   </regional>
   <regional>
     <name>八百垧</name>
     <datafile>addresslist_bbs</datafile>
     <valid>1</valid>
-    <id></id>
+    <id>2</id>
   </regional>
   <regional>
     <name>乘风</name>
     <datafile>addresslist_cf</datafile>
     <valid>1</valid>
-    <id></id>
+    <id>3</id>
   </regional>
   <regional>
     <name>东湖</name>
     <datafile>addresslist_dh</datafile>
     <valid>1</valid>
-    <id></id>
+    <id>4</id>
   </regional>
   <regional>
     <name>龙岗</name>   
     <datafile>addresslist_lg</datafile>
     <valid>1</valid>
-    <id></id>
+    <id>5</id>
   </regional>
   <regional>
     <name>让胡路</name>
     <datafile>addresslist_rhl</datafile>
     <valid>1</valid>
-    <id></id>
+    <id>6</id>
   </regional>
   <regional>
     <name>银浪</name>
     <datafile>addresslist_yl</datafile>
     <valid>1</valid>
-    <id></id>
+    <id>7</id>
   </regional>
 </address>
