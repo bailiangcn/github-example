@@ -14,14 +14,17 @@
             function startRequest(obj) {
                 createXMLHttpRequest();
                 xmlHttp.onreadystatechange = handleStateChange;   
-                spanobj = obj.getAttribute("clickCount")
-                var qurl = "src/ajax.ks/ajax?num="+spanobj;//发送请求到的URL地址
+                xmlstr ='<?xml version="1.0" encoding="utf-8"?><root><house id="1" regid="1" serid="7"/><house id="2" regid="1" serid="5"/></root>';
+                var qurl = "src/ajax.ks/ajax?xmlstr="+xmlstr;//发送请求到的URL地址
                 xmlHttp.open("GET", qurl, true);
+                //xmlHttp.setRequestHeader("Content-Length", qurl.length);
+                //xmlHttp.setRequestHeader("Content-Type","text/xml")
                 xmlHttp.send();
             }
             function handleStateChange() {        
                 if(xmlHttp.readyState == 4) {                
                     if(xmlHttp.status == 200) {
+                        alert(xmlHttp.responseText);
                         res=xmlHttp.responseText;
                         //document.getElementById('count').setAttribute('clickCount') = res;          
                         document.getElementById('txt').innerHTML = res;          
