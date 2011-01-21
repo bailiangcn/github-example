@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月20日 16时10分11秒
+# Last Change:  2011年01月21日 10时41分20秒
 
 
 """初始化xml文件，生成唯一id
@@ -41,6 +41,7 @@ def initarea():
     writer=codecs.lookup('utf-8')[3](f)
     domarea.writexml(writer,encoding='utf-8')
     writer.close 
+    f.close
     return 1
 
 def inithouse(commfilename, housenum):

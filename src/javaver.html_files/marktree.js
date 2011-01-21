@@ -531,8 +531,7 @@ function startRequest(obj) {
     createXMLHttpRequest();
     xmlHttp.onreadystatechange = handleStateChange;   
     var localurl=document.location.href;
-    alert(localurl);
-    var qurl = "../ajax.ks/ajax?num="+obj;//发送请求到的URL地址
+    var qurl = "../ajax.ks/ajax?xmlstr="+obj;//发送请求到的URL地址
     xmlHttp.open("GET", qurl, true);
     xmlHttp.send();
 }
