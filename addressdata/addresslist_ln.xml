@@ -2,361 +2,361 @@
 	<community name="奥林国际">
 		<house>
 			<number>D-01</number>
-			<service>9</service>
+			<service>7</service>
 			<id>1</id>
 		</house>
 		<house>
 			<number>D-02</number>
-			<service>5</service>
+			<service>2</service>
 			<id>2</id>
 		</house>
 		<house>
 			<number>D-03</number>
-			<service/>
+			<service>3</service>
 			<id>3</id>
 		</house>
 		<house>
 			<number>D-04</number>
-			<service/>
+			<service>3</service>
 			<id>4</id>
 		</house>
 		<house>
 			<number>D-05</number>
-			<service/>
+			<service>3</service>
 			<id>5</id>
 		</house>
 		<house>
 			<number>D-06</number>
-			<service/>
+			<service>3</service>
 			<id>6</id>
 		</house>
 		<house>
 			<number>D-08</number>
-			<service/>
+			<service>3</service>
 			<id>7</id>
 		</house>
 		<house>
 			<number>D-09</number>
-			<service/>
+			<service>3</service>
 			<id>8</id>
 		</house>
 		<house>
 			<number>D-10</number>
-			<service/>
+			<service>3</service>
 			<id>9</id>
 		</house>
 		<house>
 			<number>D-12</number>
-			<service/>
+			<service>6</service>
 			<id>10</id>
 		</house>
 		<house>
 			<number>D-13</number>
-			<service/>
+			<service>3</service>
 			<id>11</id>
 		</house>
 		<house>
 			<number>D-14</number>
-			<service/>
+			<service>3</service>
 			<id>12</id>
 		</house>
 		<house>
 			<number>D-15</number>
-			<service/>
+			<service>3</service>
 			<id>13</id>
 		</house>
 		<house>
 			<number>D-19</number>
-			<service/>
+			<service>3</service>
 			<id>14</id>
 		</house>
 		<house>
 			<number>D-21</number>
-			<service/>
+			<service>3</service>
 			<id>15</id>
 		</house>
 		<house>
 			<number>D-22</number>
-			<service/>
+			<service>3</service>
 			<id>16</id>
 		</house>
 		<house>
 			<number>D-23</number>
-			<service/>
+			<service>3</service>
 			<id>17</id>
 		</house>
 		<house>
 			<number>D-26</number>
-			<service/>
+			<service>3</service>
 			<id>18</id>
 		</house>
 		<house>
 			<number>D-28</number>
-			<service/>
+			<service>3</service>
 			<id>19</id>
 		</house>
 		<house>
 			<number>D-29</number>
-			<service/>
+			<service>3</service>
 			<id>20</id>
 		</house>
 		<house>
 			<number>D-30</number>
-			<service/>
+			<service>3</service>
 			<id>21</id>
 		</house>
 		<house>
 			<number>D-32</number>
-			<service/>
+			<service>3</service>
 			<id>22</id>
 		</house>
 		<house>
 			<number>D-33</number>
-			<service/>
+			<service>3</service>
 			<id>23</id>
 		</house>
 		<house>
 			<number>D-46</number>
-			<service/>
+			<service>3</service>
 			<id>24</id>
 		</house>
 		<house>
 			<number>D-47</number>
-			<service/>
+			<service>3</service>
 			<id>25</id>
 		</house>
 		<house>
 			<number>D-48</number>
-			<service/>
+			<service>3</service>
 			<id>26</id>
 		</house>
 		<house>
 			<number>D-49</number>
-			<service/>
+			<service>3</service>
 			<id>27</id>
 		</house>
 		<house>
 			<number>D-50</number>
-			<service/>
+			<service>6</service>
 			<id>28</id>
 		</house>
 		<house>
 			<number>D-51</number>
-			<service/>
+			<service>3</service>
 			<id>29</id>
 		</house>
 		<house>
 			<number>A01</number>
-			<service/>
+			<service>3</service>
 			<id>30</id>
 		</house>
 		<house>
 			<number>A02</number>
-			<service/>
+			<service>3</service>
 			<id>31</id>
 		</house>
 		<house>
 			<number>A03</number>
-			<service/>
+			<service>3</service>
 			<id>32</id>
 		</house>
 		<house>
 			<number>A05</number>
-			<service/>
+			<service>3</service>
 			<id>33</id>
 		</house>
 		<house>
 			<number>A06</number>
-			<service/>
+			<service>3</service>
 			<id>34</id>
 		</house>
 		<house>
 			<number>A07</number>
-			<service/>
+			<service>3</service>
 			<id>35</id>
 		</house>
 		<house>
 			<number>A08</number>
-			<service/>
+			<service>3</service>
 			<id>36</id>
 		</house>
 		<house>
 			<number>A09</number>
-			<service/>
+			<service>3</service>
 			<id>37</id>
 		</house>
 		<house>
 			<number>A10</number>
-			<service/>
+			<service>3</service>
 			<id>38</id>
 		</house>
 		<house>
 			<number>A11</number>
-			<service/>
+			<service>3</service>
 			<id>39</id>
 		</house>
 		<house>
 			<number>A12</number>
-			<service/>
+			<service>3</service>
 			<id>40</id>
 		</house>
 		<house>
 			<number>A13</number>
-			<service/>
+			<service>3</service>
 			<id>41</id>
 		</house>
 		<house>
 			<number>A15</number>
-			<service/>
+			<service>3</service>
 			<id>42</id>
 		</house>
 		<house>
 			<number>A16</number>
-			<service/>
+			<service>3</service>
 			<id>43</id>
 		</house>
 		<house>
 			<number>A17</number>
-			<service/>
+			<service>3</service>
 			<id>44</id>
 		</house>
 		<house>
 			<number>A18</number>
-			<service/>
+			<service>3</service>
 			<id>45</id>
 		</house>
 		<house>
 			<number>A19</number>
-			<service/>
+			<service>3</service>
 			<id>46</id>
 		</house>
 		<house>
 			<number>A20</number>
-			<service/>
+			<service>3</service>
 			<id>47</id>
 		</house>
 		<house>
 			<number>A21</number>
-			<service/>
+			<service>3</service>
 			<id>48</id>
 		</house>
 		<house>
 			<number>A22</number>
-			<service/>
+			<service>3</service>
 			<id>49</id>
 		</house>
 		<house>
 			<number>A23</number>
-			<service/>
+			<service>3</service>
 			<id>50</id>
 		</house>
 		<house>
 			<number>A25</number>
-			<service/>
+			<service>3</service>
 			<id>51</id>
 		</house>
 		<house>
 			<number>A26</number>
-			<service/>
+			<service>3</service>
 			<id>52</id>
 		</house>
 		<house>
 			<number>A27</number>
-			<service/>
+			<service>3</service>
 			<id>53</id>
 		</house>
 	</community>
 	<community name="广厦三期">
 		<house>
 			<number>C6</number>
-			<service/>
+			<service>3</service>
 			<id>54</id>
 		</house>
 		<house>
 			<number>C7</number>
-			<service/>
+			<service>3</service>
 			<id>55</id>
 		</house>
 		<house>
 			<number>C8</number>
-			<service/>
+			<service>3</service>
 			<id>56</id>
 		</house>
 		<house>
 			<number>C9</number>
-			<service/>
+			<service>3</service>
 			<id>57</id>
 		</house>
 		<house>
 			<number>C10</number>
-			<service/>
+			<service>3</service>
 			<id>58</id>
 		</house>
 		<house>
 			<number>C11</number>
-			<service/>
+			<service>3</service>
 			<id>59</id>
 		</house>
 		<house>
 			<number>C12</number>
-			<service/>
+			<service>3</service>
 			<id>60</id>
 		</house>
 		<house>
 			<number>D1</number>
-			<service/>
+			<service>3</service>
 			<id>61</id>
 		</house>
 		<house>
 			<number>D2</number>
-			<service/>
+			<service>3</service>
 			<id>62</id>
 		</house>
 		<house>
 			<number>D3</number>
-			<service/>
+			<service>3</service>
 			<id>63</id>
 		</house>
 		<house>
 			<number>D4</number>
-			<service/>
+			<service>3</service>
 			<id>64</id>
 		</house>
 		<house>
 			<number>D5</number>
-			<service/>
+			<service>3</service>
 			<id>65</id>
 		</house>
 		<house>
 			<number>D6</number>
-			<service/>
+			<service>3</service>
 			<id>66</id>
 		</house>
 		<house>
 			<number>D7</number>
-			<service/>
+			<service>3</service>
 			<id>67</id>
 		</house>
 		<house>
 			<number>D8</number>
-			<service/>
+			<service>3</service>
 			<id>68</id>
 		</house>
 		<house>
 			<number>D9</number>
-			<service/>
+			<service>3</service>
 			<id>69</id>
 		</house>
 		<house>
 			<number>D10</number>
-			<service/>
+			<service>3</service>
 			<id>70</id>
 		</house>
 	</community>
 	<community name="金街">
 		<house>
 			<number>1</number>
-			<service/>
+			<service>4</service>
 			<id>71</id>
 		</house>
 	</community>

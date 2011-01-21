@@ -518,7 +518,7 @@ function dividework(obj)
        startRequest(resultstr);
    }
    return true;
-}
+};
 var xmlHttp;
 function createXMLHttpRequest() {
     if (window.ActiveXObject) {
@@ -526,25 +526,28 @@ function createXMLHttpRequest() {
     } else if (window.XMLHttpRequest) {
           xmlHttp = new XMLHttpRequest();
     }
-}
-function startRequest(obj) {
+};
+function startRequest(xmlstr) {
     createXMLHttpRequest();
     xmlHttp.onreadystatechange = handleStateChange;   
     var localurl=document.location.href;
-    var qurl = ""src/ajax.ks/ajax?xmlstr="+obj;//发送请求到的URL地址
+    //    /divide/mm.ks/src/ajax.ks/ajax?
+    //    /divide/mm.ks/ajax.ks/ajax?xmlstr
+    var qurl = localurl+"../../../ajax.ks/ajax?xmlstr="+xmlstr;
+    //发送请求到的URL地址
     xmlHttp.open("GET", qurl, true);
     xmlHttp.send();
-}
+};
 function handleStateChange() {        
     if(xmlHttp.readyState == 4) {                
         if(xmlHttp.status == 200) {
-            alert(xmlHttp.responseText);
+            //alert(xmlHttp.responseText);
             res=xmlHttp.responseText;
             //document.getElementById('count').setAttribute('clickCount') = res;          
             //document.getElementById('txt').innerHTML = res;          
          }
     }
-}
+};
 function showall(obj)
 //显示所有楼，包括已经分配的
 {
