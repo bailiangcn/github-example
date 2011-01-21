@@ -531,13 +531,14 @@ function startRequest(obj) {
     createXMLHttpRequest();
     xmlHttp.onreadystatechange = handleStateChange;   
     var localurl=document.location.href;
-    var qurl = "../ajax.ks/ajax?xmlstr="+obj;//发送请求到的URL地址
+    var qurl = ""src/ajax.ks/ajax?xmlstr="+obj;//发送请求到的URL地址
     xmlHttp.open("GET", qurl, true);
     xmlHttp.send();
 }
 function handleStateChange() {        
     if(xmlHttp.readyState == 4) {                
         if(xmlHttp.status == 200) {
+            alert(xmlHttp.responseText);
             res=xmlHttp.responseText;
             //document.getElementById('count').setAttribute('clickCount') = res;          
             //document.getElementById('txt').innerHTML = res;          

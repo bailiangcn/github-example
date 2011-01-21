@@ -11,6 +11,7 @@
 
 __revision__ = '0.1'
 
+import os
 import xml.dom.minidom
 import codecs
         
@@ -52,9 +53,7 @@ def ajax(xmlstr):
         '</root>')
     '''
     RESPONSE['Content-Type']='text/plain' 
-    areafilename = REL("../addressdata/area.xml")
-    print areafilename
-    return 
+    areafilename = os.path.abspath(REL("../addressdata/area.xml"))
     domarea=xml.dom.minidom.parse(areafilename)
     regionallist = domarea.documentElement.getElementsByTagName('regional')
 
@@ -70,12 +69,12 @@ def ajax(xmlstr):
             else:
                 houseid = house.getAttribute('id')
                 serid = house.getAttribute('serid')
-                filename = region.getElementsByTagName(
-                        'datafile')[0].firstChild.data
-                regionfilename = ''.join(("../addressdata/"
-                        , filename, ".xml"))
                 housedict.update({houseid:serid})
         if len(housedict)>0: 
+            filename = region.getElementsByTagName(
+                    'datafile')[0].firstChild.data
+            regionfilename = os.path.abspath(REL(''.join(("../addressdata/"
+                    , filename, ".xml"))))
             changeserid(regionfilename, housedict)
 
 

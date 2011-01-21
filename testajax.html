@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
 <html>
     <HEAD>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <TITLE> testajax </TITLE>
         <script language="javascript" type="text/javascript">
             var xmlHttp;
@@ -14,7 +15,7 @@
             function startRequest(obj) {
                 createXMLHttpRequest();
                 xmlHttp.onreadystatechange = handleStateChange;   
-                xmlstr ='<?xml version="1.0" encoding="utf-8"?><root><house id="1" regid="1" serid="7"/><house id="2" regid="1" serid="5"/></root>';
+                xmlstr ='<?xml version="1.0" encoding="utf-8"?><root><house id="1" regid="1" serid="9"/><house id="2" regid="1" serid="5"/></root>';
                 var qurl = "src/ajax.ks/ajax?xmlstr="+xmlstr;//发送请求到的URL地址
                 xmlHttp.open("GET", qurl, true);
                 //xmlHttp.setRequestHeader("Content-Length", qurl.length);
