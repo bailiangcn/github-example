@@ -12,6 +12,7 @@
 __revision__ = '0.1'
 
 from xml.dom.minidom import parse
+from HTMLTags import *
 
 #
 ## 生成用于用户派工的html 文件
@@ -162,7 +163,7 @@ def countservice():
     '''
     #打开service.xml
     serfilename = "../addressdata/service.xml"
-    domser=parse(serfilename)
+    domser=parse(REL(serfilename))
     rootser=domser.documentElement
     serlist=rootser.getElementsByTagName('team')
     #countres为最终的统计结果
@@ -170,48 +171,64 @@ def countservice():
     for team in serlist: #服务组node
         #teamid表示当前处理的服务组号
         teamid = team.getAttribute("id")
-        countres[teamid] ={} 
+        countres.update({teamid:{}})
     #打开区域area.xml
     areafilename = "../addressdata/area.xml"
-    domarea=parse(areafilename)
+    domarea=parse(REL(areafilename))
     rootarea=domarea.documentElement
     reglist=rootarea.getElementsByTagName('regional')
     regdict = {}
     #生成一个包含所有区域的字典
     for reg in reglist: #区域nodes
-        regname = reg.getElementsByTagName("id"
-                )[0].firstChild.data + "numbuild"
-        regdict[regname] = 0
+        regname = reg.getElementsByTagName("name"
+                )[0].firstChild.data 
+        regdict.update({regname:0})
     #根据各组和区域生成空白二维字典
     #{服务组：{区域：统计值}}
     for key in countres:
-        countres[key] = regdict
+        countres[key].update(regdict)
 
     #开始遍历各区、楼号
     for reg in reglist: #区域nodes
-        regname = reg.getElementsByTagName("id"
-                )[0].firstChild.data + "numbuild"
+        regname = reg.getElementsByTagName("name"
+                )[0].firstChild.data 
         communityfilename = reg.getElementsByTagName("datafile"
                 )[0].firstChild.data.encode("utf-8")
         commfilename = ''.join(("../addressdata/", 
             communityfilename, ".xml"))
         #遍历各楼
-        domcomm=parse(commfilename)
+        domcomm=parse(REL(commfilename))
         rootcomm=domcomm.documentElement
         houselist = rootcomm.getElementsByTagName('house')
         for house in houselist:
             houseidlist = house.getElementsByTagName('id')
             houseservicelist = house.getElementsByTagName('service')
             if houseservicelist[0].hasChildNodes():
-                key0 = houseservicelist[0].firstChild.data
-                print "key:%s" % key0
-                print regname
-                num = countres[key0][regname] + 1
-                print num
+                serid = houseservicelist[0].firstChild.data
+                num = countres[serid][regname] + 1
+                countres[serid].update({regname:num})
 
-                countres[key0].update({regname:num})
-        for key, value in countres.items():
-            print "%sgroup:%s" % (key, value)
+        #按照组号对字典排序，生成列表
+        reslist=sorted(countres.items(), key=lambda d: d[0])
+
+        head = HEAD()
+         
+        body = BODY()
+        body <= H1('分工统计')
+         
+        table = TABLE(border="1")
+        table <=TH('分组')
+        for key1,value1 in regdict.items():
+            table <= TH(key1.encode("utf-8"))
+        
+        for key, value in reslist:
+            table <= TR()+TD(key)
+            for key1,value1 in value.items():
+                table <= TD(value1)
+         
+        body <= table
+        print HTML(head+body) 
+        
         return
 
 
