@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月21日 10时41分20秒
+# Last Change:  2011年01月22日 13时27分39秒
 
 
 """初始化xml文件，生成唯一id
@@ -34,7 +34,8 @@ def initarea():
             regid.appendChild(text)
         communityfilename = reg.getElementsByTagName("datafile"
                 )[0].firstChild.data.encode("utf-8")
-        commfilename = ''.join(("../addressdata/", communityfilename, ".xml"))
+        commfilename = ''.join(("../addressdata/", 
+            communityfilename, ".xml"))
         housenum = inithouse(commfilename, housenum)
 
     f=file(areafilename,'w')
