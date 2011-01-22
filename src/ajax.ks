@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月21日 17时14分23秒
+# Last Change:  2011年01月22日 12时26分37秒
 
 
 """
@@ -76,6 +76,7 @@ def ajax(xmlstr):
             regionfilename = os.path.abspath(REL(''.join(("../addressdata/"
                     , filename, ".xml"))))
             changeserid(regionfilename, housedict)
+    print "ok"
 
 
 

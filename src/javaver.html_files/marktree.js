@@ -472,14 +472,39 @@ function presstest (evt) {
 
 
 function resetAll() {
-//清除页面所有已经选择的checkbox
+//清除页面所有已经选择的checkbox的服务组号
      var el = [], 
         _el = document.getElementsByTagName('*'); 
+    var showbool=document.getElementById('showall').checked;
+    var resultstr='';
+
     for (var i=0; i<_el.length; i++ ) { 
-       if (_el[i].className == 'mycheck' ) { 
+       if (_el[i].className == 'mycheck' && _el[i].checked == true ) { 
+           if ( _el[i].name !='c000'){
+               //_el[i].value、serid表示组号
+               _el[i].value='';
+               //houseid表示楼号id
+               houseid=_el[i].id.substring(5);
+               regid=_el[i].parentNode.getAttribute('regid');
+               _textid="house"+houseid;
+               _textobj=document.getElementById(_textid);
+               _textobj.textContent="";
+               if (!showbool){ //如果不显示所有组
+                   _el[i].parentNode.style.display='inline-block';
+               }
+               //生成xml字符串用于提交服务器
+               if (resultstr==''){
+                   resultstr+='<root>' ;}
+               resultstr += '<house id="'+houseid+
+                   '" regid="'+regid+'" serid="'+_el[i].value+'"/>';
+           }
            _el[i].checked = false; 
         } 
    } 
+   if (resultstr!=''){
+       resultstr+='</root>';
+       startRequest(resultstr);
+   }
 	return true;
 };
 
@@ -531,8 +556,9 @@ function startRequest(xmlstr) {
     createXMLHttpRequest();
     xmlHttp.onreadystatechange = handleStateChange;   
     var localurl=document.location.href;
-    //    /divide/mm.ks/src/ajax.ks/ajax?
-    //    /divide/mm.ks/ajax.ks/ajax?xmlstr
+    //如果末尾有#去掉
+    if (localurl.charAt(localurl.length-1)=="#"){
+    localurl=localurl.substring(0,localurl.length-1)}
     var qurl = localurl+"../../../ajax.ks/ajax?xmlstr="+xmlstr;
     //发送请求到的URL地址
     xmlHttp.open("GET", qurl, true);
@@ -541,10 +567,11 @@ function startRequest(xmlstr) {
 function handleStateChange() {        
     if(xmlHttp.readyState == 4) {                
         if(xmlHttp.status == 200) {
-            //alert(xmlHttp.responseText);
             res=xmlHttp.responseText;
-            //document.getElementById('count').setAttribute('clickCount') = res;          
-            //document.getElementById('txt').innerHTML = res;          
+            //alert(res);
+            if (res!="ok\n"){
+                alert("操作不成功,请刷新页面");
+            }
          }
     }
 };

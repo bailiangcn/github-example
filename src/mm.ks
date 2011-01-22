@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月22日 10时40分52秒
+# Last Change:  2011年01月22日 12时34分54秒
 
 """
 
@@ -39,6 +39,7 @@ def outputhtml():
     '''
 
     htmlhead2='''
+            <input type="button" value="清空组" onclick="resetAll()">
             <a href="#" onclick="resetAll()" > 重置</a> - <a href="#" 
             <a href="#" onclick="expandAll(document.getElementById('base'))" >
             展开</a> - <a href="#" 
@@ -128,7 +129,7 @@ def outputhtml():
                         houseservicestr = ''.join(("(", houseservice, ")"))
                     else:
                         houseservice = ''
-                        houseservicestr ='&nbsp;&nbsp;&nbsp;&nbsp;' 
+                        houseservicestr ='' 
                     houseid = house.getElementsByTagName("id"
                             )[0].firstChild.data
 
