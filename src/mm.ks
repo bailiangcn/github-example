@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月22日 12时34分54秒
+# Last Change:  2011年01月22日 12时54分03秒
 
 """
 
@@ -40,7 +40,7 @@ def outputhtml():
 
     htmlhead2='''
             <input type="button" value="清空组" onclick="resetAll()">
-            <a href="#" onclick="resetAll()" > 重置</a> - <a href="#" 
+            <a href="#" onclick="resetCheck()" > 重置</a> - <a href="#" 
             <a href="#" onclick="expandAll(document.getElementById('base'))" >
             展开</a> - <a href="#" 
             onclick="collapseAll(document.getElementById('base'))"

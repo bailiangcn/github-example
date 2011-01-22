@@ -507,6 +507,17 @@ function resetAll() {
    }
 	return true;
 };
+function resetCheck() {
+//清除页面所有已经选择的checkbox的选择
+     var el = [], 
+        _el = document.getElementsByTagName('*'); 
+    for (var i=0; i<_el.length; i++ ) { 
+       if (_el[i].className == 'mycheck' ) { 
+           _el[i].checked = false; 
+        } 
+   } 
+	return true;
+};
 
 function dividework(obj)
 //给各组分派工作
