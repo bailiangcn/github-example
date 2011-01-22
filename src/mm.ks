@@ -42,6 +42,7 @@ def outputhtml():
 
     htmlhead2='''
             <input type="button" value="清空组" onclick="resetAll()">
+            <input type="button" value="统计" onclick="countSer()">
             <a href="#" onclick="resetCheck()" > 重置</a> - <a href="#" 
             <a href="#" onclick="expandAll(document.getElementById('base'))" >
             展开</a> - <a href="#" 
@@ -208,25 +209,32 @@ def countservice():
                 serid = houseservicelist[0].firstChild.data
                 num = countres[serid][regname] + 1
                 countres[serid].update({regname:num})
+        
+    #文字格式输出
+    #for key, value in countres.items():
+    #    print "<br/>%s group:" % key
+    #    for key1,value1 in countres[key].items():
+    #        print "%s :%s" % (key1.encode("utf-8"),value1),
 
-        #按照组号对字典排序，生成列表
-        reslist=sorted(countres.items(), key=lambda d: d[0])
 
-        #输出页面
-        head = HEAD()
-        body = BODY()
-        body <= H1('分工统计')
-        table = TABLE(border="1")
-        table <=TH('分组')
-        for key in reslist[0][1].keys():
-            table <= TH(key.encode("utf-8"))
-        for key, value in reslist:
-            table <= TR()+TD(key)
-            for value1 in value.items():
-                table <= TD(value1)
-        body <= table
-        print HTML(head+body) 
-        return
+    #按照组号对字典排序，生成列表
+    reslist=sorted(countres.items(), key=lambda d: d[0])
+
+    #输出页面
+    head = HEAD()
+    body = BODY()
+    body <= H1('分工统计')
+    table = TABLE(border="1")
+    table <=TH('分组')
+    for key in reslist[0][1].keys():
+        table <= TH(key.encode("utf-8"))
+    for key, value in reslist:
+        table <= TR()+TD(key)
+        for key1,value1 in value.items():
+            table <= TD(value1)
+    body <= table
+    print HTML(head+body) 
+    return
 
 
     

@@ -470,6 +470,10 @@ function presstest (evt) {
 };
 // my local function 
 
+function countSer(){
+//跳转到统计页面
+    window.open('../mm.ks/countservice/');
+}
 
 function resetAll() {
 //清除页面所有已经选择的checkbox的服务组号
