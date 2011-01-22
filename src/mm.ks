@@ -211,24 +211,20 @@ def countservice():
         #按照组号对字典排序，生成列表
         reslist=sorted(countres.items(), key=lambda d: d[0])
 
+        #输出页面
         head = HEAD()
-         
         body = BODY()
         body <= H1('分工统计')
-         
         table = TABLE(border="1")
         table <=TH('分组')
-        for key1,value1 in regdict.items():
-            table <= TH(key1.encode("utf-8"))
-        
+        for key in reslist[0][1].keys():
+            table <= TH(key.encode("utf-8"))
         for key, value in reslist:
             table <= TR()+TD(key)
-            for key1,value1 in value.items():
+            for value1 in value.items():
                 table <= TD(value1)
-         
         body <= table
         print HTML(head+body) 
-        
         return
 
 
