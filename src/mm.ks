@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月20日 20时48分18秒
+# Last Change:  2011年01月22日 10时40分52秒
 
 """
 
@@ -125,8 +125,10 @@ def outputhtml():
                             )[0].childNodes.length >0:
                         houseservice = house.getElementsByTagName(
                                 "service")[0].firstChild.data
+                        houseservicestr = ''.join(("(", houseservice, ")"))
                     else:
                         houseservice = ''
+                        houseservicestr ='&nbsp;&nbsp;&nbsp;&nbsp;' 
                     houseid = house.getElementsByTagName("id"
                             )[0].firstChild.data
 
@@ -138,10 +140,11 @@ def outputhtml():
                     str4 = ('" "'
                             '/>\n\t<span style="">')
                     str5 = '</span><span class="houseser" id="house'
-                    str6 = '">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>\n'
+                    str6 = '">'
+                    str7 = '</span></span>\n'
                     nodestr = ''.join((str0,regionalid, str1,str2,houseservice,
                         str3,houseid, str4, housename, str5, 
-                        houseid, str6))
+                        houseid, str6, houseservicestr,  str7))
 
                     print nodestr
                 print "</ul> </li>"
