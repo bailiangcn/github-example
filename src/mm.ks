@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月22日 12时54分03秒
+# Last Change:  2011年01月22日 13时19分04秒
 
 """
 
@@ -157,6 +157,9 @@ def outputhtml():
 
     return
 
+def countservice():
+    #统计各组的楼房分派情况
+    pass
 #
 ##自动调用测试用例，请输入测试用例名
 #
