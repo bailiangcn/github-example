@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月23日 11时52分10秒
+# Last Change:  2011年01月23日 13时41分06秒
 
 
 """
@@ -14,7 +14,41 @@ __revision__ = '0.1'
 import os
 import xml.dom.minidom
 import codecs
+initaddress= Import("initaddress")
         
+def initser():
+    '''
+    把所有楼房的服务号置空
+    '''
+    areafilename = os.path.abspath(REL("../addressdata/area.xml"))
+    domarea=xml.dom.minidom.parse(areafilename)
+    regionallist = domarea.documentElement.getElementsByTagName('regional')
+    for region in regionallist:
+        filename = region.getElementsByTagName(
+                'datafile')[0].firstChild.data
+        regionfilename = os.path.abspath(REL(''.join(("../addressdata/"
+                , filename, ".xml"))))
+        #遍历各个文件
+        domcomm=xml.dom.minidom.parse(regionfilename)
+        rootcomm=domcomm.documentElement
+        houseserlist = rootcomm.getElementsByTagName('service')
+        #删除所有service文本元素
+        for eachser in houseserlist:
+            for node in eachser.childNodes:
+                eachser.removeChild(eachser.firstChild)
+
+        #保存xml结果到文件
+        #遍历nodes，删除所有空格元素
+        domcopy = domcomm.cloneNode(True)
+        initaddress.clearspace(domcopy, domcopy.documentElement)
+        initaddress.Indent(domcopy, domcopy.documentElement)
+        f=file(regionfilename,'w')
+        writer=codecs.lookup('utf-8')[3](f)
+        domcopy.writexml(writer,encoding='utf-8')
+        writer.close 
+
+    print "ok"
+
 def changeserid(filename, housedict):
     '''
     根据输入的字典对{houseid:serid}在filename文件
@@ -46,6 +80,7 @@ def changeserid(filename, housedict):
 
 def ajax(xmlstr):
     '''
+        修改各个楼号的服务组id
         示例xml输入
         xmlstr =('<root>' 
         '<house id="1" regid="1" serid="1"/>'

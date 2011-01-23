@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月22日 17时09分09秒
+# Last Change:  2011年01月23日 12时29分34秒
 
 """
 
@@ -48,6 +48,7 @@ def outputhtml():
             展开</a> - <a href="#" 
             onclick="collapseAll(document.getElementById('base'))"
             > 折叠</a>
+            <input type="button" value="清空所有组" onclick="initAll()">
         </div>
         <div id="base" class="basetext">
              <ul>

@@ -522,6 +522,20 @@ function resetCheck() {
    } 
 	return true;
 };
+function initAll() {
+//清除所有服务组信息
+    resetCheck()
+    createXMLHttpRequest();
+    xmlHttp.onreadystatechange = handleStateChange;   
+    var localurl=document.location.href;
+    //如果末尾有#去掉
+    if (localurl.charAt(localurl.length-1)=="#"){
+    localurl=localurl.substring(0,localurl.length-1)}
+    var qur= localurl+"../../../ajax.ks/initser/";
+    //发送请求到的URL地址
+    xmlHttp.open("GET", qur, true);
+    xmlHttp.send();
+};
 
 function dividework(obj)
 //给各组分派工作
@@ -585,9 +599,9 @@ function handleStateChange() {
     if(xmlHttp.readyState == 4) {                
         if(xmlHttp.status == 200) {
             res=xmlHttp.responseText;
-            //alert(res);
             if (res!="ok\n"){
                 alert("操作不成功,请刷新页面");
+                alert(res);
             }
          }
     }
