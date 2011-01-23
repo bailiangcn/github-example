@@ -13,7 +13,7 @@ __revision__ = '0.1'
 
 from xml.dom.minidom import parse
 from HTMLTags import *
-
+from copy import deepcopy
 #
 ## 生成用于用户派工的html 文件
 #
@@ -163,8 +163,11 @@ def outputhtml():
 
 def countservice():
     '''统计各组的楼房分派情况
+    countres保存最后结果，格式为
+    {服务组号:[{区域名称:[{小区名称:该小区统计楼数},
+            区域统计楼数]},服务组统计楼数]}
     '''
-    #打开service.xml
+        
     serfilename = "../addressdata/service.xml"
     domser=parse(REL(serfilename))
     rootser=domser.documentElement
@@ -174,26 +177,32 @@ def countservice():
     for team in serlist: #服务组node
         #teamid表示当前处理的服务组号
         teamid = team.getAttribute("id")
-        countres.update({teamid:{}})
+        countres.update(deepcopy({teamid:[{},0]}))
+
+
     #打开区域area.xml
     areafilename = "../addressdata/area.xml"
     domarea=parse(REL(areafilename))
     rootarea=domarea.documentElement
     reglist=rootarea.getElementsByTagName('regional')
     regdict = {}
+
+
     #生成一个包含所有区域的字典
     for reg in reglist: #区域nodes
         regname = reg.getElementsByTagName("name"
                 )[0].firstChild.data 
-        regdict.update({regname:0})
+        regdict.update(deepcopy({regname:[{},0]}))
+
     #根据各组和区域生成空白二维字典
     #{服务组：{区域：统计值}}
     for key in countres:
-        countres[key].update(regdict)
+        countres[key][0].update(deepcopy(regdict))
+
 
     #开始遍历各区、楼号
-    for reg in reglist: #区域nodes
-        regname = reg.getElementsByTagName("name"
+    for reg  in  reglist: #区域nodes
+        regname0 = reg.getElementsByTagName("name"
                 )[0].firstChild.data 
         communityfilename = reg.getElementsByTagName("datafile"
                 )[0].firstChild.data.encode("utf-8")
@@ -202,39 +211,37 @@ def countservice():
         #遍历各楼
         domcomm=parse(REL(commfilename))
         rootcomm=domcomm.documentElement
-        houselist = rootcomm.getElementsByTagName('house')
-        for house in houselist:
-            houseidlist = house.getElementsByTagName('id')
-            houseservicelist = house.getElementsByTagName('service')
-            if houseservicelist[0].hasChildNodes():
-                serid = houseservicelist[0].firstChild.data
-                num = countres[serid][regname] + 1
-                countres[serid].update({regname:num})
-        
-    #文字格式输出
-    #for key, value in countres.items():
-    #    print "<br/>%s group:" % key
-    #    for key1,value1 in countres[key].items():
-    #        print "%s :%s" % (key1.encode("utf-8"),value1),
-
+        commlist = rootcomm.getElementsByTagName('community')
+        for comm  in  commlist:
+            commname=comm.getAttribute('name')
+            for key in countres:
+                countres[key][0][regname0][0][commname] = 0
+            houselist = comm.getElementsByTagName('house')
+            for house in houselist:
+                houseservicelist = house.getElementsByTagName('service')
+                if houseservicelist[0].hasChildNodes():
+                    serid = houseservicelist[0].firstChild.data
+                    #服务组统计数
+                    countres[serid][1]  += 1 
+                    #区域统计数
+                    countres[serid][0][regname0][1]  += 1 
+                    #小区统计数
+                    countres[serid][0][regname0][0][commname]  += 1 
 
     #按照组号对字典排序，生成列表
     reslist=sorted(countres.items(), key=lambda d: d[0])
+    for eachser in reslist:
+        print "<p>第%s组:%s<p>" % (eachser[0].encode("utf-8"), eachser[1][1])
+        for key in eachser[1][0]:
+            number0 = eachser[1][0][key][1]
+            if number0>0:
+                print "<p>&nbsp&nbsp&nbsp&nbsp%s:%s (" % (key,number0)
+                for key1 in eachser[1][0][key][0]:
+                    number =  eachser[1][0][key][0][key1]
+                    if number >0:
+                        print "  %s:%s " % ( key1,number) 
+                print ")"
 
-    #输出页面
-    head = HEAD()
-    body = BODY()
-    body <= H1('分工统计')
-    table = TABLE(border="1")
-    table <=TH('分组')
-    for key in reslist[0][1].keys():
-        table <= TH(key.encode("utf-8"))
-    for key, value in reslist:
-        table <= TR()+TD(key)
-        for key1,value1 in value.items():
-            table <= TD(value1)
-    body <= table
-    print HTML(head+body) 
     return
 
 

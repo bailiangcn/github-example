@@ -535,6 +535,7 @@ function initAll() {
     //发送请求到的URL地址
     xmlHttp.open("GET", qur, true);
     xmlHttp.send();
+    location.reload(true);
 };
 
 function dividework(obj)
