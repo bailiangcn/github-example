@@ -574,10 +574,12 @@ function startRequest(xmlstr) {
     //如果末尾有#去掉
     if (localurl.charAt(localurl.length-1)=="#"){
     localurl=localurl.substring(0,localurl.length-1)}
-    var qurl = localurl+"../../../ajax.ks/ajax?xmlstr="+xmlstr;
+    var postqur= localurl+"../../../ajax.ks/ajax/";
+    var poststr= "xmlstr="+encodeURIComponent(xmlstr);
     //发送请求到的URL地址
-    xmlHttp.open("GET", qurl, true);
-    xmlHttp.send();
+    xmlHttp.open("POST", postqur, true);
+    xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xmlHttp.send(poststr);
 };
 function handleStateChange() {        
     if(xmlHttp.readyState == 4) {                

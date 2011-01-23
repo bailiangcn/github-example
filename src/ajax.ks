@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月22日 12时26分37秒
+# Last Change:  2011年01月23日 11时52分10秒
 
 
 """
@@ -52,7 +52,7 @@ def ajax(xmlstr):
         '<house id="4" regid="3" serid="1"/>'
         '</root>')
     '''
-    RESPONSE['Content-Type']='text/plain' 
+    #RESPONSE['Content-Type']='text/plain' 
     areafilename = os.path.abspath(REL("../addressdata/area.xml"))
     domarea=xml.dom.minidom.parse(areafilename)
     regionallist = domarea.documentElement.getElementsByTagName('regional')
