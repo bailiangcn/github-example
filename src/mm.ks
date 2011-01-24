@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月23日 12时29分34秒
+# Last Change:  2011年01月24日 09时34分41秒
 
 """
 
@@ -164,7 +164,7 @@ def outputhtml():
 def countservice():
     '''统计各组的楼房分派情况
     countres保存最后结果，格式为
-    {服务组号:[{区域名称:[{小区名称:该小区统计楼数},
+    {服务组号:[{区域名称:[{小区名称:[该小区统计楼数,楼号,楼号,...]},
             区域统计楼数]},服务组统计楼数]}
     '''
         
@@ -215,18 +215,23 @@ def countservice():
         for comm  in  commlist:
             commname=comm.getAttribute('name')
             for key in countres:
-                countres[key][0][regname0][0][commname] = 0
+                countres[key][0][regname0][0][commname] = [0]
             houselist = comm.getElementsByTagName('house')
             for house in houselist:
                 houseservicelist = house.getElementsByTagName('service')
+                housenamelist = house.getElementsByTagName('number')
                 if houseservicelist[0].hasChildNodes():
                     serid = houseservicelist[0].firstChild.data
+                    housename = housenamelist[0].firstChild.data
                     #服务组统计数
                     countres[serid][1]  += 1 
                     #区域统计数
                     countres[serid][0][regname0][1]  += 1 
                     #小区统计数
-                    countres[serid][0][regname0][0][commname]  += 1 
+                    countres[serid][0][regname0][0][commname][0]  += 1 
+                    #楼号
+                    countres[serid][0][regname0][0][commname].append(housename)  
+                    
 
     #按照组号对字典排序，生成列表
     reslist=sorted(countres.items(), key=lambda d: d[0])
@@ -235,12 +240,18 @@ def countservice():
         for key in eachser[1][0]:
             number0 = eachser[1][0][key][1]
             if number0>0:
-                print "<p>&nbsp&nbsp&nbsp&nbsp%s:%s (" % (key,number0)
+                print "<p>&nbsp&nbsp&nbsp&nbsp%s:%s " % (key,number0)
                 for key1 in eachser[1][0][key][0]:
-                    number =  eachser[1][0][key][0][key1]
+                    number =  eachser[1][0][key][0][key1][0]
                     if number >0:
-                        print "  %s:%s " % ( key1,number) 
-                print ")"
+                        print " <p>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp %s:%s" % (
+                                key1,number) 
+                        print ("<p>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+                                "&nbsp&nbsp&nbsp&nbsp&nbsp(")
+                        for i in range(number):
+                            print "%s" % eachser[1][0][key][0][key1][i + 1]
+                        print ")"
+
 
     return
 
