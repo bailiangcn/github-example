@@ -113,7 +113,47 @@ def ajax(xmlstr):
             changeserid(regionfilename, housedict)
     print "ok"
 
+def findser(areaid, houseid):
+    '''
+    查找区域、楼号的服务信息，返回服务电话
+    '''
+    #打开区域文件
+    areafilename = "../addressdata/area.xml"
+    domarea=xml.dom.minidom.parse(REL(areafilename))
+    rootarea=domarea.documentElement
+    idlist=rootarea.getElementsByTagName('id')
+    #比对id
+    for id in idlist:
+        if id.firstChild.data  == areaid:
+            filename= ''.join((u"../addressdata/", 
+            id.parentNode.getElementsByTagName("datafile"
+                )[ 0].firstChild.data, u".xml"))
+    #打开小区文件
+    domcomm=xml.dom.minidom.parse(REL(filename))
+    rootcomm=domcomm.documentElement
+    idlist = rootcomm.getElementsByTagName('id')
+    for id  in  idlist:
+        if id.firstChild.data  == houseid:
+            serlist=id.parentNode.getElementsByTagName("service")
+            serid = ''
+            if serlist[0].hasChildNodes():
+                serid = serlist[0].firstChild.data
+    #serid为该楼的服务组id, 空白为未设置
+    #打开服务文件
+    serfilename = "../addressdata/service.xml"
+    domser=xml.dom.minidom.parse(REL(serfilename))
+    rootser=domser.documentElement
+    if serid == '': 
+        serlist=rootser.getElementsByTagName('defaultteam')
+        phone = serlist[0].getAttribute("phone")
+    else:
+        serlist=rootser.getElementsByTagName('team')
+        for ser in serlist:
+            if ser.getAttribute("id") == serid:
+                phone  = ser.getAttribute("phone")
+                break
 
+    print "%s:%s" % (serid, phone)
 
 #
 ##自动调用测试用例，请输入测试用例名

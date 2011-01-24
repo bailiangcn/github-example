@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <root>
-    <defaultteam phone="13339505100" id="0" leader="1">
+    <defaultteam phone="1234567" id="0" leader="1">
         <!--team id是0的为默认组 -->
         <man>
             <name>白亮</name>
@@ -13,7 +13,7 @@
             <id>2</id>
         </man>
     </defaultteam>
-    <team phone="13339505100" id="1" leader="1">
+    <team phone="13339505101" id="1" leader="1">
         <man>
             <name>白亮</name>
             <phone>13339505100</phone>
@@ -25,7 +25,7 @@
             <id>2</id>
         </man>
     </team>
-    <team phone="13339505101" id="2" leader="1">
+    <team phone="13339505001" id="2" leader="1">
         <man>
             <name>白亮</name>
             <phone>13339505100</phone>

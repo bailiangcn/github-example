@@ -7,47 +7,47 @@
 		</house>
 		<house>
 			<number>D-02</number>
-			<service/>
+			<service>3</service>
 			<id>2</id>
 		</house>
 		<house>
 			<number>D-03</number>
-			<service/>
+			<service>3</service>
 			<id>3</id>
 		</house>
 		<house>
 			<number>D-04</number>
-			<service/>
+			<service>3</service>
 			<id>4</id>
 		</house>
 		<house>
 			<number>D-05</number>
-			<service/>
+			<service>4</service>
 			<id>5</id>
 		</house>
 		<house>
 			<number>D-06</number>
-			<service/>
+			<service>4</service>
 			<id>6</id>
 		</house>
 		<house>
 			<number>D-08</number>
-			<service/>
+			<service>4</service>
 			<id>7</id>
 		</house>
 		<house>
 			<number>D-09</number>
-			<service/>
+			<service>5</service>
 			<id>8</id>
 		</house>
 		<house>
 			<number>D-10</number>
-			<service/>
+			<service>5</service>
 			<id>9</id>
 		</house>
 		<house>
 			<number>D-12</number>
-			<service/>
+			<service>5</service>
 			<id>10</id>
 		</house>
 		<house>

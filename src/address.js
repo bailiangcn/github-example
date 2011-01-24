@@ -8,6 +8,8 @@ else {
     // code for IE6, IE5
     xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
 }
+//读取服务组信息
+
 xmlhttp.open("GET","./addressdata/area.xml",false);
 xmlhttp.send();
 xmlDoc=xmlhttp.responseXML;
@@ -20,6 +22,8 @@ for (i=0;i<x.length;i++) {
             .childNodes[0].nodeValue; 
         option.value = x[i].getElementsByTagName("datafile")[0]
             .childNodes[0].nodeValue;
+        option.id = "reg"+x[i].getElementsByTagName("id")[0]
+            .childNodes[0].nodeValue;
         document.form1.regional.options.add(option);	  
     }
 }
@@ -28,7 +32,9 @@ for (i=0;i<x.length;i++) {
 //生成小区的选择菜单
 function getCommunity(){
     //清空地址信息
-    document.form2.message.value=''
+    document.form2.message.value='';
+    document.form2.server.value='';
+    document.getElementById('servicename').innerHTML=""; 
     //获得区域下拉框的对象
      var sltregional=document.form1.regional;
     //获得小区下拉框的对象
@@ -38,30 +44,33 @@ function getCommunity(){
     //清空小区、楼号下拉框，仅留提示选项
     sltcommunity.length=1;
     slthouse.length=1;
-    //取得小区xml文件名，生成小区选择列表
-    var xmlfilename="./addressdata/"+
-        sltregional.options[sltregional.selectedIndex].value+".xml";
-    if (window.XMLHttpRequest) {
-        // code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp=new XMLHttpRequest();
-    }
-    else {
-        // code for IE6, IE5
-        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.open("GET",xmlfilename,false);
-    xmlhttp.send();
-    xmlDoc=xmlhttp.responseXML;
-    var x=xmlDoc.getElementsByTagName("community");
-						  
-    //生成小区的选择菜单
-    for (i=0;i<x.length;i++) {
-        if (x[i].nodeType==1){
-            txt=x[i].getAttribute("name");
-            var option=document.createElement("option");
-            option.text = txt; 
-            option.value = txt;
-            sltcommunity.options.add(option);	  
+    //如果选择了有效区域
+    if ( sltregional.selectedIndex >0){
+        //取得小区xml文件名，生成小区选择列表
+        var xmlfilename="./addressdata/"+
+            sltregional.options[sltregional.selectedIndex].value+".xml";
+        if (window.XMLHttpRequest) {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp=new XMLHttpRequest();
+        }
+        else {
+            // code for IE6, IE5
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.open("GET",xmlfilename,false);
+        xmlhttp.send();
+        xmlDoc=xmlhttp.responseXML;
+        var x=xmlDoc.getElementsByTagName("community");
+                              
+        //生成小区的选择菜单
+        for (i=0;i<x.length;i++) {
+            if (x[i].nodeType==1){
+                txt=x[i].getAttribute("name");
+                var option=document.createElement("option");
+                option.text = txt; 
+                option.value = txt;
+                sltcommunity.options.add(option);	  
+            }
         }
     }
     makeMessage();
@@ -71,6 +80,8 @@ function getCommunity(){
 function getHouse(){
     //清空地址信息
     document.form2.message.value=''
+    document.form2.server.value='';
+    document.getElementById('servicename').innerHTML=""; 
     //获得区域下拉框的对象
     var sltregional=document.form1.regional;
     //获得小区下拉框的对象
@@ -79,45 +90,49 @@ function getHouse(){
     var slthouse=document.form1.house;
     //清空楼号下拉框，仅留提示选项
     slthouse.length=1;
-    //取得小区xml文件名，生成小区选择列表
-    var xmlfilename="./addressdata/"+sltregional.
-        options[sltregional.selectedIndex].value+".xml";
-    if (window.XMLHttpRequest) {
-        // code for IE7+, Firefox, Chrome, Opera, Safari
-        xmlhttp=new XMLHttpRequest();
-    }
-    else {
-        // code for IE6, IE5
-        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    xmlhttp.open("GET",xmlfilename,false);
-    xmlhttp.send();
-    xmlDoc=xmlhttp.responseXML;
-    //取得选择的小区名称,生成楼号列表
-    var x=xmlDoc.getElementsByTagName("community")
-        [sltcommunity.selectedIndex-1].childNodes;
-    var y;
-    var txt="";
-    var service="";
-    //生成楼号的选择菜单
-    for (i=0;i<x.length;i++) {
-        if (x[i].nodeType==1){
-            y=x[i].childNodes;
-            for (j=0;j<y.length;j++){
-                if (y[j].nodeType==1){
-                    switch (y[j].nodeName){
-                        case "number":
-                            txt=x[i].childNodes[j].textContent;
-                            break;
-                        case "service":
-                            service=x[i].childNodes[j].textContent;
-                    } 
+    if ( sltcommunity.selectedIndex >0){
+        //取得小区xml文件名，生成小区选择列表
+        var xmlfilename="./addressdata/"+sltregional.
+            options[sltregional.selectedIndex].value+".xml";
+        var regid=sltregional.options[sltregional.selectedIndex].id;
+        if (window.XMLHttpRequest) {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp=new XMLHttpRequest();
+        }
+        else {
+            // code for IE6, IE5
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.open("GET",xmlfilename,false);
+        xmlhttp.send();
+        xmlDoc=xmlhttp.responseXML;
+        //取得选择的小区名称,生成楼号列表
+        var x=xmlDoc.getElementsByTagName("community")
+            [sltcommunity.selectedIndex-1].childNodes;
+        var y;
+        var txt="";
+        var service="";
+        //生成楼号的选择菜单
+        for (i=0;i<x.length;i++) {
+            if (x[i].nodeType==1){
+                y=x[i].childNodes;
+                for (j=0;j<y.length;j++){
+                    if (y[j].nodeType==1){
+                        switch (y[j].nodeName){
+                            case "number":
+                                txt=x[i].childNodes[j].textContent;
+                                break;
+                            case "id":
+                                houseid="house"+x[i].childNodes[j].textContent;
+                        } 
+                    }
                 }
+                var option=document.createElement("option");
+                option.text = txt; 
+                option.value = houseid;
+                option.regid=regid;
+                slthouse.options.add(option);	  
             }
-            var option=document.createElement("option");
-            option.text = txt; 
-            option.value = service;
-            slthouse.options.add(option);	  
         }
     }
     makeMessage();
@@ -179,11 +194,54 @@ function countNumber(){
     return res*10;
 }
 //向服务器提交短信内容
-function postmess(mess,phone,areaid,houseid){
-    checkservice(areaid,houseid);
-    alert("posting message:"+mess);
+function postmess(mess,phone){
+    alert("posting message:"+mess+":"+phone);
+}
+function makeHouse(){
+//查询该楼的服务信息和电话，生成地址字符串
+makeMessage();
+var slthouse=document.form1.house;
+if ( slthouse.selectedIndex >0){
+    var areaid=slthouse.options[slthouse.selectedIndex].regid;
+    var houseid=slthouse.options[slthouse.selectedIndex].value;
+    checkservice(areaid.substr(3),houseid.substr(5));
+    }
+else{
+    document.form2.server.value='';
+    document.getElementById('servicename').innerHTML=""; 
+    }
 }
 //向服务器查询服务组及电话
-function checkservice(serid){
-    return "13339505100";
+function checkservice(areaid,houseid){
+    xmlhttp.onreadystatechange = handleStateChange;   
+    var localurl=document.referrer;
+    //如果末尾有#去掉
+    if (localurl.charAt(localurl.length-1)=="#"){
+    localurl=localurl.substring(0,localurl.length-1)}
+    var qur= localurl+"src/ajax.ks/findser?areaid="+
+        areaid+"&houseid="+houseid;
+    //发送请求到的URL地址
+    xmlhttp.open("GET", qur, true);
+    xmlhttp.send();
+};
+function handleStateChange() {        
+    if(xmlhttp.readyState == 4) {                
+        if(xmlhttp.status == 200) {
+            res=xmlhttp.responseText;
+            if (res!=""){
+                var arr=res.split(":");
+                document.form2.server.value=arr[1];
+                if (arr[0] != ''){
+                    document.getElementById('servicename').innerHTML="第"
+                        +arr[0]+"组"; }
+                else{ document.getElementById('servicename').innerHTML="默认组"; 
+
+                }
+             }
+        }
+    };
+}
+function clearform(){
+    document.form2.reset();
+    document.getElementById('servicename').innerHTML=""; 
 }

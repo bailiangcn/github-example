@@ -7,7 +7,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <link rel="stylesheet" type="text/css" href="src/addresslist.css" />
     </HEAD>
-    <body onload="document.form1.reset()">
+    <body onload="clearform()">
         <div class="container">
             <div class="header"><h1 class="header">大庆油田数字电视报修</h1></div>
             <FORM  name="form2" id="form2">
@@ -17,11 +17,14 @@
                 <br/><div id="usercall">用户电话：
                     <textarea name="phone"  rows="1" cols="30" id="userphone">
                     </textarea>
-                <button name="resetbutton" type="reset">清除</button>
+                <button name="resetbutton" type="button" onClick="clearform()">清除</button>
                 <input type="hidden"  name="servicephone" value="123">
                 <input type="button" value="发送"
-                onclick='postmess(document.form2.message.value,
-                    document.form2.phone.value)'>
+                onclick='postmess(document.form2.message.value+
+                document.form2.phone.value,document.form2.server.value)'>
+                &nbsp&nbsp&nbsp&nbsp服务：
+                    <input type="text" name="server" id="server">
+                    <span id="servicename" ></span>
                 </div>
             </FORM>
             <FORM  name="form1" id="form1">
@@ -31,7 +34,7 @@
                 <SELECT NAME="community" onChange="getHouse()" id="community">
                     <OPTION VALUE="0">请选择小区 </OPTION>
                 </SELECT>
-                <SELECT NAME="house" onChange="makeMessage()" id="house">
+                <SELECT NAME="house" onChange="makeHouse()" id="house">
                     <OPTION VALUE="0">请选择楼号 </OPTION>
                 </SELECT>
                 <div class="checkgroup">

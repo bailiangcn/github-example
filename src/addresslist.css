@@ -20,7 +20,7 @@ body {
 #userphone {
     height:25px;
     line-height:25px;
-    width:30%;
+    width:20%;
 }
 #message {
     font-size:16px;
@@ -39,6 +39,9 @@ body {
     margin-right:2.5%;
     margin-top:5px;
     width:45%;
+}
+#server {
+    width:20%;
 }
 form {
     margin:10;
