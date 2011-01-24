@@ -526,7 +526,7 @@ function initAll() {
 //清除所有服务组信息
     resetCheck()
     createXMLHttpRequest();
-    xmlHttp.onreadystatechange = handleStateChange;   
+    xmlHttp.onreadystatechange = handleStateChange1;   
     var localurl=document.location.href;
     //如果末尾有#去掉
     if (localurl.charAt(localurl.length-1)=="#"){
@@ -535,7 +535,21 @@ function initAll() {
     //发送请求到的URL地址
     xmlHttp.open("GET", qur, true);
     xmlHttp.send();
-    location.reload(true);
+   // window.open(localurl,"_self");
+};
+function handleStateChange1() {        
+    if(xmlHttp.readyState == 4) {                
+        if(xmlHttp.status == 200) {
+            res=xmlHttp.responseText;
+            if (res!="ok\n"){
+                alert("操作不成功,请刷新页面");
+                alert(res);
+            }
+            else{
+            var localurl=document.location.href;
+            window.open(localurl,"_self");}
+         }
+    }
 };
 
 function dividework(obj)
