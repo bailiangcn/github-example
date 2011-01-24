@@ -10,18 +10,23 @@
     <body onload="document.form1.reset()">
         <div class="container">
             <div class="header"><h1 class="header">大庆油田数字电视报修</h1></div>
-            <FORM METHOD=POST ACTION="src/get_address.py" name="form2" id="form2">
-                <textarea name="message"  rows="2" id="message"></textarea>
+            <FORM  name="form2" id="form2">
+                <textarea name="message"  rows="2" id="message" readonly="readonly"></textarea>
+                <textarea name="messageplus"  rows="2" id="messageplus">
+                    </textarea>
                 <br/><div id="usercall">用户电话：
-                    <textarea name="phone"  rows="1" cols="30" id="userphone"></textarea>
+                    <textarea name="phone"  rows="1" cols="30" id="userphone">
+                    </textarea>
                 <button name="resetbutton" type="reset">清除</button>
                 <input type="hidden"  name="servicephone" value="123">
-                <input type="submit" value="发送">
+                <input type="button" value="发送"
+                onclick='postmess(document.form2.message.value,
+                    document.form2.phone.value)'>
                 </div>
             </FORM>
             <FORM  name="form1" id="form1">
                 <SELECT NAME="regional" onChange="getCommunity()" id="regional">
-                    <OPTION VALUE="0">请选择区域 </OPTION>
+                    <OPTION VALUE="0" id="reg999">请选择区域 </OPTION>
                 </SELECT>
                 <SELECT NAME="community" onChange="getHouse()" id="community">
                     <OPTION VALUE="0">请选择小区 </OPTION>

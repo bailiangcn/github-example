@@ -27,6 +27,8 @@ for (i=0;i<x.length;i++) {
 //通过读取xml文件，设置区域、小区、楼号
 //生成小区的选择菜单
 function getCommunity(){
+    //清空地址信息
+    document.form2.message.value=''
     //获得区域下拉框的对象
      var sltregional=document.form1.regional;
     //获得小区下拉框的对象
@@ -67,6 +69,8 @@ function getCommunity(){
 
 //生成楼号的选择菜单
 function getHouse(){
+    //清空地址信息
+    document.form2.message.value=''
     //获得区域下拉框的对象
     var sltregional=document.form1.regional;
     //获得小区下拉框的对象
@@ -94,7 +98,7 @@ function getHouse(){
         [sltcommunity.selectedIndex-1].childNodes;
     var y;
     var txt="";
-    var phone="";
+    var service="";
     //生成楼号的选择菜单
     for (i=0;i<x.length;i++) {
         if (x[i].nodeType==1){
@@ -106,13 +110,13 @@ function getHouse(){
                             txt=x[i].childNodes[j].textContent;
                             break;
                         case "service":
-                            phone=x[i].childNodes[j].textContent;
+                            service=x[i].childNodes[j].textContent;
                     } 
                 }
             }
             var option=document.createElement("option");
             option.text = txt; 
-            option.value = phone;
+            option.value = service;
             slthouse.options.add(option);	  
         }
     }
@@ -173,4 +177,13 @@ function countNumber(){
     if (document.form1.numberdec3.checked){res+=1}
     document.getElementById("numberdec").innerHTML="+"+res*10;
     return res*10;
+}
+//向服务器提交短信内容
+function postmess(mess,phone,areaid,houseid){
+    checkservice(areaid,houseid);
+    alert("posting message:"+mess);
+}
+//向服务器查询服务组及电话
+function checkservice(serid){
+    return "13339505100";
 }

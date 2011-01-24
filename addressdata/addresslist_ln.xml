@@ -2,7 +2,7 @@
 	<community name="奥林国际">
 		<house>
 			<number>D-01</number>
-			<service/>
+			<service>1</service>
 			<id>1</id>
 		</house>
 		<house>
