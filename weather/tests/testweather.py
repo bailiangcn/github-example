@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011-01-26 01:08:07
+# Last Change:  2011-01-26 01:26:42
 
 
 """
@@ -45,9 +45,9 @@ class simpleTest(TestCase):
                 ('d0.gif', [3, '0']), 
                 ('0.gif', [4, '0']), 
                 )
-        for integer, numeral in knownValues:
-            result = weather.transPicId(integer)
-            self.assertEqual(result, numeral)
+        for souname, wishres in knownValues:
+            result = weather.transPicId(souname)
+            self.assertEqual(wishres, result)
 
 if '__main__' == __name__:
     import unittest
