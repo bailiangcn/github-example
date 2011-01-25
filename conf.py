@@ -47,7 +47,8 @@ alias = {"admin":os.path.join(server_dir,"common","admin"),
     'blogs/mysql/.*?':os.path.join(server_dir,'common','demo','mysql','blog'), 
     "add" : "/home/bl/www/", 
     "divide" : "/home/bl/www/src/", 
-    "test":"/home/bl/www/src/tests/"
+    "test":"/home/bl/www/src/tests/", 
+    "weather":"/home/bl/www/weather/", 
     }
 
 # use gzip to compress text files ?
