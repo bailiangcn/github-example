@@ -2,52 +2,52 @@
 	<community name="奥林国际">
 		<house>
 			<number>D-01</number>
-			<service>1</service>
+			<service/>
 			<id>1</id>
 		</house>
 		<house>
 			<number>D-02</number>
-			<service>3</service>
+			<service/>
 			<id>2</id>
 		</house>
 		<house>
 			<number>D-03</number>
-			<service>3</service>
+			<service/>
 			<id>3</id>
 		</house>
 		<house>
 			<number>D-04</number>
-			<service>3</service>
+			<service/>
 			<id>4</id>
 		</house>
 		<house>
 			<number>D-05</number>
-			<service>4</service>
+			<service/>
 			<id>5</id>
 		</house>
 		<house>
 			<number>D-06</number>
-			<service>4</service>
+			<service/>
 			<id>6</id>
 		</house>
 		<house>
 			<number>D-08</number>
-			<service>4</service>
+			<service/>
 			<id>7</id>
 		</house>
 		<house>
 			<number>D-09</number>
-			<service>5</service>
+			<service/>
 			<id>8</id>
 		</house>
 		<house>
 			<number>D-10</number>
-			<service>5</service>
+			<service/>
 			<id>9</id>
 		</house>
 		<house>
 			<number>D-12</number>
-			<service>5</service>
+			<service/>
 			<id>10</id>
 		</house>
 		<house>

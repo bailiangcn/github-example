@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月25日 14时16分43秒
+# Last Change:  2011-01-26 01:08:07
 
 
 """
@@ -33,6 +33,21 @@ class simpleTest(TestCase):
 
     def testOther(self):
         self.assertNotEqual(0, 1)
+    def testgetWeather0(self):
+        weather.getWeather0()
+    def testtransPicId(self):
+        '''
+        测试transPicId能否正确转换为本地图片名称
+        '''
+        knownValues= (('d00.png', [0, '0']),
+                ('d00.gif', [1, '0']), 
+                ('d00.png', [2, '0']), 
+                ('d0.gif', [3, '0']), 
+                ('0.gif', [4, '0']), 
+                )
+        for integer, numeral in knownValues:
+            result = weather.transPicId(integer)
+            self.assertEqual(result, numeral)
 
 if '__main__' == __name__:
     import unittest
