@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月25日 09时29分38秒
+# Last Change:  2011年01月25日 16时52分28秒
 
 
-"""docstring
+"""根据网页生成数据广播需要的天气预报网页
+流程:1、从getWeather*取得不同数据, 输出xml
+2、检验xml格式的正确性
+3、输入xml文件, 输出字典
+3、对比各种输入的结果, 输出合格的xml格式
+4、根据xml文件和模板生成html文件
+
 """
 
 __revision__ = '0.1'
@@ -17,7 +23,22 @@ import sys
 import time  
 from string import Template
  
-def GetWeather():  
+def getWeather0():
+    '''
+        从www.webxml.com.cn 取得天气数据(xml格式)
+    '''
+    pass
+def getWeather1():
+    '''
+        从http://www.weather.com.cn/html/weather/101050901.shtml
+        取得天气数据(xml格式)
+    '''
+    pass
+
+def getWeather2():  
+    '''
+        从qq.ip138.com 取得天气数据
+    '''
     reWeather = re.compile(r'(?<=align\="center">天气</td>).+?(?=</tr)', re.I|re.S|re.U)
     reTemperature = re.compile(r'(?<=align\="center">气温</td>).+?(?=</tr)', re.I|re.S|re.U)
     reWind = re.compile(r'(?<=align\="center">风向</td>).+?(?=</tr)', re.I|re.S|re.U)
@@ -48,8 +69,6 @@ def GetWeather():
         # [0] 当前风向 [1]明日 [2]后日
         wind = re.findall(r'(?<=td>).+?(?=</td>)', windPara[0])
 
-
-
         # 定义时间格式  
         this_date = str(time.strftime("%Y/%m/%d %a"))  
         now = int(time.time())  
@@ -69,11 +88,8 @@ def GetWeather():
         sms.append("%s:%s,%s, %s-%s℃" % (day_aftom, weathers[2], wind[2],theGrades[5 - nowtime], theGrades[4 - nowtime]))  
         smscontent = '\n'.join(sms)  
 
-
-
-        
         #写入html文件
-        filesou = open("temp.htm", "r")
+        filesou = open("./template/temp.htm", "r")
         filedes = open("./html/index.htm", "w")
         for eachline in filesou:
             s  = Template(eachline).substitute(
@@ -93,7 +109,7 @@ def GetWeather():
 
 def main():  
     print "getting out the weather code..." 
-    msg = GetWeather()  
+    msg = getWeather2()  
     print "\n", msg  
     print "Done." 
  
