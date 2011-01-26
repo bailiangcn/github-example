@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011-01-26 01:06:27
+# Last Change:  2011年01月26日 16时30分22秒
 
 
 """
@@ -175,20 +175,74 @@ def getWeather2():
     except:  
         return "There is sth wrong with the weather forecast, please inform the author. thx~" 
 
-def xmlToHtml():
-        #写入html文件
-        filesou = open("./template/temp.htm", "r")
-        filedes = open("./html/index.htm", "w")
-        for eachline in filesou:
-            s  = Template(eachline).substitute(
-                    MAXTEM=theGrades[0], #最高温度
-                    MINTEM=('中庆' + 'ss').decode('utf8').encode('gb2312'), 
-                    )
-            filedes.write('%s\n' % s)
+def xmlToHtml(xmlfilename):
+    '''
+    打开xml文件, 根据TEMPFILENAME模板替换相应字段
+    ${DAY0}     当天日期
+    ${MAXTEM0}  当日最高温度
+    ${MINTEM0}  当日最低温度
+    ${WEATHER0} 当日天气
+    ${WIND0}    当日风力
+    ${LAPIC0}   当日天气图标(大)
+    ${PIC0}     当日天气图标
+    ${TEM0}     当日最高温度至最低温度
 
-        filesou.close()
-        filedes.flush()
-        filedes.close()
+    ${DAY1}     次日日期
+    ${TEM1}     次日最高温度至最低温度
+    ${PIC1}     次日天气图标
+    
+    ${DAY2}     第三天日期
+    ${TEM2}     第三最高温度至最低温度
+    ${PIC2}     第三日天气图标
+    
+    
+    '''
+    #相应参数:如果网址参数发生变化, 修改以下部分
+    ############################################
+    TEMPFILENAME = "template/temp.htm"
+    RESULTFILENAME ="html/index.htm" 
+    ############################################
+
+    #读入天气预报xml文件
+    dom=xml.dom.minidom.parse(xmlfilename)
+    root=dom.documentElement
+    strlist=root.getElementsByTagName('string')
+    weatherlist = []
+    for eachstr in strlist:
+        weatherlist.append(getText(eachstr))
+        #print getText(eachstr).encode('utf-8')
+
+    #写入html文件
+    filesou = open(TEMPFILENAME, "r")
+    filedes = open(RESULTFILENAME, "w")
+    for eachline in filesou:
+        s  = Template(eachline).substitute(
+            MAXTEM0=diffTem(weatherlist[8])[1].encode('gb2312'),  
+            MINTEM0=diffTem(weatherlist[8])[0].encode('gb2312'), 
+            WEATHER0 =diffDayAndWeather(weatherlist[7]
+                )[2] .encode('gb2312'), 
+            WIND0 =weatherlist[9].encode('gb2312'), 
+            DAY0 =diffDayAndWeather(weatherlist[7])[1].encode('gb2312'), 
+            LAPIC0 = "".join(("../image/a", 
+                transPicId(weatherlist[10]))).encode('gb2312'),
+            PIC0 = "".join(("../image/b", 
+                transPicId(weatherlist[10]))).encode('gb2312'),
+            PIC1 = "".join(("../image/b", 
+                transPicId(weatherlist[15]))).encode('gb2312'),
+            PIC2 = "".join(("../image/b", 
+                transPicId(weatherlist[20]))).encode('gb2312'),
+            DAY1 =diffDayAndWeather(weatherlist[12])[1].encode('gb2312'), 
+            DAY2 =diffDayAndWeather(weatherlist[17])[1].encode('gb2312'), 
+            TEM0 = weatherlist[8].replace("/", u"至").encode('gb2312'), 
+            TEM1 = weatherlist[13].replace("/", u"至").encode('gb2312'), 
+            TEM2 = weatherlist[18].replace("/", u"至").encode('gb2312'), 
+
+            )
+        filedes.write('%s\n' % s)
+
+    filesou.close()
+    filedes.flush()
+    filedes.close()
 
 def transPicId(souname):
     '''
@@ -199,15 +253,40 @@ def transPicId(souname):
     3:www.nmc.gov.cn
     4:tg.360.cn
     '''
-    return ([0, '0'])
-def getText(nodelist):
+    name=souname.split(".")[0]
+    while not name.isdigit():
+        name = name[1:]
+    num = int(name)
+    resname = "".join((str(num), ".png"))
+    return (resname)
+
+def diffDayAndWeather(temstr):
     '''
-    读取一个text元素, 返回其中的内容
+    输入一个日期天气的字符串, 返回一个日期天气的列表
+    例子 输入 '1月26日 多云',  返回 ['1月26日','多云'] 
+    '''
+    restem0 = temstr.split(" ")
+    restem1 = restem0[0].split(u"月")
+    restem1[0]=restem1[0] + u"月"
+    return ([restem1[0], restem1[1], restem0[1]])
+
+def diffTem(temstr):
+    '''
+    输入一个最低温度最高温度的字符串, 返回一个最低最高温度的列表
+    例子 输入 -28℃/-18℃ 返回 [-28℃, -18℃]
+    '''
+    restem = temstr.split("/")
+    return (restem)
+
+def getText(node):
+    '''
+    读取一个只包含text元素的node值, 返回其中的内容
     '''
     rc = ""
-    for node in nodelist:
-        if node.nodeType == node.TEXT_NODE:
-            rc = rc + node.data
+    
+    for eachnode in node.childNodes:
+        if eachnode.nodeType == eachnode.TEXT_NODE:
+            rc = rc + eachnode.data
     return rc
 
 def clearSpace(dom, node):
