@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月26日 18时38分55秒
+# Last Change:  2011年01月26日 20时53分11秒
 
 
 """
@@ -29,12 +29,24 @@ class simpleTest(TestCase):
         '''
         #weather.getWeather0()
         pass
+
+    def testlistToxml(self):
+        '''
+        测试根据列表变量生成xml文件
+        listToxml(soulist)
+        '''
+        soulist = [u'0', u'2011/01/25 22:11:52',u'1月26日 多云', 
+                u'-28℃/-18℃', u'北风微风转西风微风', u'1.gif',
+                u'1月27日 晴', u'-28℃/-18℃', u'0.gif',
+                u'1月28日 晴', u'-29℃/-18℃', u'0.gif']
+        weather.listToxml(soulist)
+
     def testxmlToHtml(self):
         '''
         测试读取xml文件生成html文件
         xmlToHtml()
         '''
-        weather.xmlToHtml('./template/w1.xml')
+        weather.xmlToHtml('./template/wea.xml')
 
     def testinsertBar(self):
         '''

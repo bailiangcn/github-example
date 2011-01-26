@@ -1,48 +1,66 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月26日 18时40分30秒
+# Last Change:  2011年01月26日 21时38分31秒
+
 """
 根据网页生成数据广播需要的天气预报网页
-流程:1、从getWeather*取得不同数据, 输出xml
-        <source>0</source>    ＃表示0号网址信息来源
-        Array(0) = "省份 地区/洲 国家名(国外)"
-        Array(1) = "查询的天气预报地区名称"
-        Array(2) = "查询的天气预报地区ID"
-        Array(3) = "最后更新时间 格式:yyyy-MM-dd HH:mm:ss"
-        Array(4) = "当前天气实况:气温、风向/风力、湿度"
-        Array(5) = "第一天 空气质量、紫外线强度"
-        Array(6) = "第一天 天气和生活指数"
-        Array(7) = "第一天 概况 格式:M月d日 天气概况"
-        Array(8) = "第一天 气温"
-        Array(9) = "第一天 风力/风向"
-        Array(10) = "第一天 天气图标 1"
-        Array(11) = "第一天 天气图标 2"
-        Array(12) = "第二天 概况 格式:M月d日 天气概况"
-        Array(13) = "第二天 气温"
-        Array(14) = "第二天 风力/风向"
-        Array(15) = "第二天 天气图标 1"
-        Array(16) = "第二天 天气图标 2"
-        Array(17) = "第3天 概况 格式:M月d日 天气概况"
-        Array(18) = "第3天 气温"
-        Array(19) = "第3天 风力/风向"
-        Array(20) = "第3天 天气图标 1"
-        Array(21) = "第3天 天气图标 2"
-        ......
-        ......每一天的格式同:Array(12) -- Array(16)
-        ......
-        Array(n-4) = "最后一天 概况 格式:M月d日 天气概况"
-        Array(n-3) = "最后一天 气温"
-        Array(n-2) = "最后一天 风力/风向"
-        Array(n-1) = "最后一天 天气图标 1"
-        Array(n) = "最后一天 天气图标 2"
-        如查询结果为空,输出以下结果:
-        Array(0) = "查询结果为空"    
+流程:
+1、从getWeather0取得数据, 输出xml格式
+    <source>0</source>    ＃表示0号网址信息来源
+    Array(0) = "省份 地区/洲 国家名(国外)"
+    Array(1) = "查询的天气预报地区名称"
+    Array(2) = "查询的天气预报地区ID"
+    Array(3) = "最后更新时间 格式:yyyy-MM-dd HH:mm:ss"
+    Array(4) = "当前天气实况:气温、风向/风力、湿度"
+    Array(5) = "第一天 空气质量、紫外线强度"
+    Array(6) = "第一天 天气和生活指数"
+    Array(7) = "第一天 概况 格式:M月d日 天气概况"
+    Array(8) = "第一天 气温"
+    Array(9) = "第一天 风力/风向"
+    Array(10) = "第一天 天气图标 1"
+    Array(11) = "第一天 天气图标 2"
+    Array(12) = "第二天 概况 格式:M月d日 天气概况"
+    Array(13) = "第二天 气温"
+    Array(14) = "第二天 风力/风向"
+    Array(15) = "第二天 天气图标 1"
+    Array(16) = "第二天 天气图标 2"
+    Array(17) = "第3天 概况 格式:M月d日 天气概况"
+    Array(18) = "第3天 气温"
+    Array(19) = "第3天 风力/风向"
+    Array(20) = "第3天 天气图标 1"
+    Array(21) = "第3天 天气图标 2"
+    ......
+    ......每一天的格式同:Array(12) -- Array(16)
+    ......
+    Array(n-4) = "最后一天 概况 格式:M月d日 天气概况"
+    Array(n-3) = "最后一天 气温"
+    Array(n-2) = "最后一天 风力/风向"
+    Array(n-1) = "最后一天 天气图标 1"
+    Array(n) = "最后一天 天气图标 2"
+    如查询结果为空,输出以下结果:
+       Array(0) = "查询结果为空"    
 
-2、检验xml格式的正确性
-3、输入xml文件, 输出字典
-3、对比各种输入的结果, 输出合格的xml格式
-4、根据xml文件和模板生成html文件
+2、从其他网页取得数据, 输出为列表格式, 调用listToxml()生成xml文件
+    listToxml()输入要求如下:
+    weadata [0]    "信息来源"
+    weadata [1]    "更新时间 格式:yyyy-MM-dd HH:mm:ss"
+    weadata [2]    "第一天 概况 格式:M月d日 天气概况"
+    weadata [3]    "第一天 气温"  
+    weadata [4]    "第一天 风力/风向"
+    weadata [5]    "第一天 天气图标 1"                
+    weadata [6]    "第二天 概况 格式:M月d日 天气概况"
+    weadata [7]    "第二天 气温"  
+    weadata [8]    "第二天 天气图标 1"                
+    weadata [9]    "第三天 概况 格式:M月d日 天气概况"
+    weadata [10]   "第三天 气温"  
+    weadata [11]   "第三天 天气图标 1"
+
+3、检验xml格式的正确性(待完善)
+4、输入xml文件, 输出字典(待完善)
+4、对比各种输入的结果, 输出合格的xml格式(待完善)
+
+5、根据xml文件和模板生成html文件
 """
 __revision__ = '0.1'
 
@@ -55,10 +73,17 @@ import datetime
 from string import Template
 import xml.dom.minidom
 import codecs
- 
+
+############################################################ 
+#                                                          #
+#              网页读取部分                                #
+#                                                          #
+############################################################
+
 def getWeather0():
     '''
         从www.webxml.com.cn 取得天气数据(xml格式)
+        直接保存为xml格式
     '''
     #相应参数:如果网址参数发生变化, 修改以下部分
     ############################################
@@ -107,7 +132,7 @@ def getWeather0():
 def getWeather1():
     '''
         从http://www.weather.com.cn/html/weather/101050901.shtml
-        取得天气数据(xml格式)
+        取得天气数据(html格式), 输出为list格式
     '''
     pass
 
@@ -134,7 +159,8 @@ def getWeather2():
         # 获取网页源文件  
         sock = urllib.urlopen(URL)  
         strhtml = sock.read()  
-        strhtml = unicode(strhtml, 'gb2312','ignore').encode('utf-8','ignore')  
+        strhtml = unicode(strhtml, 'gb2312','ignore').encode('utf-8',
+                'ignore')  
         #print strhtml
         # 正则表达式取得各段
         weatherPara = re.findall(reWeather, strhtml)
@@ -159,22 +185,85 @@ def getWeather2():
         this_date = str(time.strftime("%Y/%m/%d %a"))  
         now = int(time.time())  
         sec = 24*60*60 
-        day_today = "今天(%s号)" % str(time.strftime("%d", time.localtime(now+0*sec)))  
-        day_tommo = "明天(%s号)" % str(time.strftime("%d", time.localtime(now+1*sec)))  
-        day_aftom = "后天(%s号)" % str(time.strftime("%d", time.localtime(now+2*sec)))  
+        day_today = "今天(%s号)" % str(time.strftime("%d", 
+            time.localtime(now+0*sec)))  
+        day_tommo = "明天(%s号)" % str(time.strftime("%d", 
+            time.localtime(now+1*sec)))  
+        day_aftom = "后天(%s号)" % str(time.strftime("%d", 
+            time.localtime(now+2*sec)))  
         # 定义短信正文  
         sms = [this_date]  
         sms.append("大庆天气")  
         if nowtime ==  0:
-            sms.append("%s:%s,%s, %s-%s℃" % (day_today, weathers[0],wind[0], theGrades[1], theGrades[0]))  
+            sms.append("%s:%s,%s, %s-%s℃" % (day_today, 
+                weathers[0],wind[0], theGrades[1], theGrades[0]))  
         else:
-            sms.append("%s:%s,%s, %s℃" % (day_today, weathers[0],wind[0], theGrades[0]))  
+            sms.append("%s:%s,%s, %s℃" % (day_today,
+                weathers[0],wind[0], theGrades[0]))  
 
-        sms.append("%s:%s,%s, %s-%s℃" % (day_tommo, weathers[1], wind[1],theGrades[3 - nowtime], theGrades[2 - nowtime]))  
-        sms.append("%s:%s,%s, %s-%s℃" % (day_aftom, weathers[2], wind[2],theGrades[5 - nowtime], theGrades[4 - nowtime]))  
+        sms.append("%s:%s,%s, %s-%s℃" % (day_tommo, 
+            weathers[1], wind[1],theGrades[3 - nowtime], 
+            theGrades[2 - nowtime]))  
+        sms.append("%s:%s,%s, %s-%s℃" % (day_aftom, weathers[2],
+            wind[2],theGrades[5 - nowtime], theGrades[4 - nowtime]))  
         smscontent = '\n'.join(sms)  
     except:  
-        return "There is sth wrong with the weather forecast, please inform the author. thx~" 
+        return "There is sth wrong , please inform the author. " 
+
+############################################################ 
+#                                                          #
+#              对数据进行进一步处理部分                    #
+#                                                          #
+############################################################
+
+def listToxml(weadata):
+    '''
+    输入一个天气列表, 生成xml文件
+    weadata [0]  -->   source[0]        "信息来源"
+    weadata [1]  -->   weatherlist[3]   "更新时间 格式:yyyy-MM-dd HH:mm:ss"
+    weadata [2]  -->   weatherlist[7]   "第一天 概况 格式:M月d日 天气概况"
+    weadata [3]  -->   weatherlist[8]   "第一天 气温"  
+    weadata [4]  -->   weatherlist[9]   "第一天 风力/风向"
+    weadata [5]  -->   weatherlist[10]  "第一天 天气图标 1"                
+    weadata [6]  -->   weatherlist[12]  "第二天 概况 格式:M月d日 天气概况"
+    weadata [7]  -->   weatherlist[13]  "第二天 气温"  
+    weadata [8]  -->   weatherlist[15]  "第二天 天气图标 1"                
+    weadata [9]  -->   weatherlist[17]  "第三天 概况 格式:M月d日 天气概况"
+    weadata [10]  -->  weatherlist[18]  "第三天 气温"  
+    weadata [11] -->   weatherlist[20]  "第三天 天气图标 1"
+    '''
+    #相应参数:如果参数发生变化, 修改以下部分
+    ############################################
+    FILENAME = "template/wea.xml"
+    ############################################
+    if len(weadata) > 0:
+        data = []
+        wlist = [3, 7, 8, 9, 10, 12, 13, 15, 17, 18, 20]
+        i = 0
+        data.append(u'<?xml version="1.0" encoding="utf-8"?>')
+        data.append(u' '*4 + u'<ArrayOfString>')
+        data.append(''.join((u' '*8 + u'<source>',weadata[0],u'</source>')))
+        #根据上面的列表, 填充空白的string元素
+        for j in range(wlist[-1] + 1):
+            if wlist[i] > j:
+                data.append(u' '*8 + u'<string/>')
+                continue
+            i += 1 
+            data.append(''.join((u' '*8 + u'<string>', 
+                weadata[i], u'</string>')))
+        data.append(u' '*4 + u'</ArrayOfString>')
+
+        try:
+            f = open(FILENAME, 'w')
+            for line in data:
+                line += '\n' 
+                f.write(line.encode('utf-8'))
+            f.close()
+        except Exception, ex:  
+            #如果错误, 记入日志
+            print ex
+            print sys.exc_info()
+
 
 def xmlToHtml(xmlfilename):
     '''
@@ -209,8 +298,7 @@ def xmlToHtml(xmlfilename):
     weatherlist = []
     for eachstr in strlist:
         weatherlist.append(getText(eachstr))
-        #print getText(eachstr).encode('utf-8')
-
+        
     #写入html文件
     filesou = open(TEMPFILENAME, "r")
     filedes = open(RESULTFILENAME, "w")
@@ -239,7 +327,6 @@ def xmlToHtml(xmlfilename):
             TEM0 = weatherlist[8].replace("/", u"至").encode('gb2312'), 
             TEM1 = weatherlist[13].replace("/", u"至").encode('gb2312'), 
             TEM2 = weatherlist[18].replace("/", u"至").encode('gb2312'), 
-
             )
         filedes.write('%s\n' % s)
 
