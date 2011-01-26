@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月26日 16时30分22秒
-
-
+# Last Change:  2011年01月26日 18时40分30秒
 """
 根据网页生成数据广播需要的天气预报网页
 流程:1、从getWeather*取得不同数据, 输出xml
@@ -25,6 +23,11 @@
         Array(14) = "第二天 风力/风向"
         Array(15) = "第二天 天气图标 1"
         Array(16) = "第二天 天气图标 2"
+        Array(17) = "第3天 概况 格式:M月d日 天气概况"
+        Array(18) = "第3天 气温"
+        Array(19) = "第3天 风力/风向"
+        Array(20) = "第3天 天气图标 1"
+        Array(21) = "第3天 天气图标 2"
         ......
         ......每一天的格式同:Array(12) -- Array(16)
         ......
@@ -40,17 +43,15 @@
 3、输入xml文件, 输出字典
 3、对比各种输入的结果, 输出合格的xml格式
 4、根据xml文件和模板生成html文件
-
 """
-
 __revision__ = '0.1'
-
 
 import os  
 import re  
 import urllib  
 import sys  
 import time  
+import datetime
 from string import Template
 import xml.dom.minidom
 import codecs
@@ -194,8 +195,6 @@ def xmlToHtml(xmlfilename):
     ${DAY2}     第三天日期
     ${TEM2}     第三最高温度至最低温度
     ${PIC2}     第三日天气图标
-    
-    
     '''
     #相应参数:如果网址参数发生变化, 修改以下部分
     ############################################
@@ -221,7 +220,11 @@ def xmlToHtml(xmlfilename):
             MINTEM0=diffTem(weatherlist[8])[0].encode('gb2312'), 
             WEATHER0 =diffDayAndWeather(weatherlist[7]
                 )[2] .encode('gb2312'), 
-            WIND0 =weatherlist[9].encode('gb2312'), 
+            WIND0 =insertBr(weatherlist[9]).encode('gb2312'), 
+            LONGDAY0 =''.join((diffDayAndWeather(weatherlist[7])[0],
+               diffDayAndWeather(weatherlist[7])[1],'&nbsp;&nbsp;', 
+               diffDayAndWeather(weatherlist[7])[3], )
+                ).encode('gb2312'), 
             DAY0 =diffDayAndWeather(weatherlist[7])[1].encode('gb2312'), 
             LAPIC0 = "".join(("../image/a", 
                 transPicId(weatherlist[10]))).encode('gb2312'),
@@ -243,7 +246,16 @@ def xmlToHtml(xmlfilename):
     filesou.close()
     filedes.flush()
     filedes.close()
+    return weatherlist[3].encode('utf-8')
 
+def insertBr(str):
+    '''
+    输入超长字符串自动断行
+    '''
+    resstr = str
+    if len(str)>5:
+        resstr = str[:len(str)//2] + "<br>" +str[len(str)//2:] 
+    return resstr
 def transPicId(souname):
     '''
     转换不同网站的图片名称, 翻译成本地的各种图片名称
@@ -263,12 +275,18 @@ def transPicId(souname):
 def diffDayAndWeather(temstr):
     '''
     输入一个日期天气的字符串, 返回一个日期天气的列表
-    例子 输入 '1月26日 多云',  返回 ['1月26日','多云'] 
+    例子 输入 '1月26日 多云',  返回 ['1月', '26日','多云', '星期三'] 
     '''
     restem0 = temstr.split(" ")
     restem1 = restem0[0].split(u"月")
+    month = int(restem1[0])
+    day = int(restem1[1][0:-1])
+    year = datetime.date.today().year
+    week = datetime.date(year, month, day).isoweekday()
+    weekdict = {1:u'一', 2:u'二', 3:u'三', 
+            4:u'四', 5:u'五', 6:u'六',7:u'日'}
     restem1[0]=restem1[0] + u"月"
-    return ([restem1[0], restem1[1], restem0[1]])
+    return ([restem1[0], restem1[1], restem0[1], u'星期' + weekdict[week]])
 
 def diffTem(temstr):
     '''
@@ -302,8 +320,9 @@ def clearSpace(dom, node):
                 clearSpace(dom,nd)
 
 def Indent(dom, node, indent = 0):
-    #美化xml 文件, 用于缩进
-    # Copy child list because it will change soon
+    '''美化xml 文件, 用于缩进
+     Copy child list because it will change soon
+    '''
     children = node.childNodes[:]
     # Main node doesn't need to be indented
     if indent:
@@ -335,8 +354,16 @@ def testmain():
     suite = unittest.defaultTestLoader.loadTestsFromTestCase(simpleTest)
     result = unittest.TextTestRunner(verbosity=3).run(suite)
 
+def main():
+    '''
+    调用主程序, 生成html页面
+    '''
+    getWeather0()
+    print xmlToHtml('./template/wea.xml')
+
 if __name__=='__main__':
 
     testmain()
+    #main()
 
 

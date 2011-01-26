@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月26日 16时03分05秒
+# Last Change:  2011年01月26日 18时38分55秒
 
 
 """
@@ -22,20 +22,13 @@ from unittest import TestCase
 import weather
 
 class simpleTest(TestCase):
-    def setUp(self):
-        pass
 
-    def tearDown(self):
-        pass
-
-    def testExample(self):
-        self.assertEqual(1, 1)
-
-    def testOther(self):
-        self.assertNotEqual(0, 1)
     def testgetWeather0(self):
-        pass
+        '''
+        测试从www.webxml.com.cn 取得天气数据(xml格式)
+        '''
         #weather.getWeather0()
+        pass
     def testxmlToHtml(self):
         '''
         测试读取xml文件生成html文件
@@ -43,11 +36,26 @@ class simpleTest(TestCase):
         '''
         weather.xmlToHtml('./template/w1.xml')
 
+    def testinsertBar(self):
+        '''
+        测试输入超长字符串自动断行
+        '''
+        knownValues= ((u'西风微风转西北风微风', 
+            u'西风微风转<br>西北风微风'), 
+            (u'西风转西北风', u'西风转<br>西北风'), 
+            (u'西风', u'西风'), 
+            (u'西风转西北微风', u'西风转<br>西北微风'), 
+            )
+        for soustr, resstr in knownValues:
+            wishres=weather.insertBr(soustr)
+            self.assertEqual(wishres, resstr)
+
     def testdiffDayAndWeather(self):
         '''
         测试diffDayAndWeather()能否正常返回元组
         '''
-        knownValues= ((u'1月26日 多云', [u'1月', u'26日',u'多云']), 
+        knownValues= ((u'1月26日 多云', 
+            [u'1月', u'26日',u'多云', u'星期三']), 
                 )
         for temstr, wishres in knownValues:
             result = weather.diffDayAndWeather(temstr)
