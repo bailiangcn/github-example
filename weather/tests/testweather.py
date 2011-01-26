@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月26日 20时53分11秒
+# Last Change:  2011年01月27日 00时23分24秒
 
 
 """
@@ -27,8 +27,13 @@ class simpleTest(TestCase):
         '''
         测试从www.webxml.com.cn 取得天气数据(xml格式)
         '''
-        #weather.getWeather0()
-        pass
+        weather.getWeather0()
+
+    def getWeather9(self):
+        '''
+        测试从www.webxml.com.cn 取得天气数据(xml格式)
+        '''
+        weather.getWeather9()
 
     def testlistToxml(self):
         '''

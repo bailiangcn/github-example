@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月26日 21时38分31秒
+# Last Change:  2011年01月27日 00时51分11秒
 
 """
 根据网页生成数据广播需要的天气预报网页
 流程:
-1、从getWeather0取得数据, 输出xml格式
+1、从getWeather9取得数据, 输出xml格式
     <source>0</source>    ＃表示0号网址信息来源
     Array(0) = "省份 地区/洲 国家名(国外)"
     Array(1) = "查询的天气预报地区名称"
     Array(2) = "查询的天气预报地区ID"
-    Array(3) = "最后更新时间 格式:yyyy-MM-dd HH:mm:ss"
+    Array(3) = "最后更新时间 格式:yyyy/MM/dd HH:mm:ss"
     Array(4) = "当前天气实况:气温、风向/风力、湿度"
     Array(5) = "第一天 空气质量、紫外线强度"
     Array(6) = "第一天 天气和生活指数"
@@ -41,8 +41,8 @@
     如查询结果为空,输出以下结果:
        Array(0) = "查询结果为空"    
 
-2、从其他网页取得数据, 输出为列表格式, 调用listToxml()生成xml文件
-    listToxml()输入要求如下:
+2、从其他网页取得数据, 输出为列表格式, 调用listToxml(filename)生成xml文件
+    listToxml(weadata, filename)输入要求如下:
     weadata [0]    "信息来源"
     weadata [1]    "更新时间 格式:yyyy-MM-dd HH:mm:ss"
     weadata [2]    "第一天 概况 格式:M月d日 天气概况"
@@ -56,10 +56,11 @@
     weadata [10]   "第三天 气温"  
     weadata [11]   "第三天 天气图标 1"
 
-3、检验xml格式的正确性(待完善)
-4、输入xml文件, 输出字典(待完善)
-4、对比各种输入的结果, 输出合格的xml格式(待完善)
+    filename要求为相对于本脚本的相对路径名
 
+3、检验xml格式的正确性(待完善)
+4、输入xml文件, 输出列表(待完善)
+4、对比各种输入的结果, 输出合格的xml格式(待完善)
 5、根据xml文件和模板生成html文件
 """
 __revision__ = '0.1'
@@ -82,18 +83,28 @@ import codecs
 
 def getWeather0():
     '''
-        从www.webxml.com.cn 取得天气数据(xml格式)
-        直接保存为xml格式
+    从www.webxml.com.cn 取得天气数据(xml格式)
+    直接保存为xml格式
+    来源格式说明: 
+    String(0) 到 String(4)：省份0，城市1，城市代码2，城市图片名称3，最后更新时间4。
+    String(5) 到 String(11)：当天的 气温5，概况6，风向和风力7，天气趋势开始图片
+        名称(以下称：图标一)8，天气趋势结束图片名称(以下称：图标二)9，现在的天
+        气实况10，天气和生活指数11。 
+    String(12) 到 String(16)：第二天的 气温12，概况13，风向和风力14，
+            图标一15，图标二16。
+    String(17) 到 String(21)：第三天的 气温17，概况18，风向和风力19，
+            图标一20，图标二21。
+    String(22) 被查询的城市或地区的介绍 
+    输出格式说明:(参见listToxml()输入要求)
     '''
     #相应参数:如果网址参数发生变化, 修改以下部分
     ############################################
-    DAQINGID = '83'
-    USERID = '92dc44c3fa1341c5b1e837f0d19d3c7b'
+    DAQINGID = '50842'
     URL = ''.join(("http://webservice.webxml.com.cn/", 
-            "WebServices/WeatherWS.asmx/", 
-            "getWeather?theCityCode=", 
-            DAQINGID, "&theUserID=", USERID))
-    FILENAME = "template/wea.xml"
+            "WebServices/Weatherwebservice.asmx/", 
+            "getWeatherbyCityName?theCityName=", 
+            DAQINGID))
+    FILENAME = "template/wea0.xml"
     SOURCE = "0"
     ############################################
     try:
@@ -103,23 +114,20 @@ def getWeather0():
         dom=xml.dom.minidom.parseString(strxml)
         root=dom.documentElement
         #验证xml的第一个string元素是黑龙江, 如果是表示数据正常
-        areastr=root.getElementsByTagName("string")[1].firstChild.data
+        strlist=root.getElementsByTagName("string")
+        areastr=strlist[1].firstChild.data
         if  areastr== u'大庆':
-            #添加数据来源标识, 增加source 元素
-            soutext = dom.createTextNode(SOURCE)
-            souelement = dom.createElement("source")
-            souelement.appendChild(soutext)
-            root.appendChild(souelement)
+            #生成一个包含所有天气字符串的列表
+            weatherlist = []
+            for eachstr in strlist:
+                weatherlist.append(getText(eachstr))
+            resultlist = [u'0', weatherlist[4].replace("-", "/"), 
+                    weatherlist[6], weatherlist[5], weatherlist[7], 
+                    weatherlist[8], weatherlist[13],weatherlist[12],
+                    weatherlist[15],weatherlist[18],weatherlist[17],
+                    weatherlist[20]]
+            listToxml(resultlist, "template/wea0.xml")
 
-            #xml文件正常, 保存到template目录下的w1.xml
-            #遍历nodes，删除所有空格元素
-            clearSpace(dom, dom.documentElement)
-            Indent(dom, dom.documentElement)
-            f=file(FILENAME,'w')
-            writer=codecs.lookup('utf-8')[3](f)
-            dom.writexml(writer,encoding='utf-8')
-            writer.close()
-            f.close()
         else:
             print "nothing get"
             #print root.toxml().encode("utf-8")
@@ -210,13 +218,62 @@ def getWeather2():
     except:  
         return "There is sth wrong , please inform the author. " 
 
+def getWeather9():
+    '''
+        从www.webxml.com.cn 取得天气数据(xml格式)
+        直接保存为xml格式
+    '''
+    #相应参数:如果网址参数发生变化, 修改以下部分
+    ############################################
+    DAQINGID = '83'
+    USERID = '92dc44c3fa1341c5b1e837f0d19d3c7b'
+    URL = ''.join(("http://webservice.webxml.com.cn/", 
+            "WebServices/WeatherWS.asmx/", 
+            "getWeather?theCityCode=", 
+            DAQINGID, "&theUserID=", USERID))
+    FILENAME = "template/wea9.xml"
+    SOURCE = "9"
+    ############################################
+    try:
+        # 获取网页源文件  
+        sock = urllib.urlopen(URL)  
+        strxml = sock.read()  
+        dom=xml.dom.minidom.parseString(strxml)
+        root=dom.documentElement
+        #验证xml的第一个string元素是黑龙江, 如果是表示数据正常
+        areastr=root.getElementsByTagName("string")[1].firstChild.data
+        if  areastr== u'大庆':
+            #添加数据来源标识, 增加source 元素
+            soutext = dom.createTextNode(SOURCE)
+            souelement = dom.createElement("source")
+            souelement.appendChild(soutext)
+            root.appendChild(souelement)
+
+            #xml文件正常, 保存到template目录下的w1.xml
+            #遍历nodes，删除所有空格元素
+            clearSpace(dom, dom.documentElement)
+            Indent(dom, dom.documentElement)
+            f=file(FILENAME,'w')
+            writer=codecs.lookup('utf-8')[3](f)
+            dom.writexml(writer,encoding='utf-8')
+            writer.close()
+            f.close()
+        else:
+            print "nothing get"
+            #print root.toxml().encode("utf-8")
+
+    except Exception, ex:  
+        #如果错误, 记入日志
+        print ex
+        print sys.exc_info()
+
 ############################################################ 
 #                                                          #
 #              对数据进行进一步处理部分                    #
 #                                                          #
 ############################################################
 
-def listToxml(weadata):
+def listToxml(weadata, FILENAME="template/wea.xml"):
     '''
     输入一个天气列表, 生成xml文件
     weadata [0]  -->   source[0]        "信息来源"
@@ -234,7 +291,6 @@ def listToxml(weadata):
     '''
     #相应参数:如果参数发生变化, 修改以下部分
     ############################################
-    FILENAME = "template/wea.xml"
     ############################################
     if len(weadata) > 0:
         data = []
@@ -264,10 +320,10 @@ def listToxml(weadata):
             print ex
             print sys.exc_info()
 
-
 def xmlToHtml(xmlfilename):
     '''
     打开xml文件, 根据TEMPFILENAME模板替换相应字段
+    ${SOURCE}   数据来源
     ${DAY0}     当天日期
     ${MAXTEM0}  当日最高温度
     ${MINTEM0}  当日最低温度
@@ -294,6 +350,8 @@ def xmlToHtml(xmlfilename):
     #读入天气预报xml文件
     dom=xml.dom.minidom.parse(xmlfilename)
     root=dom.documentElement
+    sourcelist = root.getElementsByTagName('source')[0]
+    source = getText(sourcelist)
     strlist=root.getElementsByTagName('string')
     weatherlist = []
     for eachstr in strlist:
@@ -304,6 +362,7 @@ def xmlToHtml(xmlfilename):
     filedes = open(RESULTFILENAME, "w")
     for eachline in filesou:
         s  = Template(eachline).substitute(
+            SOURCE = source.encode('gb2312'), 
             MAXTEM0=diffTem(weatherlist[8])[1].encode('gb2312'),  
             MINTEM0=diffTem(weatherlist[8])[0].encode('gb2312'), 
             WEATHER0 =diffDayAndWeather(weatherlist[7]
@@ -360,7 +419,7 @@ def transPicId(souname):
     return (resname)
 
 def diffDayAndWeather(temstr):
-    '''
+    '''<F3>
     输入一个日期天气的字符串, 返回一个日期天气的列表
     例子 输入 '1月26日 多云',  返回 ['1月', '26日','多云', '星期三'] 
     '''
@@ -376,7 +435,7 @@ def diffDayAndWeather(temstr):
     return ([restem1[0], restem1[1], restem0[1], u'星期' + weekdict[week]])
 
 def diffTem(temstr):
-    '''
+    '''<F3>
     输入一个最低温度最高温度的字符串, 返回一个最低最高温度的列表
     例子 输入 -28℃/-18℃ 返回 [-28℃, -18℃]
     '''
@@ -446,11 +505,13 @@ def main():
     调用主程序, 生成html页面
     '''
     getWeather0()
-    print xmlToHtml('./template/wea.xml')
+    getWeather9()
+
+    print xmlToHtml('./template/wea9.xml')
 
 if __name__=='__main__':
 
-    testmain()
-    #main()
+    #testmain()
+    main()
 
 
