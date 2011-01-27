@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月27日 00时23分24秒
+# Last Change:  2011年01月27日 12时12分43秒
 
 
 """
@@ -29,7 +29,7 @@ class simpleTest(TestCase):
         '''
         weather.getWeather0()
 
-    def getWeather9(self):
+    def testgetWeather9(self):
         '''
         测试从www.webxml.com.cn 取得天气数据(xml格式)
         '''
@@ -110,6 +110,16 @@ class simpleTest(TestCase):
             result = weather.transPicId(souname)
             self.assertEqual(wishres, result)
 
+    def sendsimplemail(self):
+        '''
+        测试sendsimplemail()发送邮件功能
+        '''
+        weather.sendsimplemail('bailiangcn@gmail.com',
+                '邮件测试', '天气不错\n新年快乐')
+    def sendattachmail(self):
+        weather.sendattachmail('bailiangcn@gmail.com', 
+                '测试附件','希望顺利' )
+        
 if '__main__' == __name__:
     import unittest
     unittest.main()

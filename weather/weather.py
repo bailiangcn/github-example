@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月27日 00时51分11秒
+# Last Change:  2011年01月27日 12时12分46秒
 
 """
 根据网页生成数据广播需要的天气预报网页
@@ -74,6 +74,10 @@ import datetime
 from string import Template
 import xml.dom.minidom
 import codecs
+
+import smtplib
+from email.mime.text import MIMEText
+from email.MIMEMultipart import MIMEMultipart
 
 ############################################################ 
 #                                                          #
@@ -484,6 +488,74 @@ def Indent(dom, node, indent = 0):
             if n.nodeType == node.ELEMENT_NODE:
                 Indent(dom, n, indent + 1)
 
+############################################################ 
+#                                                          #
+#                 发送邮件                                 #
+#                                                          #
+############################################################
+
+def sendsimplemail (address, sub, mailstr ):
+    '''
+    发送不带附件的邮件。参数说明:
+    address 邮件的目的地址[列表] 
+    例如:['one@163.com','two@163.com', ] 
+    sub 邮件的主题 
+    mailstr 邮件的内容
+    '''
+    mailuser = 'test'
+    mailpwd = 'test'
+
+    msg = MIMEText(mailstr, _charset='utf-8')
+    msg['Subject'] = sub
+    msg['From'] = '白亮<bailiangcn@163.com>'
+    try:
+        smtp = smtplib.SMTP()
+        smtp.connect('smtp.163.com')
+        smtp.login(mailuser, mailpwd)
+        smtp.sendmail('bailiangcn@163.com',
+                address, msg.as_string())
+        smtp.close()
+    except Exception, e:
+        print e
+
+
+def sendattachmail (address, sub, mailstr):
+
+    '''
+    发送带附件的邮件。参数说明:
+    address 邮件的目的地址[列表] 
+    例如:['one@163.com','two@163.com', ] 
+    sub 邮件的主题 
+    mailstr 邮件的内容
+    '''
+
+    mailuser = 'test'
+    mailpwd = 'test'
+
+    msg = MIMEMultipart()
+    att = MIMEText(open(r'tests/testweather.py', 'rb').read(), 'base64', 'utf-8')
+    att['content-type'] = 'application/octet-stream'
+    att['content-disposition'] = 'attachment;filename="keyword.py"'
+    msg.attach(att)
+
+    body = MIMEText(mailstr, _charset='utf-8')
+    msg.attach(body)
+
+    msg['to'] = address
+    msg['from'] = 'bailiangcn@163.com'
+    msg['subject'] = sub
+
+    try:
+        smtp = smtplib.SMTP()
+        smtp.connect('smtp.163.com')
+        smtp.login(mailuser, mailpwd)
+        smtp.sendmail('bailiangcn@163.com',
+                address, msg.as_string())
+        smtp.close()
+    except Exception, e:
+        print e
+   
+
 #
 ##自动调用测试用例，请输入测试用例名
 #
@@ -511,7 +583,7 @@ def main():
 
 if __name__=='__main__':
 
-    #testmain()
-    main()
+    testmain()
+    #main()
 
 
