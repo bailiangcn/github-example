@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月27日 12时12分43秒
+# Last Change:  2011年01月28日 02时17分12秒
 
 
 """
@@ -29,6 +29,20 @@ class simpleTest(TestCase):
         '''
         weather.getWeather0()
 
+    def testgetWeather1(self):
+        '''
+        测试从
+        http://www.weather.com.cn/html/weather/101050901.shtml 
+        取得天气数据(html格式)
+        '''
+        weather.getWeather1()
+
+    def testgetWeather2(self):
+        '''
+        测试从qq.ip138.com 取得天气数据(html格式)
+        '''
+        weather.getWeather2()
+
     def testgetWeather9(self):
         '''
         测试从www.webxml.com.cn 取得天气数据(xml格式)
@@ -51,7 +65,7 @@ class simpleTest(TestCase):
         测试读取xml文件生成html文件
         xmlToHtml()
         '''
-        weather.xmlToHtml('./template/wea.xml')
+        weather.xmlToHtml('./template/wea2.xml')
 
     def testinsertBar(self):
         '''

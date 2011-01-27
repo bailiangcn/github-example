@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月27日 12时12分46秒
+# Last Change:  2011年01月28日 02时18分43秒
 
 """
 根据网页生成数据广播需要的天气预报网页
@@ -144,13 +144,53 @@ def getWeather0():
 def getWeather1():
     '''
         从http://www.weather.com.cn/html/weather/101050901.shtml
-        取得天气数据(html格式), 输出为list格式
+        取得天气数据(html格式), 输出为xml格式
     '''
-    pass
+    #相应参数:如果网址参数发生变化, 修改以下部分
+    ############################################
+
+    URL = "http://www.weather.com.cn/html/weather/101050901.shtml"
+
+    ############################################
+
+    reDay = re.compile(r'(?<=class="weatherYubaoBox">).*?(?=id\="weatherYubao2")', 
+            re.I|re.S|re.U)
+
+    reWeather = re.compile(r'(?<=align\="center">天气</td>).+?(?=</tr)',
+            re.I|re.S|re.U)
+    reTemperature = re.compile(r'(?<=align\="center">气温</td>).+?(?=</tr)',
+            re.I|re.S|re.U)
+    reWind = re.compile(r'(?<=align\="center">风向</td>).+?(?=</tr)',
+            re.I|re.S|re.U)
+    rePic = reWeather
+    reEachDay = re.compile(r'(\d{4}-\d{1,2}-\d{1,2})',re.I|re.S|re.U)
+    
+    weadata = []
+    for i in range(12):
+        weadata.append(u'')
+    try:  
+        # 获取网页源文件  
+        sock = urllib.urlopen(URL)  
+        strhtml = sock.read()  
+        # 正则表达式取得各段
+        dayPara = re.findall(reDay, strhtml)
+        weatherPara = re.findall(reWeather, strhtml)
+        temperaturePara = re.findall(reTemperature, strhtml)
+        windPara = re.findall(reWind, strhtml)
+        picPara = re.findall(rePic, strhtml)
+        #获取日期
+        print len(dayPara)
+        print dayPara[0]
+        return
+
+    except Exception, ex:  
+        #如果错误, 记入日志
+        print ex
+        print sys.exc_info()
 
 def getWeather2():  
     '''
-        从qq.ip138.com 取得天气数据
+        从qq.ip138.com 取得天气数据(html格式), 输出为xml格式
     '''
     #相应参数:如果网址参数发生变化, 修改以下部分
     ############################################
@@ -159,69 +199,151 @@ def getWeather2():
 
     ############################################
 
+    reDay = re.compile(r'(?<=日期).*星期.+?(?=</tr>)', 
+            re.I|re.S|re.U)
     reWeather = re.compile(r'(?<=align\="center">天气</td>).+?(?=</tr)',
             re.I|re.S|re.U)
     reTemperature = re.compile(r'(?<=align\="center">气温</td>).+?(?=</tr)',
             re.I|re.S|re.U)
     reWind = re.compile(r'(?<=align\="center">风向</td>).+?(?=</tr)',
             re.I|re.S|re.U)
-
-
+    rePic = reWeather
+    reEachDay = re.compile(r'(\d{4}-\d{1,2}-\d{1,2})',re.I|re.S|re.U)
+    
+    weadata = []
+    for i in range(12):
+        weadata.append(u'')
     try:  
-        # 获取网页源文件  
+        #获取网页源文件  
         sock = urllib.urlopen(URL)  
         strhtml = sock.read()  
-        strhtml = unicode(strhtml, 'gb2312','ignore').encode('utf-8',
-                'ignore')  
-        #print strhtml
+        strhtml = unicode(strhtml, 'gb2312','ignore').encode('utf-8','ignore')  
+
         # 正则表达式取得各段
+        dayPara = re.findall(reDay, strhtml)
         weatherPara = re.findall(reWeather, strhtml)
         temperaturePara = re.findall(reTemperature, strhtml)
         windPara = re.findall(reWind, strhtml)
+        picPara = re.findall(rePic, strhtml)
+        #获取日期
+        theDays= re.findall(reEachDay, dayPara[0]) 
+        firstDay = datetime.datetime.strptime(theDays[1],'%Y-%m-%d')
+        nextDay = firstDay + datetime.timedelta(1)
+        lastDay = firstDay + datetime.timedelta(2)
+        weadata[0] = u'2'
+        weadata[1] = unicode(theDays[0].replace('-', '/'))
+        weadata[2] = unicode(firstDay.month)+u'月'+unicode(firstDay.day)+u'日 '
+        weadata[6] = unicode(nextDay.month)+u'月'+unicode(nextDay.day)+u'日 '
+        weadata[9] = unicode(lastDay.month)+u'月'+unicode(lastDay.day)+u'日 '
 
+        #获取天气概况
+        theWeathers= re.findall(r'(?<=br/>).+?(?=</td)',weatherPara[0])  
+        weadata[2] += unicode(theWeathers[1].decode('utf-8')) 
+        weadata[6] += unicode(theWeathers[2] .decode('utf-8'))
+        weadata[9] += unicode(theWeathers[3] .decode('utf-8'))
         # 获取温度信息
         # [0] 当前温度 [1]明日最高 [2]明日最低[3]后日最高[4]后日最低
-        theGrades = re.findall('(-?\d+)℃', temperaturePara[0])  
-        nowtime = 0
-        if int(theGrades[0]) < int(theGrades[1]):
-            nowtime = 1
-
-        # 获取天气描述信息  
-        # [0] 当前天气描述 [1]明日 [2]后日
-        weathers = re.findall(r'(?<=br/>).+?(?=</td)',weatherPara[0])  
+        theGrades = re.findall('(-?\d+℃)', temperaturePara[0])  
+        weadata[3] = unicode(theGrades[2].decode('utf-8')
+                ) + u'/' +unicode(theGrades[1].decode('utf-8')) 
+        weadata[7] = unicode(theGrades[4].decode('utf-8')
+                ) + u'/' +unicode(theGrades[3].decode('utf-8')) 
+        weadata[10] = unicode(theGrades[6].decode('utf-8')
+                ) + u'/' +unicode(theGrades[5].decode('utf-8')) 
         #获取风向
         # [0] 当前风向 [1]明日 [2]后日
-        wind = re.findall(r'(?<=td>).+?(?=</td>)', windPara[0])
+        theWinds = re.findall(r'(?<=td>).+?(?=</td>)', windPara[0])
+        weadata[4] = unicode(theWinds[1].decode('utf-8'))
+        #获取天气图标
+        thePics = re.findall(r'/image/(..\.gif)"', picPara[0])
+        weadata[5] = unicode(thePics[1].decode('utf-8'))
+        weadata[8] = unicode(thePics[2].decode('utf-8'))
+        weadata[11] = unicode(thePics[3].decode('utf-8'))
 
-        # 定义时间格式  
-        this_date = str(time.strftime("%Y/%m/%d %a"))  
-        now = int(time.time())  
-        sec = 24*60*60 
-        day_today = "今天(%s号)" % str(time.strftime("%d", 
-            time.localtime(now+0*sec)))  
-        day_tommo = "明天(%s号)" % str(time.strftime("%d", 
-            time.localtime(now+1*sec)))  
-        day_aftom = "后天(%s号)" % str(time.strftime("%d", 
-            time.localtime(now+2*sec)))  
-        # 定义短信正文  
-        sms = [this_date]  
-        sms.append("大庆天气")  
-        if nowtime ==  0:
-            sms.append("%s:%s,%s, %s-%s℃" % (day_today, 
-                weathers[0],wind[0], theGrades[1], theGrades[0]))  
-        else:
-            sms.append("%s:%s,%s, %s℃" % (day_today,
-                weathers[0],wind[0], theGrades[0]))  
+        listToxml(weadata, "template/wea2.xml")
 
-        sms.append("%s:%s,%s, %s-%s℃" % (day_tommo, 
-            weathers[1], wind[1],theGrades[3 - nowtime], 
-            theGrades[2 - nowtime]))  
-        sms.append("%s:%s,%s, %s-%s℃" % (day_aftom, weathers[2],
-            wind[2],theGrades[5 - nowtime], theGrades[4 - nowtime]))  
-        smscontent = '\n'.join(sms)  
-    except:  
-        return "There is sth wrong , please inform the author. " 
+    except Exception, ex:  
+        #如果错误, 记入日志
+        print ex
+        print sys.exc_info()
 
+def GetWeather8():
+    url = 'http://php.weather.sina.com.cn/search.php?city='+city+'&dpc=1'
+    response = urllib2.urlopen(url)
+    result=response.read() #.decode('utf-8').encode("gbk")
+    mathes = re.findall(r'<!-- box begin-->([\s\S]+?)<!-- box end-->',result)
+    if len(mathes) == 0:
+        print '没有找到'
+        return
+    data = []
+ 
+    #找城市名
+    cityname = re.findall(r'<div class="nav21">([\s\S]+?)<\/div>',result)
+    if len(cityname) > 0:
+        city = filterHtmlTags(cityname[0])
+    #天气
+    try:
+        data.append(re.findall(r'<h2>([\s\S]+?)<\/h2>',mathes[0])[0])
+    except IndexError:
+        data.append('暂无数据')
+    #温度
+    try:
+        data.append(re.findall(r'<div class="w-number">([\s\S]+?)<\/div>',mathes[0])[0])
+    except IndexError:
+        data.append('暂无数据')
+    #风向
+    try:
+        data.append(re.findall(r'<li>风向：([\s\S]+?)<\/li>',mathes[0])[0])
+    except IndexError:
+        data.append('暂无数据')
+    #风力
+    try:
+        data.append(re.findall(r'<li>风力：([\s\S]+?)<\/li>',mathes[0])[0])
+    except IndexError:
+        data.append('暂无数据')
+    #紫外线
+    try:
+        data.append(re.findall(r'<li>紫外线：([\s\S]+?)<\/li>',mathes[0])[0])
+    except IndexError:
+        data.append('暂无数据')
+    #舒适度
+    try:
+        data.append(re.findall(r'<li>舒适度：([\s\S]+?)<\/li>',mathes[0])[0])
+    except IndexError:
+        data.append('暂无数据')
+    #防晒指数
+    try:
+        data.append(re.findall(r'<li>防晒指数：([\s\S]+?)<\/li>',mathes[0])[0])
+    except IndexError:
+        data.append('暂无数据')
+ 
+    #明天
+    t = []
+    t.append(re.findall(r'<p>天气：([\s\S]+?)<\/p>',mathes[1])[0])
+    t.append(re.findall(r'<p>温度：([\s\S]+?)<\/p>',mathes[1])[0])
+    t.append(re.findall(r'<p>风力：([\s\S]+?)<\/p>',mathes[1])[0])
+    data.append(t)
+    #后天
+    t = []
+    t.append(re.findall(r'<p>天气：([\s\S]+?)<\/p>',mathes[2])[0])
+    t.append(re.findall(r'<p>温度：([\s\S]+?)<\/p>',mathes[2])[0])
+    t.append(re.findall(r'<p>风力：([\s\S]+?)<\/p>',mathes[2])[0])
+    data.append(t)
+ 
+    for a in range(len(data)):
+        data[a] = filterHtmlTags(data[a])
+ 
+    result =  "城市:\t%s\n----今日天气----\n天气:\t%s\n温度:\t%s\n风向:\t%s\n风力:\t%s\n紫外线:\t%s\n舒适度:\t%s\n防晒指数:\t%s\n----明日天气----\n天气:\t%s\n温度:%s\n风力:%s\n----后天天气----\n天气:%s\n温度:%s\n风力:%s\n" % (city,data[0],data[1],data[2],data[3],data[4],data[5],data[6],data[7][0],data[7][1],data[7][2],data[8][0],data[8][1],data[8][2])
+    print result
+ 
+def filterHtmlTags(a):
+    if isinstance(a,basestring) :
+        a = re.sub(r'<[^>]+>','',a)
+        a = re.sub(r'\s+','',a)
+    if isinstance(a,list):
+        for i in range(len(a)):
+            a[i] = filterHtmlTags(a[i])
+    return a
 def getWeather9():
     '''
         从www.webxml.com.cn 取得天气数据(xml格式)
@@ -533,7 +655,8 @@ def sendattachmail (address, sub, mailstr):
     mailpwd = 'test'
 
     msg = MIMEMultipart()
-    att = MIMEText(open(r'tests/testweather.py', 'rb').read(), 'base64', 'utf-8')
+    att = MIMEText(open(r'tests/testweather.py', 'rb').read(),
+            'base64', 'utf-8')
     att['content-type'] = 'application/octet-stream'
     att['content-disposition'] = 'attachment;filename="keyword.py"'
     msg.attach(att)
@@ -576,10 +699,7 @@ def main():
     '''
     调用主程序, 生成html页面
     '''
-    getWeather0()
-    getWeather9()
-
-    print xmlToHtml('./template/wea9.xml')
+    getWeather2()
 
 if __name__=='__main__':
 
