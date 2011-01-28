@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月28日 10时08分37秒
+# Last Change:  2011年01月28日 15时36分14秒
 
 """
 根据网页生成数据广播需要的天气预报网页
@@ -136,9 +136,11 @@ def getWeather0():
                     weatherlist[15],weatherlist[18],weatherlist[17],
                     weatherlist[20]]
             listToxml(resultlist, "template/wea0.xml")
+            log('weather0获取天气信息成功', 'logs/running.log')
         else:
             log('weather0获取xml文件失败')
             log(strxml)
+            log('weather0获取xml文件失败', 'logs/running.log')
 
     except Exception, ex:  
         #如果错误, 记入日志
@@ -247,12 +249,12 @@ def getWeather2():
         # 获取温度信息
         # [0] 当前温度 [1]明日最高 [2]明日最低[3]后日最高[4]后日最低
         theGrades = re.findall('(-?\d+℃)', temperaturePara[0])  
-        weadata[3] = unicode(theGrades[1].decode('utf-8')
-                ) + u'/' +unicode(theGrades[2].decode('utf-8')) 
-        weadata[7] = unicode(theGrades[3].decode('utf-8')
-                ) + u'/' +unicode(theGrades[4].decode('utf-8')) 
-        weadata[10] = unicode(theGrades[5].decode('utf-8')
-                ) + u'/' +unicode(theGrades[6].decode('utf-8')) 
+        weadata[3] = unicode(theGrades[2].decode('utf-8')
+                ) + u'/' +unicode(theGrades[3].decode('utf-8')) 
+        weadata[7] = unicode(theGrades[4].decode('utf-8')
+                ) + u'/' +unicode(theGrades[5].decode('utf-8')) 
+        weadata[10] = unicode(theGrades[6].decode('utf-8')
+                ) + u'/' +unicode(theGrades[7].decode('utf-8')) 
         #获取风向
         # [0] 当前风向 [1]明日 [2]后日
         theWinds = re.findall(r'(?<=td>).+?(?=</td>)', windPara[0])
@@ -264,11 +266,12 @@ def getWeather2():
         weadata[11] = unicode(thePics[3].decode('utf-8'))
 
         listToxml(weadata, "template/wea2.xml")
-
+        log('weather2获取天气信息成功', 'logs/running.log')
     except Exception, ex:  
         #如果错误, 记入日志
         log('严重错误:weather2获取xml文件失败')
         errlog('getWeather2', ex, sys.exc_info())
+        log('weather2获取xml文件失败', 'logs/running.log')
 
 def GetWeather8():
     url = 'http://php.weather.sina.com.cn/search.php?city='+city+'&dpc=1'
@@ -393,9 +396,11 @@ def getWeather9():
             dom.writexml(writer,encoding='utf-8')
             writer.close()
             f.close()
+            log('weather9获取天气信息成功', 'logs/running.log')
         else:
             log('weather9获取xml文件失败')
             log(strxml)
+            log('weather9获取xml文件失败', 'logs/running.log')
 
     except Exception, ex:  
         #如果错误, 记入日志
