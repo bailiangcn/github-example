@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月28日 15时39分54秒
+# Last Change:  2011年01月28日 16时46分35秒
 
 
 """ 
@@ -15,7 +15,8 @@ import os
 import sys
 import weather
 
-#生成页面的顺序
+#生成页面的顺序, 可以调整ORDER的顺序, 
+#表示生成的优先选用顺序
 ############################################
 ORDER = [u'0', u'9', u'2']
 ############################################
@@ -38,5 +39,4 @@ for order in ORDER:
     filename = u'template/wea' + order + u'.xml'
     if filename in allwealist:
         weather.xmlToHtml(filename)
-        print "making from %s" % filename
         break
