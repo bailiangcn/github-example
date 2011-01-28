@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月28日 02时18分43秒
+# Last Change:  2011年01月28日 10时08分37秒
 
 """
 根据网页生成数据广播需要的天气预报网页
@@ -117,9 +117,14 @@ def getWeather0():
         strxml = sock.read()  
         dom=xml.dom.minidom.parseString(strxml)
         root=dom.documentElement
-        #验证xml的第一个string元素是黑龙江, 如果是表示数据正常
+        #验证xml的第二个string元素是大庆, 如果是表示数据正常
         strlist=root.getElementsByTagName("string")
-        areastr=strlist[1].firstChild.data
+        if strlist[1].hasChildNodes():
+            areastr=strlist[1].firstChild.data
+        else:
+            log('weather0获取xml文件失败')
+            log(strxml)
+            return
         if  areastr== u'大庆':
             #生成一个包含所有天气字符串的列表
             weatherlist = []
@@ -131,15 +136,14 @@ def getWeather0():
                     weatherlist[15],weatherlist[18],weatherlist[17],
                     weatherlist[20]]
             listToxml(resultlist, "template/wea0.xml")
-
         else:
-            print "nothing get"
-            #print root.toxml().encode("utf-8")
+            log('weather0获取xml文件失败')
+            log(strxml)
 
     except Exception, ex:  
         #如果错误, 记入日志
-        print ex
-        print sys.exc_info()
+        log('严重错误:weather0获取xml文件失败')
+        errlog('getWeather0', ex, sys.exc_info())
 
 def getWeather1():
     '''
@@ -179,14 +183,13 @@ def getWeather1():
         windPara = re.findall(reWind, strhtml)
         picPara = re.findall(rePic, strhtml)
         #获取日期
-        print len(dayPara)
-        print dayPara[0]
+        #print len(dayPara)
+        #print dayPara[0]
         return
 
     except Exception, ex:  
         #如果错误, 记入日志
-        print ex
-        print sys.exc_info()
+        errlog('getWeather1', ex, sys.exc_info())
 
 def getWeather2():  
     '''
@@ -244,12 +247,12 @@ def getWeather2():
         # 获取温度信息
         # [0] 当前温度 [1]明日最高 [2]明日最低[3]后日最高[4]后日最低
         theGrades = re.findall('(-?\d+℃)', temperaturePara[0])  
-        weadata[3] = unicode(theGrades[2].decode('utf-8')
-                ) + u'/' +unicode(theGrades[1].decode('utf-8')) 
-        weadata[7] = unicode(theGrades[4].decode('utf-8')
-                ) + u'/' +unicode(theGrades[3].decode('utf-8')) 
-        weadata[10] = unicode(theGrades[6].decode('utf-8')
-                ) + u'/' +unicode(theGrades[5].decode('utf-8')) 
+        weadata[3] = unicode(theGrades[1].decode('utf-8')
+                ) + u'/' +unicode(theGrades[2].decode('utf-8')) 
+        weadata[7] = unicode(theGrades[3].decode('utf-8')
+                ) + u'/' +unicode(theGrades[4].decode('utf-8')) 
+        weadata[10] = unicode(theGrades[5].decode('utf-8')
+                ) + u'/' +unicode(theGrades[6].decode('utf-8')) 
         #获取风向
         # [0] 当前风向 [1]明日 [2]后日
         theWinds = re.findall(r'(?<=td>).+?(?=</td>)', windPara[0])
@@ -264,8 +267,8 @@ def getWeather2():
 
     except Exception, ex:  
         #如果错误, 记入日志
-        print ex
-        print sys.exc_info()
+        log('严重错误:weather2获取xml文件失败')
+        errlog('getWeather2', ex, sys.exc_info())
 
 def GetWeather8():
     url = 'http://php.weather.sina.com.cn/search.php?city='+city+'&dpc=1'
@@ -366,8 +369,14 @@ def getWeather9():
         strxml = sock.read()  
         dom=xml.dom.minidom.parseString(strxml)
         root=dom.documentElement
-        #验证xml的第一个string元素是黑龙江, 如果是表示数据正常
-        areastr=root.getElementsByTagName("string")[1].firstChild.data
+        #验证xml的第二个string元素是大庆, 如果是表示数据正常
+        strlist = root.getElementsByTagName("string")
+        if strlist[1].hasChildNodes():
+            areastr=strlist[1].firstChild.data
+        else:
+            log('weather9获取xml文件失败')
+            log(strxml)
+            return
         if  areastr== u'大庆':
             #添加数据来源标识, 增加source 元素
             soutext = dom.createTextNode(SOURCE)
@@ -385,13 +394,13 @@ def getWeather9():
             writer.close()
             f.close()
         else:
-            print "nothing get"
-            #print root.toxml().encode("utf-8")
+            log('weather9获取xml文件失败')
+            log(strxml)
 
     except Exception, ex:  
         #如果错误, 记入日志
-        print ex
-        print sys.exc_info()
+        log('严重错误:weather9获取xml文件失败')
+        errlog('getWeather9', ex, sys.exc_info())
 
 ############################################################ 
 #                                                          #
@@ -610,6 +619,29 @@ def Indent(dom, node, indent = 0):
             if n.nodeType == node.ELEMENT_NODE:
                 Indent(dom, n, indent + 1)
 
+def errlog(modelname, ex, exc_info):
+    '''
+    把错误信息写入日志文件
+    '''
+    log(modelname + '模块发生错误:')
+    log(unicode(ex)) 
+    log(unicode(exc_info))
+
+def log(str, filename="logs/weatherlog.txt"):
+    '''
+    把字符串写入日志文件
+    '''
+    #根据分类从配置文件选择合适的目标文件写入字符串
+    nowtimestr = unicode(datetime.datetime.now().strftime(
+        "[%Y-%m-%d %H:%M:%S]"),'utf-8')
+    f = open(filename, 'a')
+    if not isinstance(str,unicode):
+        str = unicode(str,'utf-8')
+    desstr = "%s  %s\n" % (nowtimestr, str)
+    byte_out = desstr.encode('utf-8')
+    f.write(byte_out)
+    f.close()
+    return True
 ############################################################ 
 #                                                          #
 #                 发送邮件                                 #

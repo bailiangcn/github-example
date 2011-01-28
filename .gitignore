@@ -1,3 +1,4 @@
 *.pyc
 *.swp
 weather/html/index.htm
+log.txt

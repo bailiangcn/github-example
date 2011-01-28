@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月28日 02时17分12秒
+# Last Change:  2011年01月28日 10时06分04秒
 
 
 """
@@ -23,7 +23,7 @@ import weather
 
 class simpleTest(TestCase):
 
-    def testgetWeather0(self):
+    def getWeather0(self):
         '''
         测试从www.webxml.com.cn 取得天气数据(xml格式)
         '''
@@ -58,7 +58,7 @@ class simpleTest(TestCase):
                 u'-28℃/-18℃', u'北风微风转西风微风', u'1.gif',
                 u'1月27日 晴', u'-28℃/-18℃', u'0.gif',
                 u'1月28日 晴', u'-29℃/-18℃', u'0.gif']
-        weather.listToxml(soulist)
+        weather.listToxml(soulist, 'template/testwea.xml')
 
     def testxmlToHtml(self):
         '''
@@ -100,6 +100,13 @@ class simpleTest(TestCase):
         for temstr, wishres in knownValues:
             result = weather.diffTem(temstr)
             self.assertEqual(wishres, result)
+
+    def testlog(self):
+        '''
+        测试log函数记录日志功能
+        '''
+        res=weather.log('开始日志记录')
+        self.assertEqual(res, True)
 
     def testtransPicId(self):
         '''
