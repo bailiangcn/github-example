@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月28日 10时06分04秒
+# Last Change:  2011-01-28 21:16:53
 
 
 """
@@ -29,7 +29,7 @@ class simpleTest(TestCase):
         '''
         weather.getWeather0()
 
-    def testgetWeather1(self):
+    def getWeather1(self):
         '''
         测试从
         http://www.weather.com.cn/html/weather/101050901.shtml 
@@ -131,13 +131,13 @@ class simpleTest(TestCase):
             result = weather.transPicId(souname)
             self.assertEqual(wishres, result)
 
-    def sendsimplemail(self):
+    def testsendsimplemail(self):
         '''
         测试sendsimplemail()发送邮件功能
         '''
-        weather.sendsimplemail('bailiangcn@gmail.com',
-                '邮件测试', '天气不错\n新年快乐')
-    def sendattachmail(self):
+        weather.sendsimplemail(['bailiangcn@gmail.com','bailiangcn@163.com'], 
+                '群发邮件测试', '兔年吉祥\n新年快乐')
+    def testsendattachmail(self):
         weather.sendattachmail('bailiangcn@gmail.com', 
                 '测试附件','希望顺利' )
         

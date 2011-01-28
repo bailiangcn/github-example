@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月28日 15时36分14秒
+# Last Change:  2011-01-28 22:21:09
 
 """
 根据网页生成数据广播需要的天气预报网页
@@ -661,21 +661,21 @@ def sendsimplemail (address, sub, mailstr ):
     sub 邮件的主题 
     mailstr 邮件的内容
     '''
-    mailuser = 'test'
-    mailpwd = 'test'
+    mailuser = 'test2011'
+    mailpwd = 'password2011'
 
     msg = MIMEText(mailstr, _charset='utf-8')
     msg['Subject'] = sub
-    msg['From'] = '白亮<bailiangcn@163.com>'
+    msg['From'] = '系统监控服务中心<test2011@126.com>'
     try:
         smtp = smtplib.SMTP()
-        smtp.connect('smtp.163.com')
+        smtp.connect('smtp.126.com')
         smtp.login(mailuser, mailpwd)
-        smtp.sendmail('bailiangcn@163.com',
+        smtp.sendmail('test2011@126.com',
                 address, msg.as_string())
         smtp.close()
-    except Exception, e:
-        print e
+    except Exception, ex:
+        errlog('发送邮件错误', ex, sys.exc_info())
 
 
 def sendattachmail (address, sub, mailstr):
@@ -688,32 +688,32 @@ def sendattachmail (address, sub, mailstr):
     mailstr 邮件的内容
     '''
 
-    mailuser = 'test'
-    mailpwd = 'test'
+    mailuser = 'test2011'
+    mailpwd = 'password2011'
 
     msg = MIMEMultipart()
-    att = MIMEText(open(r'tests/testweather.py', 'rb').read(),
+    att = MIMEText(open(r'html/index.htm', 'rb').read(),
             'base64', 'utf-8')
     att['content-type'] = 'application/octet-stream'
-    att['content-disposition'] = 'attachment;filename="keyword.py"'
+    att['content-disposition'] = 'attachment;filename="index.htm"'
     msg.attach(att)
 
     body = MIMEText(mailstr, _charset='utf-8')
     msg.attach(body)
 
     msg['to'] = address
-    msg['from'] = 'bailiangcn@163.com'
+    msg['From'] = '系统监控服务中心<test2011@126.com>'
     msg['subject'] = sub
 
     try:
         smtp = smtplib.SMTP()
-        smtp.connect('smtp.163.com')
+        smtp.connect('smtp.126.com')
         smtp.login(mailuser, mailpwd)
-        smtp.sendmail('bailiangcn@163.com',
+        smtp.sendmail('test2011@126.com',
                 address, msg.as_string())
         smtp.close()
-    except Exception, e:
-        print e
+    except Exception, ex:
+        errlog('发送带附件邮件错误', ex, sys.exc_info())
    
 
 #
