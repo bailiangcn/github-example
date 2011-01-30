@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月30日 15时25分10秒
+# Last Change:  2011年01月30日 16时53分33秒
 
 """
 根据网页生成数据广播需要的天气预报网页
@@ -124,7 +124,7 @@ def getWeather0():
         else:
             log('weather0获取xml文件失败')
             log(strxml)
-            return
+            return False
         if  areastr== u'大庆':
             #生成一个包含所有天气字符串的列表
             weatherlist = []
@@ -141,11 +141,13 @@ def getWeather0():
             log('weather0获取xml文件失败')
             log(strxml)
             log('weather0获取xml文件失败', 'logs/running.log')
-
+            return False
     except Exception, ex:  
         #如果错误, 记入日志
         log('严重错误:weather0获取xml文件失败')
         errlog('getWeather0', ex, sys.exc_info())
+        return False
+    return True
 
 def getWeather1():
     '''
@@ -272,6 +274,8 @@ def getWeather2():
         log('严重错误:weather2获取xml文件失败')
         errlog('getWeather2', ex, sys.exc_info())
         log('weather2获取xml文件失败', 'logs/running.log')
+        return False
+    return True
 
 def GetWeather8():
     url = 'http://php.weather.sina.com.cn/search.php?city='+city+'&dpc=1'
@@ -379,7 +383,7 @@ def getWeather9():
         else:
             log('weather9获取xml文件失败')
             log(strxml)
-            return
+            return False
         if  areastr== u'大庆':
             #添加数据来源标识, 增加source 元素
             soutext = dom.createTextNode(SOURCE)
@@ -401,12 +405,14 @@ def getWeather9():
             log('weather9获取xml文件失败')
             log(strxml)
             log('weather9获取xml文件失败', 'logs/running.log')
+            return False
 
     except Exception, ex:  
         #如果错误, 记入日志
         log('严重错误:weather9获取xml文件失败')
         errlog('getWeather9', ex, sys.exc_info())
-
+        return False
+    return True
 ############################################################ 
 #                                                          #
 #              对数据进行进一步处理部分                    #
