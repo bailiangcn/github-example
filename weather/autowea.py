@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月30日 15时42分42秒
+# Last Change:  2011年01月30日 16时56分27秒
 
 
 """ 
@@ -26,10 +26,20 @@ MAILLIST = ['bailiangcn@gmail.com','test2011@126.com']
 #删除所有原有的wea*.xml文件
 os.system('rm template/wea[0-9].xml')
 
+mess= u'信息采集开始:\n'
 ##取网页生成xml文件
-weather.getWeather0()
-weather.getWeather2()
-weather.getWeather9()
+if weather.getWeather0():
+    mess  += u'信息源0号成功\n' 
+else:
+    mess  += u'信息源0号失败\n' 
+if weather.getWeather2():
+    mess  += u'信息源2号成功\n' 
+else:
+    mess  += u'信息源2号失败\n' 
+if weather.getWeather9():
+    mess  += u'信息源9号成功\n' 
+else:
+    mess  += u'信息源9号失败\n' 
 
 
 #取出所有生成的中间xml文件
@@ -42,7 +52,7 @@ if len(allwealist)==0:
 for order in ORDER:
     filename = u'template/wea' + order + u'.xml'
     if filename in allwealist:
-        mess= ''.join((u'系统采集正常,信息来源:', filename)) 
+        mess= ''.join((mess, u'系统采集正常,信息来源:', filename)) 
         weather.xmlToHtml(filename)
         weather.sendattachmail('bailiangcn@gmail.com',u'天气预报运行报告',
                 mess.encode('utf-8'))
