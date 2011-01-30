@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011-01-28 22:40:46
+# Last Change:  2011年01月30日 15时39分49秒
 
 
 """ 
@@ -24,7 +24,7 @@ MAILLIST = ['bailiangcn@gmail.com','test2011@126.com']
 ############################################
 
 #删除所有原有的wea*.xml文件
-#os.system('rm template/wea[0-9].xml')
+os.system('rm template/wea[0-9].xml')
 
 ##取网页生成xml文件
 weather.getWeather0()

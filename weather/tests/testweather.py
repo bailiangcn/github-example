@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011-01-28 21:16:53
+# Last Change:  2011年01月30日 15时20分18秒
 
 
 """
@@ -60,7 +60,7 @@ class simpleTest(TestCase):
                 u'1月28日 晴', u'-29℃/-18℃', u'0.gif']
         weather.listToxml(soulist, 'template/testwea.xml')
 
-    def testxmlToHtml(self):
+    def xmlToHtml(self):
         '''
         测试读取xml文件生成html文件
         xmlToHtml()
@@ -76,6 +76,8 @@ class simpleTest(TestCase):
             (u'西风转西北风', u'西风转<br>西北风'), 
             (u'西风', u'西风'), 
             (u'西风转西北微风', u'西风转<br>西北微风'), 
+            (u'西风转西北微风西风转西北微风西风转西北微风', 
+             u'西风转西北微风西<br>风转西北微风西风'), 
             )
         for soustr, resstr in knownValues:
             wishres=weather.insertBr(soustr)
