@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011-01-28 22:21:09
+# Last Change:  2011年01月30日 15时25分10秒
 
 """
 根据网页生成数据广播需要的天气预报网页
@@ -538,9 +538,11 @@ def insertBr(str):
     '''
     输入超长字符串自动断行
     '''
-    resstr = str
-    if len(str)>5:
-        resstr = str[:len(str)//2] + "<br>" +str[len(str)//2:] 
+    resstr = str.strip()
+    if len(resstr)>16:
+        resstr = resstr[0:16]
+    if len(resstr)>5:
+        resstr = resstr[:len(resstr)//2] + "<br>" +resstr[len(resstr)//2:] 
     return resstr
 def transPicId(souname):
     '''
@@ -559,7 +561,7 @@ def transPicId(souname):
     return (resname)
 
 def diffDayAndWeather(temstr):
-    '''<F3>
+    '''
     输入一个日期天气的字符串, 返回一个日期天气的列表
     例子 输入 '1月26日 多云',  返回 ['1月', '26日','多云', '星期三'] 
     '''
@@ -575,7 +577,7 @@ def diffDayAndWeather(temstr):
     return ([restem1[0], restem1[1], restem0[1], u'星期' + weekdict[week]])
 
 def diffTem(temstr):
-    '''<F3>
+    '''
     输入一个最低温度最高温度的字符串, 返回一个最低最高温度的列表
     例子 输入 -28℃/-18℃ 返回 [-28℃, -18℃]
     '''
