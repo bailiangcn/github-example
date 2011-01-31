@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月30日 16时53分33秒
+# Last Change:  2011年01月31日 12时36分56秒
 
 """
 根据网页生成数据广播需要的天气预报网页
@@ -74,6 +74,7 @@ import datetime
 from string import Template
 import xml.dom.minidom
 import codecs
+from BeautifulSoup import BeautifulSoup
 
 import smtplib
 from email.mime.text import MIMEText
@@ -161,18 +162,6 @@ def getWeather1():
 
     ############################################
 
-    reDay = re.compile(r'(?<=class="weatherYubaoBox">).*?(?=id\="weatherYubao2")', 
-            re.I|re.S|re.U)
-
-    reWeather = re.compile(r'(?<=align\="center">天气</td>).+?(?=</tr)',
-            re.I|re.S|re.U)
-    reTemperature = re.compile(r'(?<=align\="center">气温</td>).+?(?=</tr)',
-            re.I|re.S|re.U)
-    reWind = re.compile(r'(?<=align\="center">风向</td>).+?(?=</tr)',
-            re.I|re.S|re.U)
-    rePic = reWeather
-    reEachDay = re.compile(r'(\d{4}-\d{1,2}-\d{1,2})',re.I|re.S|re.U)
-    
     weadata = []
     for i in range(12):
         weadata.append(u'')
@@ -180,19 +169,83 @@ def getWeather1():
         # 获取网页源文件  
         sock = urllib.urlopen(URL)  
         strhtml = sock.read()  
-        # 正则表达式取得各段
-        dayPara = re.findall(reDay, strhtml)
-        weatherPara = re.findall(reWeather, strhtml)
-        temperaturePara = re.findall(reTemperature, strhtml)
-        windPara = re.findall(reWind, strhtml)
-        picPara = re.findall(rePic, strhtml)
-        #获取日期
-        #print len(dayPara)
-        #print dayPara[0]
-        return
+        soup = BeautifulSoup(strhtml)
+        #取得当日日期
+        daystr = soup.find("div", "weatherYubao").find("h1", "weatheH1").text
+        strday = re.search(r'\d{4}-\d{1,2}-\d{1,2}',daystr).group()
+        firstDay = datetime.datetime.strptime(strday,'%Y-%m-%d')
+        nextDay = firstDay + datetime.timedelta(1)
+        lastDay = firstDay + datetime.timedelta(2)
+        weadata[0] = u'1'
+        weadata[1] = unicode(strday.replace('-', '/') )
+        weadata[2] = unicode(firstDay.month)+u'月'+unicode(firstDay.day)+u'日 '
+        weadata[6] = unicode(nextDay.month)+u'月'+unicode(nextDay.day)+u'日 '
+        weadata[9] = unicode(lastDay.month)+u'月'+unicode(lastDay.day)+u'日 '
+
+        #取得有关天气的标签
+        wealist = soup.find("div", "weatherYubaoBox").findAll("table", "yuBaoTable")
+        if  len(wealist) == 3:
+            #取得第一天信息
+            daytr = wealist[0].findAll("td")
+            #图片
+            thePic = os.path.basename(daytr[2].img['src'])
+            weadata[5] = thePic
+            #天气
+            theWeather = daytr[3].text
+            weadata[2] += theWeather
+            #温度
+            gradehighstr=daytr[4].findAll("strong")
+            theHighGrade = gradehighstr[0].text + gradehighstr[1].text
+            gradelowerstr=daytr[10].findAll("strong")
+            theLowerGrade = gradelowerstr[0].text + gradelowerstr[1].text
+            weadata[3] =  theLowerGrade + u'/'  + theHighGrade  
+            #风向
+            weadata[4] = daytr[5].text + daytr[6].text
+
+            #取得第二天信息
+            daytr = wealist[1].findAll("td")
+            #图片
+            thePic = os.path.basename(daytr[2].img['src'])
+            weadata[8] = thePic
+            #天气
+            theWeather = daytr[3].text
+            weadata[6] += theWeather
+            #温度
+            gradehighstr=daytr[4].findAll("strong")
+            theHighGrade = gradehighstr[0].text + gradehighstr[1].text
+            gradelowerstr=daytr[10].findAll("strong")
+            theLowerGrade = gradelowerstr[0].text + gradelowerstr[1].text
+            weadata[7] =  theLowerGrade + u'/'  + theHighGrade  
+
+            #取得第三天信息
+            daytr = wealist[2].findAll("td")
+            #图片
+            thePic = os.path.basename(daytr[2].img['src'])
+            weadata[11] = thePic
+            #天气
+            theWeather = daytr[3].text
+            weadata[9] += theWeather
+            #温度
+            gradehighstr=daytr[4].findAll("strong")
+            theHighGrade = gradehighstr[0].text + gradehighstr[1].text
+            gradelowerstr=daytr[10].findAll("strong")
+            theLowerGrade = gradelowerstr[0].text + gradelowerstr[1].text
+            weadata[10] =  theLowerGrade + u'/'  + theHighGrade  
+
+            listToxml(weadata, "template/wea1.xml")
+            log('weather1获取天气信息成功', 'logs/running.log')
+
+        else:
+            log('weather1获取html文件失败')
+            log(strhtml)
+            log('weather1获取html文件失败', 'logs/running.log')
+            return False
+
+        return True
 
     except Exception, ex:  
         #如果错误, 记入日志
+        print "error"
         errlog('getWeather1', ex, sys.exc_info())
 
 def getWeather2():  
@@ -354,6 +407,7 @@ def filterHtmlTags(a):
         for i in range(len(a)):
             a[i] = filterHtmlTags(a[i])
     return a
+
 def getWeather9():
     '''
         从www.webxml.com.cn 取得天气数据(xml格式)
@@ -744,7 +798,8 @@ def main():
     '''
     调用主程序, 生成html页面
     '''
-    getWeather2()
+    xmlToHtml('./template/wea0.xml')
+
 
 if __name__=='__main__':
 

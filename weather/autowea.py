@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月30日 16时56分27秒
+# Last Change:  2011年01月31日 12时35分28秒
 
 
 """ 
@@ -18,7 +18,7 @@ import weather
 #生成页面的顺序, 可以调整ORDER的顺序, 
 #表示生成的优先选用顺序
 ############################################
-ORDER = [u'0', u'9', u'2']
+ORDER = [u'0', u'9', u'1', u'2']
 #管理员邮箱, 可自行添加(但注意可能出现126认为是垃圾邮件)
 MAILLIST = ['bailiangcn@gmail.com','test2011@126.com']
 ############################################
@@ -32,6 +32,10 @@ if weather.getWeather0():
     mess  += u'信息源0号成功\n' 
 else:
     mess  += u'信息源0号失败\n' 
+if weather.getWeather1():
+    mess  += u'信息源1号成功\n' 
+else:
+    mess  += u'信息源1号失败\n' 
 if weather.getWeather2():
     mess  += u'信息源2号成功\n' 
 else:
