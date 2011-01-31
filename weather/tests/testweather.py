@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月30日 17时04分51秒
+# Last Change:  2011年01月31日 16时26分20秒
 
 
 """
@@ -59,6 +59,19 @@ class simpleTest(TestCase):
                 u'1月27日 晴', u'-28℃/-18℃', u'0.gif',
                 u'1月28日 晴', u'-29℃/-18℃', u'0.gif']
         weather.listToxml(soulist, 'template/testwea.xml')
+
+    def testxmlToList(self):
+        '''
+        测试读取xml文件生成html文件
+        xmlToList()
+        '''
+        wishvalue = [u'1', u'2011/1/28 9:44:38', 
+        u'1月28日 多云', u'-29℃/-19℃', u'西北风3-4级', u'1.gif', 
+        u'1月29日 多云转晴', u'-28℃/-20℃', u'1.gif', u'1月30日 晴', 
+        u'-27℃/-17℃', u'0.gif']
+        resvalue=weather.xmlToList('./template/wea0')
+        self.assertEqual(wishvalue, resvalue)
+
 
     def xmlToHtml(self):
         '''
@@ -133,6 +146,28 @@ class simpleTest(TestCase):
             result = weather.transPicId(souname)
             self.assertEqual(wishres, result)
 
+    def testisChinese(self):
+        '''
+        测试isChinese()能否判断汉字
+        '''
+        knownValues=((u'中',True),('e',False),
+                ('中',False))
+        for souchr, wishres in knownValues:
+            result = weather.isChinese(souchr)
+            self.assertEqual(wishres, result)
+
+    def testzhLjust(self):
+        '''
+        测试zhLjust()能否正确根据中文填充空格
+        '''
+        knownValues=((
+            (u'中',4),u'中  '),
+            ((u'e中f',6),u'e中f  '))
+        for souchr, wishres in knownValues:
+            result = weather.zhLjust(souchr[0],souchr[1])
+            self.assertEqual(wishres, result)
+
+
     def testsendsimplemail(self):
         '''
         测试sendsimplemail()发送邮件功能
@@ -142,6 +177,7 @@ class simpleTest(TestCase):
     def testsendattachmail(self):
         weather.sendattachmail('bailiangcn@gmail.com', 
                 '测试附件','希望顺利' )
+
         
 if '__main__' == __name__:
     import unittest

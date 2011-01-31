@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月31日 12时36分56秒
+# Last Change:  2011年01月31日 17时07分04秒
 
 """
 根据网页生成数据广播需要的天气预报网页
@@ -486,7 +486,7 @@ def listToxml(weadata, FILENAME="template/wea.xml"):
     weadata [7]  -->   weatherlist[13]  "第二天 气温"  
     weadata [8]  -->   weatherlist[15]  "第二天 天气图标 1"                
     weadata [9]  -->   weatherlist[17]  "第三天 概况 格式:M月d日 天气概况"
-    weadata [10]  -->  weatherlist[18]  "第三天 气温"  
+    weadata [10] -->  weatherlist[18]  "第三天 气温"  
     weadata [11] -->   weatherlist[20]  "第三天 天气图标 1"
     '''
     #相应参数:如果参数发生变化, 修改以下部分
@@ -519,6 +519,34 @@ def listToxml(weadata, FILENAME="template/wea.xml"):
             #如果错误, 记入日志
             print ex
             print sys.exc_info()
+
+def xmlToList(xmlfilename):
+    '''
+    读入一个xml文件, 返回一个列表
+    weadata [0]  <--   source[0]        "信息来源"
+    weadata [1]  <--   weatherlist[3]   "更新时间 格式:yyyy-MM-dd HH:mm:ss"
+    weadata [2]  <--   weatherlist[7]   "第一天 概况 格式:M月d日 天气概况"
+    weadata [3]  <--   weatherlist[8]   "第一天 气温"  
+    weadata [4]  <--   weatherlist[9]   "第一天 风力/风向"
+    weadata [5]  <--   weatherlist[10]  "第一天 天气图标 1"                
+    weadata [6]  <--   weatherlist[12]  "第二天 概况 格式:M月d日 天气概况"
+    weadata [7]  <--   weatherlist[13]  "第二天 气温"  
+    weadata [8]  <--   weatherlist[15]  "第二天 天气图标 1"                
+    weadata [9]  <--   weatherlist[17]  "第三天 概况 格式:M月d日 天气概况"
+    weadata [10] <--  weatherlist[18]  "第三天 气温"  
+    weadata [11] <--   weatherlist[20]  "第三天 天气图标 1"
+    '''
+    #读入天气预报xml文件
+    dom=xml.dom.minidom.parse(xmlfilename)
+    root=dom.documentElement
+    sourcelist = root.getElementsByTagName('source')[0]
+    source = getText(sourcelist)
+    strlist=root.getElementsByTagName('string')
+    weatherlist = [source]
+    wlist = [3, 7, 8, 9, 10, 12, 13, 15, 17, 18, 20]
+    for i in wlist:
+        weatherlist.append(getText(strlist[i]))
+    return weatherlist
 
 def xmlToHtml(xmlfilename):
     '''
@@ -709,6 +737,28 @@ def log(str, filename="logs/weatherlog.txt"):
     f.write(byte_out)
     f.close()
     return True
+
+def isChinese(uchar):
+    '''
+    判断一个unicode是否是汉字
+    '''
+    if isinstance(uchar, unicode):
+        if uchar >= u'\u4e00' and uchar<=u'\u9fa5':
+            return True
+        else:
+            return False
+    else:
+        return False
+
+def zhLjust(soustr,width):
+    soustr=soustr.strip()
+    for char in soustr:
+        if isChinese(char):
+            width -= 2
+    resstr=soustr.ljust(width)
+    return resstr
+
+
 ############################################################ 
 #                                                          #
 #                 发送邮件                                 #
