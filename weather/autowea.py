@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月31日 17时09分55秒
+# Last Change:  2011年02月01日 09时19分58秒
 
 
 """ 
@@ -15,6 +15,7 @@ import os
 import sys
 import weather
 from weather import zhLjust
+import time
 
 #生成页面的顺序, 可以调整ORDER的顺序, 
 #表示生成的优先选用顺序
@@ -28,23 +29,22 @@ MAILLIST = ['bailiangcn@gmail.com','test2011@126.com']
 os.system('rm template/wea[0-9].xml')
 
 mess= u'信息采集开始:\n'
-#取网页生成xml文件
-if weather.getWeather0():
-    mess  += u'信息源0号成功\n' 
-else:
-    mess  += u'信息源0号失败\n' 
-if weather.getWeather1():
-    mess  += u'信息源1号成功\n' 
-else:
-    mess  += u'信息源1号失败\n' 
-if weather.getWeather2():
-    mess  += u'信息源2号成功\n' 
-else:
-    mess  += u'信息源2号失败\n' 
-if weather.getWeather9():
-    mess  += u'信息源9号成功\n' 
-else:
-    mess  += u'信息源9号失败\n' 
+for order in ORDER:
+    cmdstr=u'weather.getWeather'+order+u'()'
+    weafilename=u'template/wea'+order+u'.xml'
+    i=0
+    #如果网页链接出错,等待5秒钟后重新采集三次
+    while i < 3:
+        exec cmdstr
+        if os.path.isfile(weafilename):
+            mess  += u'信息源'+order+u'号成功\n' 
+            i=9
+        else:
+            time.sleep(5)
+            i+=1
+    if i<9 :
+        mess  += u'信息源'+order+u'号失败\n' 
+
 
 
 #取出所有生成的中间xml文件
