@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月31日 17时07分04秒
+# Last Change:  2011年02月02日 03时46分43秒
 
 """
 根据网页生成数据广播需要的天气预报网页
@@ -170,10 +170,18 @@ def getWeather1():
         sock = urllib.urlopen(URL)  
         strhtml = sock.read()  
         soup = BeautifulSoup(strhtml)
+        #判断是否是夜间
+        wealist = soup.find("div", "weatherYubaoBox").findAll(
+                "table", "yuBaoTable")
+        if len(wealist) == 4:
+            nightnum=1
+        else:
+            nightnum=0
         #取得当日日期
         daystr = soup.find("div", "weatherYubao").find("h1", "weatheH1").text
         strday = re.search(r'\d{4}-\d{1,2}-\d{1,2}',daystr).group()
-        firstDay = datetime.datetime.strptime(strday,'%Y-%m-%d')
+        firstDay = datetime.datetime.strptime(strday,'%Y-%m-%d'
+                )+ datetime.timedelta(nightnum)
         nextDay = firstDay + datetime.timedelta(1)
         lastDay = firstDay + datetime.timedelta(2)
         weadata[0] = u'1'
@@ -183,10 +191,9 @@ def getWeather1():
         weadata[9] = unicode(lastDay.month)+u'月'+unicode(lastDay.day)+u'日 '
 
         #取得有关天气的标签
-        wealist = soup.find("div", "weatherYubaoBox").findAll("table", "yuBaoTable")
-        if  len(wealist) == 3:
+        if  len(wealist) == 3 or nightnum==1 :
             #取得第一天信息
-            daytr = wealist[0].findAll("td")
+            daytr = wealist[nightnum].findAll("td")
             #图片
             thePic = os.path.basename(daytr[2].img['src'])
             weadata[5] = thePic
@@ -203,7 +210,7 @@ def getWeather1():
             weadata[4] = daytr[5].text + daytr[6].text
 
             #取得第二天信息
-            daytr = wealist[1].findAll("td")
+            daytr = wealist[nightnum+1].findAll("td")
             #图片
             thePic = os.path.basename(daytr[2].img['src'])
             weadata[8] = thePic
@@ -218,7 +225,7 @@ def getWeather1():
             weadata[7] =  theLowerGrade + u'/'  + theHighGrade  
 
             #取得第三天信息
-            daytr = wealist[2].findAll("td")
+            daytr = wealist[nightnum+2].findAll("td")
             #图片
             thePic = os.path.basename(daytr[2].img['src'])
             weadata[11] = thePic
@@ -848,12 +855,13 @@ def main():
     '''
     调用主程序, 生成html页面
     '''
-    xmlToHtml('./template/wea0.xml')
+    #xmlToHtml('./template/wea0.xml')
+    getWeather1()
 
 
 if __name__=='__main__':
 
-    testmain()
-    #main()
+    #testmain()
+    main()
 
 
