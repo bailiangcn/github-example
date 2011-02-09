@@ -27,6 +27,7 @@ class Frame(wx.Frame):
         self.mpc = mpc.MplayerCtrl(self, -1, mplayer, media_file,keep_pause=False)
         #self.mpc = mpc.MplayerCtrl(self, -1, mplayer, media_file,[u'-vo',u'xv'],keep_pause=False)
         self.Bind(mpc.EVT_MEDIA_STARTED, self.on_media_started)
+        self.mpc.SetBackgroundColour((0,0,0))
         self.Show()
 
     def on_media_started(self, evt):
