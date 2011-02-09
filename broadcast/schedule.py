@@ -21,18 +21,25 @@ class Frame(wx.Frame):
     节目播出窗口类
     '''
     def __init__(self, parent, id, title, mplayer, media_file,x,y):
-        wx.Frame.__init__(self, None, -1, u"无边框窗口", (winx, winy) ,(winw, winh), 
-                style = wx.FRAME_SHAPED|wx.SIMPLE_BORDER|wx.FRAME_NO_TASKBAR|wx.STAY_ON_TOP)
-
-        self.mpc = mpc.MplayerCtrl(self, -1, mplayer, media_file,keep_pause=False)
-        #self.mpc = mpc.MplayerCtrl(self, -1, mplayer, media_file,[u'-vo',u'xv'],keep_pause=False)
+        wx.Frame.__init__(self, None, -1, u"无边框窗口", (winx, winy) , 
+                (winw, winh), style = wx.FRAME_SHAPED|wx.SIMPLE_BORDER\
+                |wx.FRAME_NO_TASKBAR|wx.STAY_ON_TOP)
+        #创建一个mplayerctrl实例
+        self.mpc = mpc.MplayerCtrl(self, -1, mplayer, media_file,
+                keep_pause=False)
+        #self.mpc = mpc.MplayerCtrl(self, -1, mplayer, media_file,
+        # [u'-vo',u'xv'],keep_pause=False)
         self.Bind(mpc.EVT_MEDIA_STARTED, self.on_media_started)
+        #设置屏幕背景为黑色
         self.mpc.SetBackgroundColour((0,0,0))
         self.Show()
 
     def on_media_started(self, evt):
-            print 'Media started!'
-            self.mpc.FrameStep()
+        '''
+        设置图像播放一帧后暂停
+        '''
+        print 'Media started!'
+        self.mpc.FrameStep()
 
 #---------------------------------------------------------------------------
 
@@ -79,11 +86,25 @@ class ParFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.OnCloseMe, button)
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
 
+        #创建一个定时器
+        self.timer = wx.Timer(self)
+        self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
+        self.timer.Start(during)
+
+
+
         self.Show(True)
 
 
+    def OnTimer(self, evt):
+        '''
+        每秒钟查询一次看看是否播出列表有变化
+        '''
+        print "time is working"
+
     def OnButtonb(self, evt):
-        self.win = Frame(None, -1, 'Hello MplayerCtrl', u'mplayer', u'2.mpg',1920,0)
+        self.win = Frame(None, -1, 'Hello MplayerCtrl', u'mplayer', 
+                u'2.mpg',1920,0)
 
     def OnButtonc(self, evt):
         self.win.mpc.Pause()
@@ -101,7 +122,8 @@ class ParFrame(wx.Frame):
             self.win1.Hide()
 
     def OnButtonb1(self, evt):
-        self.win1 = Frame(None, -1, 'Hello MplayerCtrl', u'mplayer', u'1.mpg',2120,0)
+        self.win1 = Frame(None, -1, 'Hello MplayerCtrl', u'mplayer', 
+                u'1.mpg',2120,0)
 
     def OnButtonc1(self, evt):
         print self.win.mpc.get
@@ -145,6 +167,7 @@ if __name__ == '__main__':
     winy=int(cp.get('position','y'))
     winw=int(cp.get('size','width'))
     winh=int(cp.get('size','height'))
+    during = int(cp.get('timer', 'during'))
 
     app = wx.App(redirect=False)
     b = ParFrame()
