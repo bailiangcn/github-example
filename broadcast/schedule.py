@@ -125,8 +125,10 @@ class ParFrame(wx.Frame):
 
     def OnCloseWindow(self, event):
         if self.win != None:
+            self.win.mpc.Quit()
             self.win.Destroy()
         if self.win1 != None:
+            self.win1.mpc.Quit()
             self.win1.Destroy()
 
         self.Destroy()
