@@ -38,7 +38,6 @@ class Frame(wx.Frame):
         '''
         设置图像播放一帧后暂停
         '''
-        print 'Media started!'
         self.mpc.FrameStep()
 
 #---------------------------------------------------------------------------
@@ -168,6 +167,9 @@ if __name__ == '__main__':
     winw=int(cp.get('size','width'))
     winh=int(cp.get('size','height'))
     during = int(cp.get('timer', 'during'))
+    moviepath=cp.get('movie','moviepath')
+    movielist=cp.get('movie','movielist')
+    print moviepath+'/'+movielist
 
     app = wx.App(redirect=False)
     b = ParFrame()
