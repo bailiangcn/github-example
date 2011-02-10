@@ -24,7 +24,7 @@ class Mlist(object):
     '''
     影片列表类
     '''
-    def __init__(self,filename=u'mlist.xml'):
+    def __init__(self,filename=u'mainlist.xml'):
         '''
         类的初始化,读取一个xml文件,生成文件列表
         '''
@@ -91,8 +91,7 @@ class Mlist(object):
         '''
         for eachex in extension:
             tmppath=os.path.join(path,eachex)
-            filelist=glob.glob(tmppath)
-            for eachfile in filelist:
+            for eachfile in glob.glob(tmppath):
                 if eachfile not in self.mlist:
                     self.mlist.append(eachfile)
         self.length=len(self.mlist)

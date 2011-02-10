@@ -13,6 +13,7 @@ __revision__ = '0.1'
 import MplayerCtrl as mpc
 import wx
 import ConfigParser 
+import os
 
 
 
@@ -22,7 +23,7 @@ class Frame(wx.Frame):
     '''
     def __init__(self, parent, id, title, mplayer, media_file,x,y):
         wx.Frame.__init__(self, None, -1, u"无边框窗口", (winx, winy) , 
-                (winw, winh), style = wx.FRAME_SHAPED|wx.SIMPLE_BORDER\
+                (0, 0), style = wx.FRAME_SHAPED|wx.SIMPLE_BORDER\
                 |wx.FRAME_NO_TASKBAR|wx.STAY_ON_TOP)
         #创建一个mplayerctrl实例
         self.mpc = mpc.MplayerCtrl(self, -1, mplayer, media_file,
@@ -38,7 +39,9 @@ class Frame(wx.Frame):
         '''
         设置图像播放一帧后暂停
         '''
-        self.mpc.FrameStep()
+        self.mpc.Pause()
+        self.Hide()
+        self.SetSize(wx.Size(winw,winh))
 
 #---------------------------------------------------------------------------
 
@@ -51,6 +54,7 @@ class ParFrame(wx.Frame):
         wx.Frame.__init__(self, None,  -1, 'Manager')
         self.win = None
         self.win1=None
+        self.mmtime=0
         panel = wx.Panel(self, -1)
         b = wx.Button(panel, -1, u"打开播放窗口", (50,50))
         b.SetPosition((15, 15))
@@ -99,13 +103,17 @@ class ParFrame(wx.Frame):
         '''
         每秒钟查询一次看看是否播出列表有变化
         '''
-        print "time is working"
+        tmptime=os.stat(movielist).st_mtime
+        if self.mmtime != tmptime:
+            print "mainlist.xml is changed!"
+            self.mmtime = tmptime
 
     def OnButtonb(self, evt):
         self.win = Frame(None, -1, 'Hello MplayerCtrl', u'mplayer', 
                 u'2.mpg',1920,0)
 
     def OnButtonc(self, evt):
+        self.win.Show()
         self.win.mpc.Pause()
 
     def OnButtond(self, evt):
@@ -169,7 +177,6 @@ if __name__ == '__main__':
     during = int(cp.get('timer', 'during'))
     moviepath=cp.get('movie','moviepath')
     movielist=cp.get('movie','movielist')
-    print moviepath+'/'+movielist
 
     app = wx.App(redirect=False)
     b = ParFrame()

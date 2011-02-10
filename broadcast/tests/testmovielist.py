@@ -22,7 +22,7 @@ from movielist import *
 
 class simpleTest(TestCase):
     def setUp(self):
-        self.mt=Mlist('mlist.xml')
+        self.mt=Mlist('mainlist.xml')
 
     def tearDown(self):
         pass
@@ -51,7 +51,7 @@ class simpleTest(TestCase):
     def testSavefile(self):
         "测试根据列表生成xml文件"
         self.mt.mlist=[u'1.mpg', u'2.mpg']
-        self.mt.savefile(u'mlist.xml')
+        self.mt.savefile(u'mainlist.xml')
 
     def testgetnextfile(self):
         "测试返回下一个播出文件"
