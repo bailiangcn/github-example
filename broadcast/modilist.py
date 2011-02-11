@@ -9,111 +9,173 @@
 
 __revision__ = '0.1'
 
+
+
 import  wx
+import  wx.grid             as  gridlib
+import  wx.lib.gridmovers   as  gridmovers
+import movielist
 
-colourList = [ "Aquamarine", "Black", "Blue", "Blue Violet", "Brown", "Cadet Blue",
-               "Coral", "Cornflower Blue", "Cyan", "Dark Grey", "Dark Green",
-               "Dark Olive Green",
-               ]
+#---------------------------------------------------------------------------
 
-#----------------------------------------------------------------------------
-class ColoredPanel(wx.Window):
-    def __init__(self, parent, color):
-        wx.Window.__init__(self, parent, -1, style = wx.SIMPLE_BORDER)
-        self.SetBackgroundColour(color)
-        if wx.Platform == '__WXGTK__':
-            self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
+class CustomDataTable(gridlib.PyGridTableBase):
+    def __init__(self):
+        gridlib.PyGridTableBase.__init__(self)
 
-class TestLB(wx.Listbook):
-    def __init__(self, parent, id, log):
-        wx.Listbook.__init__(self, parent, id, style=
-                            wx.BK_DEFAULT
-                            #wx.BK_TOP
-                            #wx.BK_BOTTOM
-                            #wx.BK_LEFT
-                            #wx.BK_RIGHT
-                            )
-        self.log = log
+        ml = movielist.Mlist()
+        self.identifiers = ['name','path']
+        self.rowLabels = []
 
-        # make an image list using the LBXX images
-        il = wx.ImageList(32, 32)
-        #for x in range(12):
-        #    obj = getattr(images, 'LB%02d' % (x+1))
-        #    bmp = obj.GetBitmap()
-        #    il.Add(bmp)
-        #self.AssignImageList(il)
-
-        # Now make a bunch of panels for the list book
-        first = True
-        imID = 0
-        for colour in colourList:
-            win = self.makeColorPanel(colour)
-            self.AddPage(win, colour, imageId=imID)
-            imID += 1
-            if imID == il.GetImageCount(): imID = 0
-            if first:
-                st = wx.StaticText(win.win, -1,
-                          "You can put nearly any type of window here,\n"
-                          "and the list can be on any side of the Listbook",
-                          wx.Point(10, 10))
-                first = False
-
-        self.Bind(wx.EVT_LISTBOOK_PAGE_CHANGED, self.OnPageChanged)
-        self.Bind(wx.EVT_LISTBOOK_PAGE_CHANGING, self.OnPageChanging)
+        self.colLabels = {'name':u'节目名称','path':u'文件存储路径' }
+        for i in range(len(ml.mlist)):
+            self.rowLabels  += [(u'节目' + unicode(str(i+1), 'utf-8'))]
 
 
-    def makeColorPanel(self, color):
-        p = wx.Panel(self, -1)
-        win = ColoredPanel(p, color)
-        p.win = win
-        def OnCPSize(evt, win=win):
-            win.SetPosition((0,0))
-            win.SetSize(evt.GetSize())
-        p.Bind(wx.EVT_SIZE, OnCPSize)
-        return p
+        self.data = ml.mlist 
+
+    #--------------------------------------------------
+    # required methods for the wxPyGridTableBase interface
+
+    def GetNumberRows(self):
+        return len(self.data)
+
+    def GetNumberCols(self):
+        return len(self.identifiers)
+
+    def IsEmptyCell(self, row, col):
+        id = self.identifiers[col]
+        return not self.data[row][id]
+
+    def GetValue(self, row, col):
+        id = self.identifiers[col]
+        return self.data[row][id]
+
+    def SetValue(self, row, col, value):
+        id = self.identifiers[col]
+        self.data[row][id] = value
+
+    #--------------------------------------------------
+    # Some optional methods
+
+    # Called when the grid needs to display column labels
+    def GetColLabelValue(self, col):
+        id = self.identifiers[col]
+        return self.colLabels[id]
+
+    # Called when the grid needs to display row labels
+    def GetRowLabelValue(self,row):
+        return self.rowLabels[row]
+
+    #--------------------------------------------------
+    # Methods added for demo purposes.
+
+    # The physical moving of the cols/rows is left to the implementer.
+    # Because of the dynamic nature of a wxGrid the physical moving of
+    # columns differs from implementation to implementation
+
+    # Move the row
+    def MoveRow(self,frm,to):
+        grid = self.GetView()
+
+        if grid:
+            # Move the rowLabels and data rows
+            oldLabel = self.rowLabels[frm]
+            oldData = self.data[frm]
+            del self.rowLabels[frm]
+            del self.data[frm]
+
+            if to > frm:
+                self.rowLabels.insert(to-1,oldLabel)
+                self.data.insert(to-1,oldData)
+            else:
+                self.rowLabels.insert(to,oldLabel)
+                self.data.insert(to,oldData)
+
+            # Notify the grid
+            grid.BeginBatch()
+
+            msg = gridlib.GridTableMessage(
+                    self, gridlib.GRIDTABLE_NOTIFY_ROWS_INSERTED, to, 1
+                    )
+            grid.ProcessTableMessage(msg)
+
+            msg = gridlib.GridTableMessage(
+                    self, gridlib.GRIDTABLE_NOTIFY_ROWS_DELETED, frm, 1
+                    )
+            grid.ProcessTableMessage(msg)
+    
+            grid.EndBatch()
 
 
-    def OnPageChanged(self, event):
-        old = event.GetOldSelection()
-        new = event.GetSelection()
-        sel = self.GetSelection()
-        self.log.write('OnPageChanged,  old:%d, new:%d, sel:%d\n' % (old, new, sel))
-        event.Skip()
-
-    def OnPageChanging(self, event):
-        old = event.GetOldSelection()
-        new = event.GetSelection()
-        sel = self.GetSelection()
-        self.log.write('OnPageChanging, old:%d, new:%d, sel:%d\n' % (old, new, sel))
-        event.Skip()
-
-#----------------------------------------------------------------------------
-
-def runTest(frame, nb, log):
-    testWin = TestLB(nb, -1, log)
-    return testWin
-
-#----------------------------------------------------------------------------
+#---------------------------------------------------------------------------
 
 
-overview = """\
-<html><body>
-<h2>wx.Listbook</h2>
-<p>
-This class is a control similar to a notebook control, but with a
-wx.ListCtrl instead of a set of tabs.
+class DragableGrid(gridlib.Grid):
+    def __init__(self, parent):
+        gridlib.Grid.__init__(self, parent, -1)
 
-"""
+        table = CustomDataTable()
+
+        # The second parameter means that the grid is to take ownership of the
+        # table and will destroy it when done.  Otherwise you would need to keep
+        # a reference to it and call it's Destroy method later.
+        self.SetTable(table, True)
+        self.AutoSizeColumns()
+
+        # Enable Row moving
+        gridmovers.GridRowMover(self)
+        self.Bind(gridmovers.EVT_GRID_ROW_MOVE, self.OnRowMove, self)
 
 
+    # Event method called when a row move needs to take place
+    def OnRowMove(self,evt):
+        frm = evt.GetMoveRow()          # Row being moved
+        to = evt.GetBeforeRow()         # Before which row to insert
+        self.GetTable().MoveRow(frm,to)
+
+#---------------------------------------------------------------------------
+
+class TestFrame(wx.Frame):
+    def __init__(self, parent):
+        wx.Frame.__init__(self, parent, -1, u"节目播出顺序调整", 
+                size=(800,600))
+        self.sizer1 = wx.BoxSizer(wx.VERTICAL)
+        self.sizer2 = wx.BoxSizer(wx.HORIZONTAL)
+        self.grid = DragableGrid(self)
+
+        self.bn1 = wx.Button(self,  -1, u"清空列表")
+        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.bn1)
+        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
+
+        self.bn2 = wx.Button(self,  -1, u"退出")
+        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.bn2)
+        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
+
+        self.sizer2.Add(self.bn1, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
+        self.sizer2.Add(self.bn2, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
+
+        self.sizer1.Add(self.grid, 1, flag=wx.EXPAND|wx.ALL, border=15)
+        self.sizer1.Add(self.sizer2, 0, flag=wx.EXPAND|wx.ALL, border=10)
+        self.SetSizer(self.sizer1)
+        self.SetAutoLayout(1)
+        #self.sizer1.Fit(self)
+
+        self.Show()
+
+    def OnCloseMe(self, event):
+        self.Close(True)
+
+    def OnCloseWindow(self, event):
+        self.Destroy()
+
+
+#---------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    import sys,os
-    import run
-    run.main(['', os.path.basename(sys.argv[0])] + sys.argv[1:])
+    import sys
+    app = wx.PySimpleApp()
+    frame = TestFrame(None)
+    #frame.Show(True)
+    app.MainLoop()
 
-
-
-
-
-
+#---------------------------------------------------------------------------
