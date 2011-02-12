@@ -81,10 +81,10 @@ class Mlist(object):
         data.append(u'<ROOT>')
         for eachmovie in self.mlist:
             data.append(''.join((u' '*4 + u'<MOVIE>')))
-            data.append(''.join((u' '*8 + u'<NAME>'
-                +eachmovie['name']+ u'</NAME>')))
-            data.append(''.join((u' '*8 + u'<PATH>'
-                +eachmovie['path']+ u'</PATH>')))
+            data.append(''.join((u' '*8 + u'<NAME>' +eachmovie[
+                'name']+ u'</NAME>')))
+            data.append(''.join((u' '*8 + u'<PATH>' +eachmovie[
+                'path']+ u'</PATH>')))
             data.append(''.join((u' '*4 + u'</MOVIE>')))
         data.append(u'</ROOT>')
 
@@ -117,6 +117,7 @@ class Mlist(object):
         for eachex in extension:
             tmppath=os.path.join(path,eachex).encode('utf-8') 
             dirlist=glob.glob(tmppath)
+            dirlist.sort()
             for eachfile in dirlist:
                 tempmn=os.path.splitext(
                         os.path.basename(eachfile))[0]

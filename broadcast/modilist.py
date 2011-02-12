@@ -11,11 +11,20 @@ __revision__ = '0.1'
 
 
 
+import  os
 import  wx
 import  wx.grid             as  gridlib
 import  wx.lib.gridmovers   as  gridmovers
 import  movielist
+from copy import deepcopy
 
+#---------------------------------------------------------------------------
+# 文件选择支持的扩展名
+wildcard = u"Mpeg 文件(*.mpg)|*.mpg|"     \
+           u"Avi 文件 (*.avi)|*.avi|" \
+           u"Real 文件 (*.rm)|*.rm|" \
+           u"Real 文件 (*.rmvb)|*.rmvb|" \
+           u"所有文件(*.*)|*.*"
 #---------------------------------------------------------------------------
 
 class CustomDataTable(gridlib.PyGridTableBase):
@@ -241,19 +250,28 @@ class TestFrame(wx.Frame):
         self.bn1 = wx.Button(self,  -1, u"清空列表")
         self.Bind(wx.EVT_BUTTON, self.OnReset, self.bn1)
 
-        self.bn2 = wx.Button(self, -1, u"读取路径下文件")
-        self.Bind(wx.EVT_BUTTON, self.OnPickDir, self.bn2)
 
-        self.bn4 = wx.Button(self, -1, u"上传服务器")
-        self.Bind(wx.EVT_BUTTON, self.OnPush, self.bn4)
+        self.bn2 = wx.Button(self, -1, u"读取路径下所有文件")
+        self.Bind(wx.EVT_BUTTON, self.OnPickDir, self.bn2)
 
         self.bn3 = wx.Button(self,  -1, u"退出")
         self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.bn3)
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
 
+        self.bn4 = wx.Button(self, -1, u"上传服务器")
+        self.Bind(wx.EVT_BUTTON, self.OnPush, self.bn4)
+
+        self.bn5 = wx.Button(self, -1, u"添加影片文件")
+        self.Bind(wx.EVT_BUTTON, self.OnPickFile, self.bn5)
+
+        self.bn6 = wx.Button(self, -1, u"复制当前播出列表")
+        self.Bind(wx.EVT_BUTTON, self.OnPull, self.bn6)
+
         #将各组件加入位置容器
         self.sizer2.Add(self.bn1, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
+        self.sizer2.Add(self.bn6, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
         self.sizer2.Add(self.bn2, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
+        self.sizer2.Add(self.bn5, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
         self.sizer2.Add(self.bn4, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
         self.sizer2.Add(self.bn3, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
 
@@ -281,13 +299,73 @@ class TestFrame(wx.Frame):
 
     def OnPush(self, event):
         '''
-        上传到实际工作列表
+        上传到实际播出列表
         '''
         ml = movielist.Mlist('templist.xml')
         ml.savefile('mainlist.xml')
         self.gridold.GetTable().ReloadData('templist.xml')
         self.gridold.AutoSizeColumns()
         
+    def OnPull(self, event):
+        '''
+        复制播出列表
+        '''
+        mla = movielist.Mlist(u'mainlist.xml')
+        mlb = movielist.Mlist(u'templist.xml')
+        mlb.mlist.extend(mla.mlist)
+        mlb.savefile(u'templist.xml')
+        self.gridnew.GetTable().ReloadData(u'templist.xml')
+        self.gridnew.AutoSizeColumns()
+
+
+    def OnPickDir(self, evt):
+        '''
+        选择文件目录添加影片
+        '''
+        dlg = wx.DirDialog(self, u"请选择影片所在目录",
+                          style=wx.DD_DEFAULT_STYLE
+                           | wx.DD_DIR_MUST_EXIST
+                           )
+        if dlg.ShowModal() == wx.ID_OK:
+            ml = movielist.Mlist(u'templist.xml')
+            #wxpython默认无法正常得到有效unicode编码,需要进行转换
+            tmppath=repr(dlg.GetPath())[1:]
+            exec 'tmppath='+ tmppath
+            path=tmppath.decode('utf-8')
+
+            ml.makebaselist(path)
+            ml.savefile(u'templist.xml')
+            self.gridnew.GetTable().ReloadData(u'templist.xml')
+            self.gridnew.AutoSizeColumns()
+        dlg.Destroy()
+
+    def OnPickFile(self, evt):
+        '''
+        选择单个影片文件添加
+        '''
+        dlg = wx.FileDialog(
+                    self, message=u"选择影片文件",
+                    defaultDir=os.getcwd(), 
+                    defaultFile="",
+                    wildcard=wildcard,
+                    style=wx.OPEN | wx.MULTIPLE
+                    )
+        if dlg.ShowModal() == wx.ID_OK:
+            ml = movielist.Mlist('templist.xml')
+            # 选择返回一个多个文件的列表
+            paths = dlg.GetPaths()
+            #wxpython默认无法正常得到有效unicode编码,需要进行转换
+            for eachfile in paths:
+                tmpfile = repr(eachfile)[1:]
+                exec 'tmpfile='+ tmpfile
+                path=tmpfile.decode('utf-8')
+                tempmn=os.path.splitext(os.path.basename(path))[0]
+                ml.append([tempmn, path])
+            ml.savefile(u'templist.xml')
+            self.gridnew.GetTable().ReloadData(u'templist.xml')
+            self.gridnew.AutoSizeColumns()
+        dlg.Destroy()
+
     def OnCloseMe(self, event):
         '''
         点击关闭按钮
@@ -299,28 +377,6 @@ class TestFrame(wx.Frame):
         点击关闭窗口
         '''
         self.Destroy()
-
-    def OnPickDir(self, evt):
-        '''
-        选择文件目录添加影片
-        '''
-        dlg = wx.DirDialog(self, "Choose a directory:",
-                          style=wx.DD_DEFAULT_STYLE
-                           | wx.DD_DIR_MUST_EXIST
-                           )
-        if dlg.ShowModal() == wx.ID_OK:
-            ml = movielist.Mlist('templist.xml')
-            #wxpython默认无法正常得到有效unicode编码,需要进行转换
-            tmppath=repr(dlg.GetPath())[1:]
-            exec 'tmppath='+ tmppath
-            path=tmppath.decode('utf-8')
-
-            ml.makebaselist(path)
-            ml.savefile('templist.xml')
-            self.gridnew.GetTable().ReloadData('templist.xml')
-            self.gridnew.AutoSizeColumns()
-        dlg.Destroy()
-
 
 #---------------------------------------------------------------------------
 
