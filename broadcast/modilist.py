@@ -14,27 +14,33 @@ __revision__ = '0.1'
 import  wx
 import  wx.grid             as  gridlib
 import  wx.lib.gridmovers   as  gridmovers
-import movielist
+import  movielist
 
 #---------------------------------------------------------------------------
 
 class CustomDataTable(gridlib.PyGridTableBase):
-    def __init__(self):
+    '''
+    wxpython下的定制表格类
+    '''
+    def __init__(self,filename,canmove=True):
+        '''
+        初始化表格数据,filename表示初始化的数据来源
+        canmove表示表格各行能否移动
+        '''
         gridlib.PyGridTableBase.__init__(self)
 
-        ml = movielist.Mlist()
+        #定义一个影片列表类
+        ml = movielist.Mlist(filename)
         self.identifiers = ['name','path']
-        self.rowLabels = []
-
         self.colLabels = {'name':u'节目名称','path':u'文件存储路径' }
+        #行标签显示值
+        self.rowLabels = []
         for i in range(len(ml.mlist)):
             self.rowLabels  += [(u'节目' + unicode(str(i+1), 'utf-8'))]
-
-
+        #实际数据赋值
         self.data = ml.mlist 
-
     #--------------------------------------------------
-    # required methods for the wxPyGridTableBase interface
+    # 实现接口所需的方法
 
     def GetNumberRows(self):
         return len(self.data)
@@ -55,7 +61,7 @@ class CustomDataTable(gridlib.PyGridTableBase):
         self.data[row][id] = value
 
     #--------------------------------------------------
-    # Some optional methods
+    # 一些可以选择实现的方法
 
     # Called when the grid needs to display column labels
     def GetColLabelValue(self, col):
@@ -67,43 +73,83 @@ class CustomDataTable(gridlib.PyGridTableBase):
         return self.rowLabels[row]
 
     #--------------------------------------------------
-    # Methods added for demo purposes.
 
-    # The physical moving of the cols/rows is left to the implementer.
-    # Because of the dynamic nature of a wxGrid the physical moving of
-    # columns differs from implementation to implementation
+    # 重载数据到表格
+    def ReloadData(self,filename):
+        ml = movielist.Mlist(filename)
 
-    # Move the row
+        grid = self.GetView()
+        if grid:
+            numRows=len(self.data)
+            self.rowLabels = []
+            for i in range(len(ml.mlist)):
+                self.rowLabels  += [(u'节目' + unicode(str(i+1), 'utf-8'))]
+            self.data = ml.mlist 
+
+            # Notify the grid
+            grid.BeginBatch()
+            msg = gridlib.GridTableMessage(
+                    self, gridlib.GRIDTABLE_NOTIFY_ROWS_DELETED, 0,numRows 
+                    )
+            grid.ProcessTableMessage(msg)
+            msg = gridlib.GridTableMessage(
+                    self, gridlib.GRIDTABLE_NOTIFY_ROWS_APPENDED, 
+                    len(self.data) )
+            grid.ProcessTableMessage(msg)
+            grid.EndBatch()
+
+    # 删除所有行
+    def DelRows(self):
+        grid = self.GetView()
+        if grid:
+            numRows=len(self.data)
+            self.data=[]
+            self.rowLabels=[]
+
+            # Notify the grid
+            grid.BeginBatch()
+            msg = gridlib.GridTableMessage(
+                    self, gridlib.GRIDTABLE_NOTIFY_ROWS_DELETED, 0,numRows 
+                    )
+            grid.ProcessTableMessage(msg)
+            grid.EndBatch()
+
+    # 删除单独行
+    def DelRow(self,rowpos):
+        grid = self.GetView()
+        if grid:
+            del self.data[rowpos]
+            self.rowLabels=[]
+            for i in range(len(self.data)):
+                self.rowLabels  += [(u'节目' + unicode(str(i+1), 'utf-8'))]
+            # Notify the grid
+            grid.BeginBatch()
+            msg = gridlib.GridTableMessage(
+                    self, gridlib.GRIDTABLE_NOTIFY_ROWS_DELETED, rowpos,1 )
+            grid.ProcessTableMessage(msg)
+            grid.EndBatch()
+
+    # 移动行
     def MoveRow(self,frm,to):
         grid = self.GetView()
 
         if grid:
             # Move the rowLabels and data rows
-            oldLabel = self.rowLabels[frm]
             oldData = self.data[frm]
-            del self.rowLabels[frm]
             del self.data[frm]
-
             if to > frm:
-                self.rowLabels.insert(to-1,oldLabel)
                 self.data.insert(to-1,oldData)
             else:
-                self.rowLabels.insert(to,oldLabel)
                 self.data.insert(to,oldData)
 
             # Notify the grid
             grid.BeginBatch()
-
             msg = gridlib.GridTableMessage(
-                    self, gridlib.GRIDTABLE_NOTIFY_ROWS_INSERTED, to, 1
-                    )
+                    self, gridlib.GRIDTABLE_NOTIFY_ROWS_INSERTED, to, 1)
             grid.ProcessTableMessage(msg)
-
             msg = gridlib.GridTableMessage(
-                    self, gridlib.GRIDTABLE_NOTIFY_ROWS_DELETED, frm, 1
-                    )
+                    self, gridlib.GRIDTABLE_NOTIFY_ROWS_DELETED, frm, 1)
             grid.ProcessTableMessage(msg)
-    
             grid.EndBatch()
 
 
@@ -111,62 +157,169 @@ class CustomDataTable(gridlib.PyGridTableBase):
 
 
 class DragableGrid(gridlib.Grid):
-    def __init__(self, parent):
+    '''
+    实际实现的表格与数据绑定
+    '''
+    def __init__(self, parent,filename,canmove=True):
+        '''
+        初始化
+        filename表示初始化的数据来源
+        canmove表示表格各行能否移动
+        '''
         gridlib.Grid.__init__(self, parent, -1)
-
-        table = CustomDataTable()
-
-        # The second parameter means that the grid is to take ownership of the
-        # table and will destroy it when done.  Otherwise you would need to keep
-        # a reference to it and call it's Destroy method later.
+        table = CustomDataTable(filename,canmove)
+        # 第二个参数标识覆盖表格数据后自动销毁
         self.SetTable(table, True)
+        #自动调整列宽
         self.AutoSizeColumns()
+        #禁止调整行高
+        self.EnableDragRowSize(False)
 
-        # Enable Row moving
+        # 如果允许行移动设置绑定
         gridmovers.GridRowMover(self)
-        self.Bind(gridmovers.EVT_GRID_ROW_MOVE, self.OnRowMove, self)
+        if canmove:
+            self.Bind(gridmovers.EVT_GRID_ROW_MOVE, self.OnRowMove, self)
+        #设置右键点击标签删除功能的绑定
+        self.Bind(gridlib.EVT_GRID_LABEL_RIGHT_CLICK, 
+                self.OnLabelRightClick)
 
+    def OnLabelRightClick(self, evt):
+        '''
+        右键点击标签后删除当前行
+        '''
+        rowpos=evt.GetRow()
+        moviestr=self.GetTable().GetValue(rowpos,0)
+        dlg = wx.MessageDialog(self, u'是否删除此条节目?\n'+moviestr,
+                   u'确认', wx.YES_NO | wx.NO_DEFAULT 
+                   | wx.ICON_INFORMATION
+                   )
+        if dlg.ShowModal() == wx.ID_YES:
+            self.GetTable().DelRow(rowpos)
+            self.SaveData()
+        dlg.Destroy()
+        evt.Skip()
 
-    # Event method called when a row move needs to take place
     def OnRowMove(self,evt):
+        '''
+        当行发生移动
+        '''
         frm = evt.GetMoveRow()          # Row being moved
         to = evt.GetBeforeRow()         # Before which row to insert
         self.GetTable().MoveRow(frm,to)
+        self.SaveData()
+
+    def SaveData(self,filename=u'templist.xml'):
+        '''
+        保存表格数据到文件
+        '''
+        ml = movielist.Mlist(empty=True)
+        ml.mlist=self.GetTable().data
+        ml.savefile(filename)
 
 #---------------------------------------------------------------------------
 
 class TestFrame(wx.Frame):
+    '''
+    主调用框架
+    '''
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, -1, u"节目播出顺序调整", 
                 size=(800,600))
+        #设置位置容器
         self.sizer1 = wx.BoxSizer(wx.VERTICAL)
         self.sizer2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.grid = DragableGrid(self)
+        self.sizer3 = wx.BoxSizer(wx.HORIZONTAL)
+        #定义临时表格
+        self.gridnew = DragableGrid(self,u'templist.xml')
+        #定义当前应用的表格,只读
+        self.gridold = DragableGrid(self,u'mainlist.xml',canmove=False)
+        for i in range(self.gridold.GetNumberRows()):
+            self.gridold.SetReadOnly(i,0,True)
+            self.gridold.SetReadOnly(i,1,True)
 
+        #定义一组功能按钮
         self.bn1 = wx.Button(self,  -1, u"清空列表")
-        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.bn1)
+        self.Bind(wx.EVT_BUTTON, self.OnReset, self.bn1)
+
+        self.bn2 = wx.Button(self, -1, u"读取路径下文件")
+        self.Bind(wx.EVT_BUTTON, self.OnPickDir, self.bn2)
+
+        self.bn4 = wx.Button(self, -1, u"上传服务器")
+        self.Bind(wx.EVT_BUTTON, self.OnPush, self.bn4)
+
+        self.bn3 = wx.Button(self,  -1, u"退出")
+        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.bn3)
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
 
-        self.bn2 = wx.Button(self,  -1, u"退出")
-        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.bn2)
-        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
-
+        #将各组件加入位置容器
         self.sizer2.Add(self.bn1, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
         self.sizer2.Add(self.bn2, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
+        self.sizer2.Add(self.bn4, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
+        self.sizer2.Add(self.bn3, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
 
-        self.sizer1.Add(self.grid, 1, flag=wx.EXPAND|wx.ALL, border=15)
+        self.sizer3.Add(self.gridold, 0, flag=wx.EXPAND|wx.ALL, border=15)
+        self.sizer3.Add(self.gridnew, 1, flag=wx.EXPAND|wx.ALL, border=15)
+
+        self.sizer1.Add(self.sizer3, 1, flag=wx.EXPAND|wx.ALL, border=10)
         self.sizer1.Add(self.sizer2, 0, flag=wx.EXPAND|wx.ALL, border=10)
+        #自动调整尺寸、布局
         self.SetSizer(self.sizer1)
         self.SetAutoLayout(1)
-        #self.sizer1.Fit(self)
+        self.sizer1.Fit(self)
 
         self.Show()
 
+
+    def OnReset(self, event):
+        '''
+        清空临时播出列表
+        '''
+        ml = movielist.Mlist(empty=True)
+        ml.savefile('templist.xml')
+        self.gridnew.GetTable().DelRows()
+        self.gridnew.AutoSizeColumns()
+
+    def OnPush(self, event):
+        '''
+        上传到实际工作列表
+        '''
+        ml = movielist.Mlist('templist.xml')
+        ml.savefile('mainlist.xml')
+        self.gridold.GetTable().ReloadData('templist.xml')
+        self.gridold.AutoSizeColumns()
+        
     def OnCloseMe(self, event):
+        '''
+        点击关闭按钮
+        '''
         self.Close(True)
 
     def OnCloseWindow(self, event):
+        '''
+        点击关闭窗口
+        '''
         self.Destroy()
+
+    def OnPickDir(self, evt):
+        '''
+        选择文件目录添加影片
+        '''
+        dlg = wx.DirDialog(self, "Choose a directory:",
+                          style=wx.DD_DEFAULT_STYLE
+                           | wx.DD_DIR_MUST_EXIST
+                           )
+        if dlg.ShowModal() == wx.ID_OK:
+            ml = movielist.Mlist('templist.xml')
+            #wxpython默认无法正常得到有效unicode编码,需要进行转换
+            tmppath=repr(dlg.GetPath())[1:]
+            exec 'tmppath='+ tmppath
+            path=tmppath.decode('utf-8')
+
+            ml.makebaselist(path)
+            ml.savefile('templist.xml')
+            self.gridnew.GetTable().ReloadData('templist.xml')
+            self.gridnew.AutoSizeColumns()
+        dlg.Destroy()
 
 
 #---------------------------------------------------------------------------
@@ -175,7 +328,6 @@ if __name__ == '__main__':
     import sys
     app = wx.PySimpleApp()
     frame = TestFrame(None)
-    #frame.Show(True)
     app.MainLoop()
 
 #---------------------------------------------------------------------------

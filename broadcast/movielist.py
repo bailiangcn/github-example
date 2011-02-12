@@ -26,13 +26,15 @@ class Mlist(object):
     '''
     影片列表类
     '''
-    def __init__(self,filename=u'mainlist.xml'):
+    def __init__(self,filename=u'mainlist.xml',empty=False):
         '''
         类的初始化,读取一个xml文件,生成文件列表
         '''
         self.mlist=[]   #播出文件列表
         self.length=0   #播出文件的个数
         self.nowplay=0  #当前播放的影片号,从0开始
+        if  empty:
+            return
         try:
             dom=xml.dom.minidom.parse(filename)
             self.root=dom.documentElement
@@ -116,7 +118,8 @@ class Mlist(object):
             tmppath=os.path.join(path,eachex).encode('utf-8') 
             dirlist=glob.glob(tmppath)
             for eachfile in dirlist:
-                tempmn=os.path.splitext(os.path.basename(eachfile))[0]
+                tempmn=os.path.splitext(
+                        os.path.basename(eachfile))[0]
                 if tempmn not in templist:
                     mdict['name']=unicode(tempmn,'utf-8')
                     mdict['path']=unicode(os.path.abspath(eachfile),'utf-8')
