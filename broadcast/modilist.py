@@ -225,6 +225,11 @@ class DragableGrid(gridlib.Grid):
         ml.mlist=self.GetTable().data
         ml.savefile(filename)
 
+#----------------------------------------------------------------------
+class TabPanel(wx.Panel):
+    def __init__(self, parent):
+        """"""
+        wx.Panel.__init__(self, parent=parent)
 #---------------------------------------------------------------------------
 
 class TestFrame(wx.Frame):
@@ -233,58 +238,84 @@ class TestFrame(wx.Frame):
     '''
     def __init__(self, parent):
         wx.Frame.__init__(self, parent, -1, u"节目播出顺序调整", 
-                size=(800,600))
+                size=(1024,768))
+        #设置标签
+        panel = wx.Panel(self)
+        notebook = wx.Notebook(panel)
+
+        tabOne = TabPanel(notebook)
+        notebook.AddPage(tabOne, u"轮播节目单调整")
+        tabTwo = TabPanel(notebook)
+        notebook.AddPage(tabTwo, u"插播节目调整")
         #设置位置容器
-        self.sizer1 = wx.BoxSizer(wx.VERTICAL)
-        self.sizer2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.sizer3 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        tabOne.sizer1 = wx.BoxSizer(wx.VERTICAL)
+        tabOne.sizer2 = wx.BoxSizer(wx.HORIZONTAL)
+        tabOne.sizer3 = wx.BoxSizer(wx.HORIZONTAL)
+        tabOne.sizer4 = wx.BoxSizer(wx.VERTICAL)
+        tabOne.sizer5 = wx.BoxSizer(wx.VERTICAL)
         #定义临时表格
-        self.gridnew = DragableGrid(self,u'templist.xml')
+        self.gridnew = DragableGrid(tabOne,u'templist.xml')
         #定义当前应用的表格,只读
-        self.gridold = DragableGrid(self,u'mainlist.xml',canmove=False)
+        self.gridold = DragableGrid(tabOne,u'mainlist.xml',canmove=False)
         for i in range(self.gridold.GetNumberRows()):
             self.gridold.SetReadOnly(i,0,True)
             self.gridold.SetReadOnly(i,1,True)
 
+        #定义一组文字标签
+        font = wx.Font(16, wx.SWISS, wx.NORMAL, wx.NORMAL)
+        self.st1 = wx.StaticText(tabOne, -1, u"当前服务器播出清单")
+        self.st2 = wx.StaticText(tabOne, -1, u"临时操作清单")
+        self.st1.SetFont(font)
+        self.st2.SetFont(font)
+
         #定义一组功能按钮
-        self.bn1 = wx.Button(self,  -1, u"清空列表")
+        self.bn1 = wx.Button(tabOne,  -1, u"清空列表")
         self.Bind(wx.EVT_BUTTON, self.OnReset, self.bn1)
 
 
-        self.bn2 = wx.Button(self, -1, u"读取路径下所有文件")
+        self.bn2 = wx.Button(tabOne, -1, u"读取路径下所有文件")
         self.Bind(wx.EVT_BUTTON, self.OnPickDir, self.bn2)
 
-        self.bn3 = wx.Button(self,  -1, u"退出")
+        self.bn3 = wx.Button(tabOne,  -1, u"退出")
         self.Bind(wx.EVT_BUTTON, self.OnCloseMe, self.bn3)
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
 
-        self.bn4 = wx.Button(self, -1, u"上传服务器")
+        self.bn4 = wx.Button(tabOne, -1, u"上传服务器")
         self.Bind(wx.EVT_BUTTON, self.OnPush, self.bn4)
 
-        self.bn5 = wx.Button(self, -1, u"添加影片文件")
+        self.bn5 = wx.Button(tabOne, -1, u"添加影片文件")
         self.Bind(wx.EVT_BUTTON, self.OnPickFile, self.bn5)
 
-        self.bn6 = wx.Button(self, -1, u"复制当前播出列表")
+        self.bn6 = wx.Button(tabOne, -1, u"复制当前播出列表")
         self.Bind(wx.EVT_BUTTON, self.OnPull, self.bn6)
 
-        #将各组件加入位置容器
-        self.sizer2.Add(self.bn1, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
-        self.sizer2.Add(self.bn6, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
-        self.sizer2.Add(self.bn2, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
-        self.sizer2.Add(self.bn5, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
-        self.sizer2.Add(self.bn4, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
-        self.sizer2.Add(self.bn3, 1, wx.ALIGN_CENTER | wx.ALL, border=10)
+        ##将各组件加入位置容器
+        tabOne.sizer4.Add(self.st1, 0, flag=wx.ALIGN_CENTER|wx.ALL, border=5)
+        tabOne.sizer4.Add(self.gridold, 1, flag=wx.EXPAND|wx.ALL, border=0)
+        tabOne.sizer5.Add(self.st2, 0, flag=wx.ALIGN_CENTER|wx.ALL, border=5)
+        tabOne.sizer5.Add(self.gridnew, 1, flag=wx.EXPAND|wx.ALL, border=0)
 
-        self.sizer3.Add(self.gridold, 0, flag=wx.EXPAND|wx.ALL, border=15)
-        self.sizer3.Add(self.gridnew, 1, flag=wx.EXPAND|wx.ALL, border=15)
+        tabOne.sizer2.Add(self.bn1, 1, wx.ALIGN_CENTER | wx.ALL, border=5)
+        tabOne.sizer2.Add(self.bn6, 1, wx.ALIGN_CENTER | wx.ALL, border=5)
+        tabOne.sizer2.Add(self.bn2, 1, wx.ALIGN_CENTER | wx.ALL, border=5)
+        tabOne.sizer2.Add(self.bn5, 1, wx.ALIGN_CENTER | wx.ALL, border=5)
+        tabOne.sizer2.Add(self.bn4, 1, wx.ALIGN_CENTER | wx.ALL, border=5)
+        tabOne.sizer2.Add(self.bn3, 1, wx.ALIGN_CENTER | wx.ALL, border=5)
 
-        self.sizer1.Add(self.sizer3, 1, flag=wx.EXPAND|wx.ALL, border=10)
-        self.sizer1.Add(self.sizer2, 0, flag=wx.EXPAND|wx.ALL, border=10)
+        tabOne.sizer3.Add(tabOne.sizer4, 1, flag=wx.EXPAND|wx.ALL, border=5)
+        tabOne.sizer3.Add(tabOne.sizer5, 1, flag=wx.EXPAND|wx.ALL, border=5)
+
+        tabOne.sizer1.Add(tabOne.sizer3, 1, flag=wx.EXPAND|wx.ALL, border=5)
+        tabOne.sizer1.Add(tabOne.sizer2, 0, flag=wx.EXPAND|wx.ALL, border=5)
+
+        sizer.Add(notebook, 1, wx.ALL|wx.EXPAND, 5)
+        tabOne.SetSizer(tabOne.sizer1)
+        tabOne.Layout()
+
         #自动调整尺寸、布局
-        self.SetSizer(self.sizer1)
-        self.SetAutoLayout(1)
-        self.sizer1.Fit(self)
-
+        panel.SetSizer(sizer)
+        self.Layout()
         self.Show()
 
 
