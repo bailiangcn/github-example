@@ -3,7 +3,8 @@
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
 
 
-"""节目播出调度
+"""
+节目播出调度主程序
 """
 
 __revision__ = '0.1'
@@ -15,37 +16,84 @@ import wx
 import ConfigParser 
 import os
 
+class movieConf(object):
+    """
+    设置配置文件类
+    """
+    def __init__(self, filename=u'schedule.conf'):
+        cp=ConfigParser.ConfigParser()
+        cp.read('schedule.conf')
+        self.winx=int(cp.get('position','x'))
+        self.winy=int(cp.get('position','y'))
+        self.winw=int(cp.get('size','width'))
+        self.winh=int(cp.get('size','height'))
+        self.during = int(cp.get('timer', 'during'))
+        self.moviepath=cp.get('movie','moviepath')
+        self.movielist=cp.get('movie','movielist')
 
-
-class Frame(wx.Frame):
+class movieFrame(wx.Frame):
     '''
     节目播出窗口类
+    默认在配置文件指定大小及位置
     '''
-    def __init__(self, parent, id, title, mplayer, media_file,x,y):
-        wx.Frame.__init__(self, None, -1, u"无边框窗口", (winx, winy) , 
-                (0, 0), style = wx.FRAME_SHAPED|wx.SIMPLE_BORDER\
+    def __init__(self,media_file):
+        '''
+        初始化一个大小为零的播放页面, 用于提前调入影片
+        '''
+        wx.Frame.__init__(self, None, -1, u"mplayer", 
+                (mcon.winx, mcon.winy) , (0, 0), 
+                style = wx.FRAME_SHAPED|wx.SIMPLE_BORDER\
                 |wx.FRAME_NO_TASKBAR|wx.STAY_ON_TOP)
         #创建一个mplayerctrl实例
-        self.mpc = mpc.MplayerCtrl(self, -1, mplayer, media_file,
-                keep_pause=False)
-        #self.mpc = mpc.MplayerCtrl(self, -1, mplayer, media_file,
-        # [u'-vo',u'xv'],keep_pause=False)
+        #可以指定mplayer参数
+        self.mpc = mpc.MplayerCtrl(self, -1, u'mplayer', 
+                # [u'-vo',u'xv'],
+                #media_file, 
+                keep_pause=True)
+
+        #绑定启动事件, 暂停播放
         self.Bind(mpc.EVT_MEDIA_STARTED, self.on_media_started)
+
         #设置屏幕背景为黑色
         self.mpc.SetBackgroundColour((0,0,0))
         self.Show()
+        self.mpc.Start()
+        self.mpc.Loadfile(media_file)
 
     def on_media_started(self, evt):
         '''
-        设置图像播放一帧后暂停
+        设置图像调入后暂停, 隐藏窗口, 恢复窗口大小
         '''
+        print "movie started"
+        print self.mpc.filename
         self.mpc.Pause()
         self.Hide()
-        self.SetSize(wx.Size(winw,winh))
+        self.mpc.Seek(0, 2)
+        self.SetSize(wx.Size(mcon.winw,mcon.winh))
+
+    def pauseMovie(self):
+        pass
+
+    def getPause(self):
+        '''
+        获得影片是否暂停的状态
+        '''
+        return self.mpc.playing
+
+    def loadMovie(self, filename):
+        '''
+        调入一个文件
+        '''
+        self.SetSize(wx.Size(0, 0))
+        self.Show()
+        self.mpc.Loadfile(filename)
+        #print "stream_length:%s" % self.mpc.GetTimeLength()
+        #print "stream_pos:%s" % self.mpc.GetTimePos()
+        #print "Pause stat is:%s" % self.mpc.pause
 
 #---------------------------------------------------------------------------
 
-class ParFrame(wx.Frame):
+class MainFrame(wx.Frame):
     '''
     主调用窗口类,负责调度各个播出窗口
     '''
@@ -72,17 +120,9 @@ class ParFrame(wx.Frame):
         b1.SetPosition((115, 15))
         self.Bind(wx.EVT_BUTTON, self.OnButtonb1, b1)
 
-        c1 = wx.Button(panel, -1, u"预留", (50,50))
+        c1 = wx.Button(panel, -1, u"测试暂停状态", (50,50))
         c1.SetPosition((115, 55))
         self.Bind(wx.EVT_BUTTON, self.OnButtonc1, c1)
-
-        d1 = wx.Button(panel, -1, u"预留", (50,50))
-        d1.SetPosition((115, 95))
-        self.Bind(wx.EVT_BUTTON, self.OnButtond1, d1)
-
-        e = wx.Button(panel, -1, u"预留", (50,50))
-        e.SetPosition((15, 135))
-        self.Bind(wx.EVT_BUTTON, self.OnButtone, e)
 
         button = wx.Button(panel, 1003, u"退出")
         button.SetPosition((215, 15))
@@ -92,25 +132,22 @@ class ParFrame(wx.Frame):
         #创建一个定时器
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
-        self.timer.Start(during)
+        self.timer.Start(mcon.during)
 
-
-
-        self.Show(True)
+        self.Show()
 
 
     def OnTimer(self, evt):
         '''
         每秒钟查询一次看看是否播出列表有变化
         '''
-        tmptime=os.stat(movielist).st_mtime
+        tmptime=os.stat(mcon.movielist).st_mtime
         if self.mmtime != tmptime:
             print "mainlist.xml is changed!"
             self.mmtime = tmptime
 
     def OnButtonb(self, evt):
-        self.win = Frame(None, -1, 'Hello MplayerCtrl', u'mplayer', 
-                u'2.mpg',1920,0)
+        self.win = movieFrame( u'2.mpg')
 
     def OnButtonc(self, evt):
         self.win.Show()
@@ -129,11 +166,15 @@ class ParFrame(wx.Frame):
             self.win1.Hide()
 
     def OnButtonb1(self, evt):
-        self.win1 = Frame(None, -1, 'Hello MplayerCtrl', u'mplayer', 
-                u'1.mpg',2120,0)
+        self.win1 = movieFrame( u'1.mpg')
 
     def OnButtonc1(self, evt):
-        print self.win.mpc.get
+        mv = self.win.loadMovie(u'视频片段/002.mpg')
+        #print self.win.mpc.filename
+        #print "stream_length:%s" % self.win.mpc.GetTimeLength()
+        #print "stream_pos:%s" % self.win.mpc.GetTimePos()
+        #print "Pause stat is:%s" % self.win.mpc.pause
+        #self.win.mpc.Seek(0, 2)
 
     def OnButtond1(self, evt):
         self.win1.mpc.keep_pause=False
@@ -167,19 +208,11 @@ class ParFrame(wx.Frame):
 #---------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    #读取配置文件获得播放窗口的位置
-    cp=ConfigParser.ConfigParser()
-    cp.read('schedule.conf')
-    winx=int(cp.get('position','x'))
-    winy=int(cp.get('position','y'))
-    winw=int(cp.get('size','width'))
-    winh=int(cp.get('size','height'))
-    during = int(cp.get('timer', 'during'))
-    moviepath=cp.get('movie','moviepath')
-    movielist=cp.get('movie','movielist')
 
+    #读取配置文件获得播放窗口的位置
+    mcon = movieConf()
     app = wx.App(redirect=False)
-    b = ParFrame()
+    b = MainFrame()
     app.MainLoop()
 
 
