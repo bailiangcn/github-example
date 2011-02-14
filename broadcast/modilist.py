@@ -359,10 +359,14 @@ class TestFrame(wx.Frame):
                            )
         if dlg.ShowModal() == wx.ID_OK:
             ml = movielist.Mlist(u'templist.xml')
-            #wxpython默认无法正常得到有效unicode编码,需要进行转换
-            tmppath=repr(dlg.GetPath())[1:]
-            exec 'tmppath='+ tmppath
-            path=tmppath.decode('utf-8')
+            if sys.getfilesystemencoding() != u'UTF-8':
+                #wxpython默认在vim下面无法正常得到有效unicode编码,
+                #为方便调试,需要进行转换
+                tmppath=repr(dlg.GetPath())[1:]
+                exec 'tmppath='+ tmppath
+                path=tmppath.decode('utf-8')
+            else:
+                path=dlg.GetPath()
 
             ml.makebaselist(path)
             ml.savefile(u'templist.xml')
@@ -385,11 +389,15 @@ class TestFrame(wx.Frame):
             ml = movielist.Mlist('templist.xml')
             # 选择返回一个多个文件的列表
             paths = dlg.GetPaths()
-            #wxpython默认无法正常得到有效unicode编码,需要进行转换
             for eachfile in paths:
-                tmpfile = repr(eachfile)[1:]
-                exec 'tmpfile='+ tmpfile
-                path=tmpfile.decode('utf-8')
+                if sys.getfilesystemencoding() != u'UTF-8':
+                    #wxpython默认在vim下面无法正常得到有效unicode编码,
+                    #为方便调试,需要进行转换
+                    tmpfile = repr(eachfile)[1:]
+                    exec 'tmpfile='+ tmpfile
+                    path=tmpfile.decode('utf-8')
+                else:
+                    path=eachfile
                 tempmn=os.path.splitext(os.path.basename(path))[0]
                 ml.append([tempmn, path])
             ml.savefile(u'templist.xml')

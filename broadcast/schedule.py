@@ -15,6 +15,7 @@ import MplayerCtrl as mpc
 import wx
 import ConfigParser 
 import os
+import sys
 
 class movieConf(object):
     """
@@ -47,18 +48,20 @@ class movieFrame(wx.Frame):
         #创建一个mplayerctrl实例
         #可以指定mplayer参数
         self.mpc = mpc.MplayerCtrl(self, -1, u'mplayer', 
-                # [u'-vo',u'xv'],
-                #media_file, 
+                media_file, (u'-cache',u'1024'),
                 keep_pause=True)
 
         #绑定启动事件, 暂停播放
         self.Bind(mpc.EVT_MEDIA_STARTED, self.on_media_started)
+        #self.Bind(mpc.EVT_MEDIA_FINISHED, self.on_media_finished)
+        self.Bind(mpc.EVT_PROCESS_STOPPED, self.on_process_stopped)
 
         #设置屏幕背景为黑色
         self.mpc.SetBackgroundColour((0,0,0))
         self.Show()
-        self.mpc.Start()
-        self.mpc.Loadfile(media_file)
+
+        #if media_file != '':
+        #    self.mpc.Loadfile(media_file)
 
     def on_media_started(self, evt):
         '''
@@ -66,10 +69,20 @@ class movieFrame(wx.Frame):
         '''
         print "movie started"
         print self.mpc.filename
+        self.mpc.Mute(1)
         self.mpc.Pause()
         self.Hide()
         self.mpc.Seek(0, 2)
+        self.mpc.Mute(0)
         self.SetSize(wx.Size(mcon.winw,mcon.winh))
+
+    def on_process_started(self, evt):
+        print 'Process started'
+    def on_media_finished(self, evt):
+        print 'Media finished'
+        self.mpc.Quit()
+    def on_process_stopped(self, evt):
+        print 'Process stopped'
 
     def pauseMovie(self):
         pass
@@ -102,6 +115,7 @@ class MainFrame(wx.Frame):
         wx.Frame.__init__(self, None,  -1, 'Manager')
         self.win = None
         self.win1=None
+        self.win3=None
         self.mmtime=0
         panel = wx.Panel(self, -1)
         b = wx.Button(panel, -1, u"打开播放窗口", (50,50))
@@ -169,7 +183,8 @@ class MainFrame(wx.Frame):
         self.win1 = movieFrame( u'1.mpg')
 
     def OnButtonc1(self, evt):
-        mv = self.win.loadMovie(u'视频片段/002.mpg')
+        self.win3=movieFrame('')
+        #mv = self.win3.loadMovie(u'视频片段/002.mpg')
         #print self.win.mpc.filename
         #print "stream_length:%s" % self.win.mpc.GetTimeLength()
         #print "stream_pos:%s" % self.win.mpc.GetTimePos()
@@ -197,12 +212,22 @@ class MainFrame(wx.Frame):
     def OnCloseWindow(self, event):
         if self.win != None:
             self.win.mpc.Quit()
+            self.win.mpc.Destroy()
             self.win.Destroy()
-        if self.win1 != None:
-            self.win1.mpc.Quit()
-            self.win1.Destroy()
+        #if self.win1 != None:
+        #    self.win1.mpc.Quit()
+        #    self.win1.mpc.Destroy()
+        #    self.win1.Destroy()
+        if self.win3 != None:
+            self.win3.mpc.Quit()
+            self.win3.mpc.Destroy()
+            self.win3.Destroy()
 
-        self.Destroy()
+        self.win1.mpc.Quit()
+        self.win1.mpc.Destroy()
+        self.win1.Destroy()
+
+        #self.Destroy()
 
         
 #---------------------------------------------------------------------------
