@@ -16,6 +16,7 @@ import wx
 import ConfigParser 
 import os
 import sys
+import time
 
 class movieConf(object):
     """
@@ -37,9 +38,10 @@ class movieFrame(wx.Frame):
     节目播出窗口类
     默认在配置文件指定大小及位置
     '''
-    def __init__(self,media_file):
+    def __init__(self,media_file=None, mute=False):
         '''
         初始化一个大小为零的播放页面, 用于提前调入影片
+        mute = True 会启动一个静音窗口
         '''
         wx.Frame.__init__(self, None, -1, u"mplayer", 
                 (mcon.winx, mcon.winy) , (0, 0), 
@@ -47,17 +49,18 @@ class movieFrame(wx.Frame):
                 |wx.FRAME_NO_TASKBAR|wx.STAY_ON_TOP)
         #创建一个mplayerctrl实例
         #可以指定mplayer参数
+        if mute:
+            mplayarg = (u'-vo',u'xv', u'-af', u'volume=-200' )
+        else:
+            mplayarg = (u'-vo',u'xv')
         self.mpc = mpc.MplayerCtrl(self, -1, u'mplayer', 
-                media_file, (u'-cache',u'1024'),
+                media_file, mplayer_args=mplayarg,
                 keep_pause=True)
-
+        self.mpc.SetBackgroundColour((0,0,0))
         #绑定启动事件, 暂停播放
         self.Bind(mpc.EVT_MEDIA_STARTED, self.on_media_started)
-        #self.Bind(mpc.EVT_MEDIA_FINISHED, self.on_media_finished)
-        self.Bind(mpc.EVT_PROCESS_STOPPED, self.on_process_stopped)
 
         #设置屏幕背景为黑色
-        self.mpc.SetBackgroundColour((0,0,0))
         self.Show()
 
         #if media_file != '':
@@ -67,13 +70,10 @@ class movieFrame(wx.Frame):
         '''
         设置图像调入后暂停, 隐藏窗口, 恢复窗口大小
         '''
-        print "movie started"
         print self.mpc.filename
-        self.mpc.Mute(1)
         self.mpc.Pause()
-        self.Hide()
         self.mpc.Seek(0, 2)
-        self.mpc.Mute(0)
+        self.Hide()
         self.SetSize(wx.Size(mcon.winw,mcon.winh))
 
     def on_process_started(self, evt):
@@ -97,6 +97,9 @@ class movieFrame(wx.Frame):
         '''
         调入一个文件
         '''
+        if not self.mpc.process_alive:
+            print "begin a new process"
+            self.mpc.Start()
         self.SetSize(wx.Size(0, 0))
         self.Show()
         self.mpc.Loadfile(filename)
@@ -115,7 +118,7 @@ class MainFrame(wx.Frame):
         wx.Frame.__init__(self, None,  -1, 'Manager')
         self.win = None
         self.win1=None
-        self.win3=None
+        self.win3=movieFrame(mute=True)
         self.mmtime=0
         panel = wx.Panel(self, -1)
         b = wx.Button(panel, -1, u"打开播放窗口", (50,50))
@@ -183,8 +186,7 @@ class MainFrame(wx.Frame):
         self.win1 = movieFrame( u'1.mpg')
 
     def OnButtonc1(self, evt):
-        self.win3=movieFrame('')
-        #mv = self.win3.loadMovie(u'视频片段/002.mpg')
+        self.win3.loadMovie(u'视频片段/002.mpg')
         #print self.win.mpc.filename
         #print "stream_length:%s" % self.win.mpc.GetTimeLength()
         #print "stream_pos:%s" % self.win.mpc.GetTimePos()
@@ -198,10 +200,8 @@ class MainFrame(wx.Frame):
             self.win1.mpc.keep_pause=True
 
     def OnButtone(self, evt):
-        self.win.mpc.Mute()
         self.win.mpc.Loadfile(u'1.mpg')
         self.win.mpc.Seek(20,2)
-        self.win.mpc.Mute()
         mm=self.win.mpc.GetPosition()
         print "width=",mm[0]
         print 'height=',mm[1]
@@ -214,20 +214,17 @@ class MainFrame(wx.Frame):
             self.win.mpc.Quit()
             self.win.mpc.Destroy()
             self.win.Destroy()
-        #if self.win1 != None:
-        #    self.win1.mpc.Quit()
-        #    self.win1.mpc.Destroy()
-        #    self.win1.Destroy()
+        if self.win1 != None:
+            self.win1.mpc.Quit()
+            self.win1.mpc.Destroy()
+            self.win1.Destroy()
         if self.win3 != None:
             self.win3.mpc.Quit()
             self.win3.mpc.Destroy()
             self.win3.Destroy()
 
-        self.win1.mpc.Quit()
-        self.win1.mpc.Destroy()
-        self.win1.Destroy()
 
-        #self.Destroy()
+        self.Destroy()
 
         
 #---------------------------------------------------------------------------
