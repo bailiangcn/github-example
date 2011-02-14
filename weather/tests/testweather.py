@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年01月31日 16时26分20秒
 
 
 """
@@ -85,12 +84,12 @@ class simpleTest(TestCase):
         测试输入超长字符串自动断行
         '''
         knownValues= ((u'西风微风转西北风微风', 
-            u'西风微风转<br>西北风微风'), 
-            (u'西风转西北风', u'西风转<br>西北风'), 
+            u'西风微风'), 
+            (u'西风转西北风', u'西风'), 
             (u'西风', u'西风'), 
-            (u'西风转西北微风', u'西风转<br>西北微风'), 
-            (u'西风转西北微风西风转西北微风西风转西北微风', 
-             u'西风转西北微风西<br>风转西北微风西风'), 
+            (u'西风西北微风', u'西风西<br>北微风'), 
+            (u'西风西北微风西风西北微风西风转西北微风', 
+             u'西风西北微<br>风西风西北'), 
             )
         for soustr, resstr in knownValues:
             wishres=weather.insertBr(soustr)
@@ -160,9 +159,10 @@ class simpleTest(TestCase):
         '''
         测试zhLjust()能否正确根据中文填充空格
         '''
-        knownValues=((
-            (u'中',4),u'中  '),
-            ((u'e中f',6),u'e中f  '))
+        knownValues=(
+            ((u'中',4),u'中 '),
+            ((u'e中f  ',6),u'e中f '),
+            )
         for souchr, wishres in knownValues:
             result = weather.zhLjust(souchr[0],souchr[1])
             self.assertEqual(wishres, result)
