@@ -85,7 +85,7 @@ class movieFrame(wx.Frame):
         '''
         if self.pause:
             #读取节目时长
-            #print "now begin-->",self.mpc.filename.encode('utf-8') 
+            print "now begin-->",self.mpc.filename.encode('utf-8') 
             #print "set timelen:",self.movielen
             self.mpc.Pause()
             self.mpc.Osd(0)
@@ -97,8 +97,11 @@ class movieFrame(wx.Frame):
             #self.mpc.SetSize(wx.Size(mcon.winw,mcon.winh))
             if self.par.dropmovie:
                 print "into pass"
+                print "now begin-->",self.mpc.filename.encode('utf-8') 
+                print "set timelen:",self.movielen
                 self.par.dropmovie=False
-                self.movietime.Stop()
+                self.par.buffer0.movietime.Stop()
+                self.par.buffer1.movietime.Stop()
                 self.par.DoNext()
         else:
             #第一个播放的节目
@@ -111,6 +114,7 @@ class movieFrame(wx.Frame):
 
     def OnTimerEvent(self,evt):
         print "movie timeout"
+        #print "id:",self.id
         self.par.DoNext()
 
     def on_process_started(self, evt):
@@ -129,11 +133,11 @@ class movieFrame(wx.Frame):
             self.SetSize(wx.Size(1, 1))
         else:
             self.SetSize(wx.Size(mcon.winw,mcon.winh))
-            self.mpc.SetSize(wx.Size(mcon.winw,mcon.winh))
+            #self.mpc.SetSize(wx.Size(mcon.winw,mcon.winh))
             
         self.Show()
         if not self.mpc.process_alive:
-            print "begin a new process"
+            #print "begin a new process"
             self.mpc.Start( mplayer_args=self.mplayarg)
         self.mpc.Loadfile(filename)
 
@@ -189,7 +193,7 @@ class MainFrame(wx.Frame):
 
         if self.nowbuffer:
             #第一视频窗口
-            print "buffer1 is activeing"
+            #print "buffer1 is activeing"
             self.buffer1.Show()
             self.buffer1.mpc.Pause()
             self.buffer0.mpc.Pause()
@@ -200,7 +204,7 @@ class MainFrame(wx.Frame):
             self.buffer0.loadMovie(self.ml.getnextfile(1))
         else:
             #第二视频窗口
-            print "buffer0 is activeing"
+            #print "buffer0 is activeing"
             self.buffer0.Show()
             self.buffer0.mpc.Pause()
             self.buffer1.mpc.Pause()
@@ -215,6 +219,7 @@ class MainFrame(wx.Frame):
         #播放列表发生变化
         self.ml.reload()
         if mcon.immediately != 0:
+            #如果立即生效
             self.dropmovie=True
         if self.nowbuffer:
             self.buffer1.loadMovie(self.ml.getnextfile())
@@ -258,7 +263,7 @@ if __name__ == '__main__':
 
     #读取配置文件获得播放窗口的位置
     mcon = movieConf()
-    app = wx.App(redirect=False)
+    app = wx.App(redirect=True)
     b = MainFrame()
     app.MainLoop()
 

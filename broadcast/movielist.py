@@ -108,8 +108,8 @@ class Mlist(object):
         '''
         nownum=self.nowplay+num
         self.length=len(self.mlist)
-        print "nownum=",nownum
-        print "length=",self.length
+        #print "nownum=",nownum
+        #print "length=",self.length
         if nownum > self.length-1:
             return self.mlist[0]['path']
         else:
