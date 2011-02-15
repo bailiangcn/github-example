@@ -30,6 +30,9 @@ class Mlist(object):
         '''
         类的初始化,读取一个xml文件,生成文件列表
         '''
+        self.reload(filename,empty)
+
+    def reload(self,filename=u'mainlist.xml',empty=False):
         self.mlist=[]   #播出文件列表
         self.length=0   #播出文件的个数
         self.nowplay=0  #当前播放的影片号,从0开始

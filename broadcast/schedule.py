@@ -24,16 +24,19 @@ class movieConf(object):
     设置配置文件类
     """
     def __init__(self, filename=u'schedule.conf'):
-        cp=ConfigParser.ConfigParser()
-        cp.read('schedule.conf')
-        self.winx=int(cp.get('position','x'))
-        self.winy=int(cp.get('position','y'))
-        self.winw=int(cp.get('size','width'))
-        self.winh=int(cp.get('size','height'))
-        self.during = int(cp.get('timer', 'during'))
-        self.moviepath=cp.get('movie','moviepath')
-        self.movielist=cp.get('movie','movielist')
-        self.cutclip=int(cp.get('movie','cutclip'))
+        self.cp=ConfigParser.ConfigParser()
+        self.cp.read('schedule.conf')
+        self.winx=int(self.cp.get('position','x'))
+        self.winy=int(self.cp.get('position','y'))
+        self.winw=int(self.cp.get('size','width'))
+        self.winh=int(self.cp.get('size','height'))
+        self.during = int(self.cp.get('timer', 'during'))
+        self.cutclip=int(self.cp.get('timer','cutclip'))
+        self.moviepath=self.cp.get('movie','moviepath')
+        self.movielist=self.cp.get('movie','movielist')
+        self.immediately=int(self.cp.get('movie','immediately'))
+    def reload(self):
+        self.immediately=int(self.cp.get('movie','immediately'))
 
 class movieFrame(wx.Frame):
     '''
@@ -54,12 +57,12 @@ class movieFrame(wx.Frame):
         self.par=par
         self.movielen=0
         if mute:
-            mplayarg = (u'-vo',u'gl2', u'-af', u'volume=-200' )
+            self.mplayarg = (u'-vo',u'xv', u'-af', u'volume=-200' )
         else:
-            mplayarg = (u'-vo',u'gl2')
-        self.pause=True
+            #self.mplayarg = (u'-vo',u'xv')
+            self.mplayarg = (u'-vo',u'xv', u'-af', u'volume=-100' )
         self.mpc = mpc.MplayerCtrl(self, -1, u'mplayer', 
-                media_file, mplayer_args=mplayarg,
+                media_file, mplayer_args=self.mplayarg,
                 keep_pause=True)
 
         #创建一个影片计时器
@@ -81,12 +84,15 @@ class movieFrame(wx.Frame):
         if self.pause:
             #读取节目时长
             self.movielen=self.mpc.GetTimeLength()*1000
+            print "set timelen:",self.movielen
             self.mpc.Pause()
             self.mpc.Seek(0, 2)
             self.mpc.FrameStep()
             self.Hide()
             self.SetSize(wx.Size(mcon.winw,mcon.winh))
+            self.mpc.SetSize(wx.Size(mcon.winw,mcon.winh))
         else:
+            #第一个播放的节目
             self.movielen=self.mpc.GetTimeLength()*1000
             self.movietime.Start(self.movielen-mcon.cutclip,True)
             print "beging play:",self.mpc.filename,self.movielen 
@@ -110,14 +116,16 @@ class movieFrame(wx.Frame):
         '''
         调入一个文件
         '''
-        if not self.mpc.process_alive:
-            print "begin a new process"
-            self.mpc.Start()
         if self.pause:
             self.SetSize(wx.Size(1, 1))
         else:
             self.SetSize(wx.Size(mcon.winw,mcon.winh))
+            self.mpc.SetSize(wx.Size(mcon.winw,mcon.winh))
+            
         self.Show()
+        if not self.mpc.process_alive:
+            print "begin a new process"
+            self.mpc.Start( mplayer_args=self.mplayarg)
         self.mpc.Loadfile(filename)
 
 #---------------------------------------------------------------------------
@@ -134,11 +142,15 @@ class MainFrame(wx.Frame):
         self.buffer1 = movieFrame(self)
         #读取节目列表
         self.ml=movielist.Mlist(mcon.movielist)
+        #第一个节目暂停取消
         self.buffer0.pause=False
+        self.buffer1.pause=True
         self.buffer0.loadMovie(self.ml.getnextfile())
         #定义面板
         panel = wx.Panel(self, -1)
         self.mmtime=os.stat(mcon.movielist).st_mtime
+        #定义播放列表变化标志
+        self.listchanged=False
 
         #self.win3=movieFrame(self,mute=True)
 
@@ -158,34 +170,48 @@ class MainFrame(wx.Frame):
         self.buffer1.loadMovie(self.ml.getnextfile(1))
 
     def DoNext(self):
-        self.ml.beginnext()
+        if not self.listchanged:
+            #播放列表如果没有变化
+            self.ml.beginnext()
+        else:
+            self.listchanged=False
+
         if self.nowbuffer:
             #第一视频窗口
+            print "buffer1 is activeing"
             self.buffer1.Show()
             self.buffer1.mpc.Pause()
             self.buffer0.mpc.Pause()
             self.buffer0.Hide()
             self.buffer1.movietime.Start(
                     self.buffer1.movielen-mcon.cutclip,True)
-            #print "pre load:",self.ml.getnextfile(1).encode('utf-8') 
             self.buffer0.loadMovie(self.ml.getnextfile(1))
         else:
             #第二视频窗口
-            #self.buffer0.mpc.keep_pause=False
+            print "buffer0 is activeing"
             self.buffer0.Show()
             self.buffer0.mpc.Pause()
             self.buffer1.mpc.Pause()
             self.buffer1.Hide()
             self.buffer0.movietime.Start(
                     self.buffer1.movielen-mcon.cutclip,True)
-            #self.buffer0.mpc.keep_pause=True
-            #print "beging play:",self.buffer0.mpc.filename, \
-            #        self.buffer0.mpc.GetTimeLength()
-            #print "pre load:",self.ml.getnextfile(1).encode('utf-8') 
             self.buffer1.loadMovie(self.ml.getnextfile(1))
-
         self.nowbuffer=not self.nowbuffer
 
+    def ChangeMovie(self):
+        #播放列表发生变化
+        self.ml.reload()
+        if mcon.immediately == 0:
+            print "after this program end begin chang list"
+            print self.ml.tostr().encode('utf-8') 
+            print 'next pro:',self.ml.getnextfile().encode('utf-8') 
+
+            if self.nowbuffer:
+                self.buffer1.loadMovie(self.ml.getnextfile())
+            else:
+                self.buffer0.loadMovie(self.ml.getnextfile())
+        else:
+            print "now change program"
 
         
 
@@ -193,10 +219,14 @@ class MainFrame(wx.Frame):
         '''
         每秒钟查询一次看看是否播出列表有变化
         '''
+        #查询时间标签是否更改
         tmptime=os.stat(mcon.movielist).st_mtime
         if self.mmtime != tmptime:
-            print "mainlist.xml is changed!"
+            self.listchanged=True
             self.mmtime = tmptime
+            mcon.reload()
+            self.ChangeMovie()
+
 
 
     def OnCloseMe(self, event):
@@ -220,7 +250,7 @@ if __name__ == '__main__':
 
     #读取配置文件获得播放窗口的位置
     mcon = movieConf()
-    app = wx.App(redirect=True)
+    app = wx.App(redirect=False)
     #app = wx.App(redirect=False)
     b = MainFrame()
     app.MainLoop()

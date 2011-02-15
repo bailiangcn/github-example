@@ -333,9 +333,10 @@ class TestFrame(wx.Frame):
         上传到实际播出列表
         '''
         ml = movielist.Mlist('templist.xml')
-        ml.savefile('mainlist.xml')
-        self.gridold.GetTable().ReloadData('templist.xml')
-        self.gridold.AutoSizeColumns()
+        if ml.length >0:
+            ml.savefile('mainlist.xml')
+            self.gridold.GetTable().ReloadData('templist.xml')
+            self.gridold.AutoSizeColumns()
         
     def OnPull(self, event):
         '''
