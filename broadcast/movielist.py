@@ -98,14 +98,33 @@ class Mlist(object):
             #如果错误, 记入日志
             print ex
             print sys.exc_info()
-    def getnextfile(self):
+
+    def getnextfile(self,num=0):
         '''
         返回下一个影片的文件名
         '''
-        if self.nowplay == self.length-1:
+        nownum=self.nowplay+num
+        self.length=len(self.mlist)
+        if nownum > self.length-1:
             return self.mlist[0]['path']
         else:
-            return self.mlist[self.nowplay+1]['path']
+            return self.mlist[nownum]['path']
+
+    def beginnext(self):
+        '''
+        标记开始下一个影片
+        '''
+        self.nowplay+=1
+        self.length=len(self.mlist)
+        if self.nowplay>self.length:
+            self.nowplay=0
+        return self.nowplay
+
+    def getnowplay(self):
+        '''
+        返回当前播放的影片,如果是-1表示停止播放
+        '''
+        return self.nowplay
 
     def makebaselist(self,path,extension=['*']):
         '''
@@ -133,6 +152,19 @@ class Mlist(object):
         '''
         tempmovie=self.mlist.pop(oldord)
         self.mlist.insert(neword,tempmovie)
+
+    def tostr(self):
+        '''
+        文本格式显示mlist
+        '''
+        resstr=u"节目列表:\n"
+        for eachmovie in self.mlist:
+            ts=u"name:"+eachmovie['name'
+                ]+u"    path:"+eachmovie['path']+u"\n"
+            resstr+=ts
+        return resstr
+
+            
         
 
 

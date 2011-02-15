@@ -72,9 +72,17 @@ class simpleTest(TestCase):
     def testgetnextfile(self):
         "测试返回下一个播出文件"
         self.mt.nowplay=0
-        self.assertEqual(u'2.mpg',self.mt.getnextfile())
-        self.mt.nowplay=1
+        self.mt.mlist=[
+                        {'name':u'1.mpg','path':u'1.mpg'},
+                        {'name':u'2.mpg','path':u'2.mpg'},
+                        {'name':u'3.mpg','path':u'3.mpg'},
+                        {'name':u'4.mpg','path':u'4.mpg'},
+                        ]
+        print self.mt.tostr().encode('utf-8') 
+        print self.mt.getnextfile()
         self.assertEqual(u'1.mpg',self.mt.getnextfile())
+        print self.mt.getnextfile(2)
+        self.assertEqual(u'3.mpg',self.mt.getnextfile(2))
 
     def testmakebaselist(self):
         "测试根据指定目录生成节目列表" 
