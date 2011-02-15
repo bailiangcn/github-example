@@ -89,7 +89,14 @@ class movieFrame(wx.Frame):
             #print "set timelen:",self.movielen
             self.mpc.Pause()
             self.mpc.Osd(0)
-            self.movielen=self.mpc.GetTimeLength()*1000
+            i=0
+            while i<3:
+                try:
+                    self.movielen=self.mpc.GetTimeLength()*1000
+                    break
+                except:
+                    i+=1
+                    time.sleep(0.003)
             self.mpc.Seek(0, 2)
             self.mpc.FrameStep()
             self.Hide()
