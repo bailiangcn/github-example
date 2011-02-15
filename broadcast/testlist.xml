@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ROOT>
+    <MOVIE>
+        <NAME>1.mpg</NAME>
+        <PATH>1.mpg</PATH>
+    </MOVIE>
+    <MOVIE>
+        <NAME>2.mpg</NAME>
+        <PATH>2.mpg</PATH>
+    </MOVIE>
+</ROOT>

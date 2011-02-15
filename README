@@ -14,3 +14,22 @@
 3、启动Karrigell
     sudo python Karrigell
 
+broadcast模块安装指南
+环境要求: 
+    python2.6.5 
+    wxpython 2.8
+    mplayer
+安装方法: 
+
+sudo apt-get install mplayer
+sudo apt-get install git-core
+sudo apt-get install python-setuptools 
+sudo easy_install pip
+sudo pip install mplayerctrl
+sudo apt-get install python-wxgtk2.8
+git clone git://github.com/bailiangcn/github-example.git www
+git pull origin develop
+git checkout develop
+cd www/broadcast/
+python schedule.py 
+
