@@ -108,6 +108,8 @@ class Mlist(object):
         '''
         nownum=self.nowplay+num
         self.length=len(self.mlist)
+        print "nownum=",nownum
+        print "length=",self.length
         if nownum > self.length-1:
             return self.mlist[0]['path']
         else:
@@ -119,7 +121,7 @@ class Mlist(object):
         '''
         self.nowplay+=1
         self.length=len(self.mlist)
-        if self.nowplay>self.length:
+        if self.nowplay>self.length-1:
             self.nowplay=0
         return self.nowplay
 
