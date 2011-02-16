@@ -21,6 +21,7 @@ import glob
 import os
 from copy import deepcopy
 import sys
+import datetime 
 
 class Mlist(object):
     '''
@@ -183,6 +184,35 @@ def getText(node):
         if eachnode.nodeType == eachnode.TEXT_NODE:
             rc = rc + eachnode.data
     return rc
+
+def errlog(modelname, ex, exc_info):
+    '''
+    把错误信息写入日志文件
+    usage:
+    try:
+    except Exception, ex:
+        errlog('发送邮件错误', ex, sys.exc_info())
+    '''
+    log(modelname + u'模块发生错误:',u'logs/error.log')
+    log(unicode(ex),u'logs/error.log') 
+    log(unicode(exc_info),u'logs/error.log')
+
+def log(str, filename="logs/schedulelog.txt",logs=True):
+    '''
+    把字符串写入日志文件
+    '''
+    #根据分类从配置文件选择合适的目标文件写入字符串
+    if logs:
+        nowtimestr = unicode(datetime.datetime.now().strftime(
+            "[%Y-%m-%d %H:%M:%S]"),'utf-8')
+        f = open(filename, 'a')
+        if not isinstance(str,unicode):
+            str = unicode(str,'utf-8')
+        desstr = "%s  %s\n" % (nowtimestr, str)
+        byte_out = desstr.encode('utf-8')
+        f.write(byte_out)
+        f.close()
+        return True
 
 #
 ##自动调用测试用例，请输入测试用例名

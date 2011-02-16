@@ -18,6 +18,9 @@ import os
 import sys
 import time
 import movielist
+from movielist import log
+from movielist import errlog
+
 
 #------------------------------------------------------------
 class movieConf(object):
@@ -36,6 +39,7 @@ class movieConf(object):
         self.moviepath=self.cp.get('movie','moviepath')
         self.movielist=self.cp.get('movie','movielist')
         self.immediately=int(self.cp.get('movie','immediately'))
+        self.logs=(self.cp.get('logs','log')=='1')
     def reload(self):
         self.immediately=int(self.cp.get('movie','immediately'))
 
@@ -50,7 +54,7 @@ class movieFrame(wx.Frame):
         初始化一个大小为零的播放页面, 用于提前调入影片
         mute = True 会启动一个静音窗口
         '''
-        wx.Frame.__init__(self, None, -1, u"mplayer", 
+        wx.Frame.__init__(self, par, -1, u"mplayer", 
                 (mcon.winx, mcon.winy) , (1, 1), 
                 style = wx.FRAME_SHAPED|wx.SIMPLE_BORDER\
                 |wx.FRAME_NO_TASKBAR|wx.STAY_ON_TOP)
@@ -61,8 +65,8 @@ class movieFrame(wx.Frame):
         if mute:
             self.mplayarg = (u'-vo',u'xv', u'-af', u'volume=-200' )
         else:
-            self.mplayarg = (u'-vo',u'xv')
-            #self.mplayarg = (u'-vo',u'xv', u'-af', u'volume=-100' )
+            #self.mplayarg = (u'-vo',u'xv')
+            self.mplayarg = (u'-vo',u'xv', u'-af', u'volume=-50' )
         self.mpc = mpc.MplayerCtrl(self, -1, u'mplayer', 
                 media_file, mplayer_args=self.mplayarg,
                 keep_pause=True)
@@ -85,66 +89,70 @@ class movieFrame(wx.Frame):
         '''
         if self.pause:
             #读取节目时长
-            print "now begin-->",self.mpc.filename.encode('utf-8') 
-            #print "set timelen:",self.movielen
+            moviename=self.mpc.filename
+            log(u'媒体播放事件开始'+moviename,logs=mcon.logs)
             self.mpc.Pause()
             self.mpc.Osd(0)
-            i=0
-            while i<3:
-                try:
-                    self.movielen=self.mpc.GetTimeLength()*1000
-                    break
-                except:
-                    i+=1
-                    time.sleep(0.003)
+            log(u'开始取播放文件时长',logs=mcon.logs)
+            try:
+                self.movielen=self.mpc.GetTimeLength()*1000
+            except Exception, ex:
+                errlog(u'开始取播放文件时长出现错误', ex, sys.exc_info())
+
+            log(u'影片长度:'+unicode(self.movielen) ,logs=mcon.logs)
             self.mpc.Seek(0, 2)
             self.mpc.FrameStep()
             self.Hide()
             self.SetSize(wx.Size(mcon.winw,mcon.winh))
-            #self.mpc.SetSize(wx.Size(mcon.winw,mcon.winh))
+
             if self.par.dropmovie:
-                print "into pass"
-                print "now begin-->",self.mpc.filename.encode('utf-8') 
-                print "set timelen:",self.movielen
+                log("into pass",logs=mcon.logs)
+                log("now begin-->"+self.mpc.filename,logs=mcon.logs)
+                log("set timelen:%s" % self.movielen,logs=mcon.logs)
                 self.par.dropmovie=False
                 self.par.buffer0.movietime.Stop()
                 self.par.buffer1.movietime.Stop()
                 self.par.DoNext()
         else:
             #第一个播放的节目
+            log(u'第一个播放的节目 ',logs=mcon.logs)
             self.movielen=self.mpc.GetTimeLength()*1000
             self.movietime.Start(self.movielen-mcon.cutclip,True)
-            print "beging play:",self.mpc.filename,self.movielen 
+            moviename=self.mpc.filename
+            log(u'开始播放影片:'+moviename ,logs=mcon.logs)
+            log(u'影片长度:'+unicode(self.movielen) ,logs=mcon.logs)
             self.pause=True
             self.par.PreLoad()
 
 
     def OnTimerEvent(self,evt):
-        print "movie timeout"
-        #print "id:",self.id
+        log(u'影片计时器时间激活,开始准备调用DoNext()',logs=mcon.logs)
         self.par.DoNext()
 
     def on_process_started(self, evt):
-        print 'Process started'
+        log(u'mplayer 进程开始',logs=mcon.logs)
+
     def on_media_finished(self, evt):
-        print 'Media finished'
+        log(u'媒体停止播放事件',logs=mcon.logs)
         #self.par.DoNext()
+
     def on_process_stopped(self, evt):
-        print 'Process stopped'
+        log(u'mplayer 进程停止',logs=mcon.logs)
 
     def loadMovie(self, filename):
         '''
         调入一个文件
         '''
         if self.pause:
+            log(u'设置窗口最小尺寸',logs=mcon.logs)
             self.SetSize(wx.Size(1, 1))
         else:
+            log(u'设置窗口全屏尺寸',logs=mcon.logs)
             self.SetSize(wx.Size(mcon.winw,mcon.winh))
-            #self.mpc.SetSize(wx.Size(mcon.winw,mcon.winh))
             
         self.Show()
         if not self.mpc.process_alive:
-            #print "begin a new process"
+            log(u'开始一个新mplayer进程',logs=mcon.logs)
             self.mpc.Start( mplayer_args=self.mplayarg)
         self.mpc.Loadfile(filename)
 
@@ -156,23 +164,27 @@ class MainFrame(wx.Frame):
     '''
     def __init__(self):
         wx.Frame.__init__(self, None,  -1, 'Manager')
+        #定义播放列表变化标志
+        self.listchanged=False
+        #定义紧急切换节目标识
+        self.dropmovie=False
+
         #定义2个播放窗口,用于切换播出
+        log(u'定义2个播放窗口,用于切换播出',logs=mcon.logs)
         self.nowbuffer=True
         self.buffer0 = movieFrame(self)
         self.buffer1 = movieFrame(self)
         #读取节目列表
         self.ml=movielist.Mlist(mcon.movielist)
+        #取配置文件的时间标签
+        self.mmtime=os.stat(mcon.movielist).st_mtime
         #第一个节目暂停取消
         self.buffer0.pause=False
         self.buffer1.pause=True
+        log(u'0缓冲区开始调入影片'+self.ml.getnextfile(),logs=mcon.logs)
         self.buffer0.loadMovie(self.ml.getnextfile())
         #定义面板
         panel = wx.Panel(self, -1)
-        self.mmtime=os.stat(mcon.movielist).st_mtime
-        #定义播放列表变化标志
-        self.listchanged=False
-        #定义紧急切换节目标识
-        self.dropmovie=False
 
         #self.win3=movieFrame(self,mute=True)
 
@@ -181,7 +193,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.OnCloseMe, button)
         self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
 
-        #创建一个定时器
+        #创建一个检测配置文件更改的定时器
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
         self.timer.Start(mcon.during)
@@ -189,36 +201,42 @@ class MainFrame(wx.Frame):
         self.Show()
 
     def PreLoad(self):
+        "预读文件"
+        log(u'预读文件:'+self.ml.getnextfile(1),logs=mcon.logs)
         self.buffer1.loadMovie(self.ml.getnextfile(1))
 
     def DoNext(self):
+        "播放下一个影片"
         if not self.listchanged:
             #播放列表如果没有变化
+            log(u'播放列表变化,调用ml.beginnext()',logs=mcon.logs)
             self.ml.beginnext()
         else:
             self.listchanged=False
 
         if self.nowbuffer:
             #第一视频窗口
-            #print "buffer1 is activeing"
+            log(u'1 号缓冲区激活,0 号隐藏',logs=mcon.logs)
             self.buffer1.Show()
             self.buffer1.mpc.Pause()
             self.buffer0.mpc.Pause()
             self.buffer0.Hide()
-            print "real timelong",self.buffer1.movielen
+            log(u"影片长度:"+unicode(self.buffer1.movielen),logs=mcon.logs)
             self.buffer1.movietime.Start(
                     self.buffer1.movielen-mcon.cutclip,True)
+            log(u'0 号缓冲区准备预读文件:'+self.ml.getnextfile(1),logs=mcon.logs)
             self.buffer0.loadMovie(self.ml.getnextfile(1))
         else:
             #第二视频窗口
-            #print "buffer0 is activeing"
+            log(u'0 号缓冲区激活,1 号隐藏',logs=mcon.logs)
             self.buffer0.Show()
             self.buffer0.mpc.Pause()
             self.buffer1.mpc.Pause()
             self.buffer1.Hide()
-            print "real timelong",self.buffer0.movielen
+            log(u"影片长度:"+unicode(self.buffer0.movielen),logs=mcon.logs)
             self.buffer0.movietime.Start(
                     self.buffer0.movielen-mcon.cutclip,True)
+            log(u'1 号缓冲区准备预读文件:'+self.ml.getnextfile(1),logs=mcon.logs)
             self.buffer1.loadMovie(self.ml.getnextfile(1))
         self.nowbuffer=not self.nowbuffer
 
@@ -269,10 +287,15 @@ class MainFrame(wx.Frame):
 if __name__ == '__main__':
 
     #读取配置文件获得播放窗口的位置
-    mcon = movieConf()
+    try :
+        mcon = movieConf()
+    except Exception, ex:
+        errlog(u'配置文件错误', ex, sys.exc_info())
+    log(u"\n\n***************开始运行程序***************\n\n",logs=mcon.logs)
     app = wx.App(redirect=True)
     b = MainFrame()
     app.MainLoop()
+
 
 
 
