@@ -65,8 +65,8 @@ class movieFrame(wx.Frame):
         if mute:
             self.mplayarg = (u'-vo',u'xv', u'-af', u'volume=-200' )
         else:
-            #self.mplayarg = (u'-vo',u'xv')
-            self.mplayarg = (u'-vo',u'xv', u'-af', u'volume=-50' )
+            self.mplayarg = (u'-vo',u'xv')
+            #self.mplayarg = (u'-vo',u'xv', u'-af', u'volume=-50' )
         self.mpc = mpc.MplayerCtrl(self, -1, u'mplayer', 
                 media_file, mplayer_args=self.mplayarg,
                 keep_pause=True)
@@ -94,6 +94,7 @@ class movieFrame(wx.Frame):
             self.mpc.Pause()
             self.mpc.Osd(0)
             log(u'开始取播放文件时长',logs=mcon.logs)
+            self.movielen=0
             try:
                 self.movielen=self.mpc.GetTimeLength()*1000
             except Exception, ex:
@@ -134,7 +135,10 @@ class movieFrame(wx.Frame):
 
     def on_media_finished(self, evt):
         log(u'媒体停止播放事件',logs=mcon.logs)
-        #self.par.DoNext()
+        #如果没有正常取得视频文件的长度, 
+        #在视频文件停止播放后切换到下一个影片
+        if self.movielen ==0:
+            self.par.DoNext()
 
     def on_process_stopped(self, evt):
         log(u'mplayer 进程停止',logs=mcon.logs)
