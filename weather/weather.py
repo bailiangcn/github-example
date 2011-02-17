@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# Last Change:  2011年02月02日 03时46分43秒
 
 """
 根据网页生成数据广播需要的天气预报网页
@@ -634,8 +633,11 @@ def insertBr(str):
     输入超长字符串自动断行
     '''
     resstr = str.strip()
-    if len(resstr)>16:
-        resstr = resstr[0:16]
+    zpos=resstr.find(u'转')
+    if zpos != -1:
+        resstr=resstr[0:zpos]
+    if len(resstr)>10:
+        resstr = resstr[0:10]
     if len(resstr)>5:
         resstr = resstr[:len(resstr)//2] + "<br>" +resstr[len(resstr)//2:] 
     return resstr
@@ -849,7 +851,7 @@ def testmain():
     from testweather import simpleTest
 
     suite = unittest.defaultTestLoader.loadTestsFromTestCase(simpleTest)
-    result = unittest.TextTestRunner(verbosity=3).run(suite)
+    result = unittest.TextTestRunner(verbosity=9).run(suite)
 
 def main():
     '''
@@ -861,7 +863,7 @@ def main():
 
 if __name__=='__main__':
 
-    #testmain()
-    main()
+    testmain()
+    #main()
 
 
