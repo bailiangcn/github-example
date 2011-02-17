@@ -197,7 +197,7 @@ def errlog(modelname, ex, exc_info):
     log(unicode(ex),u'logs/error.log') 
     log(unicode(exc_info),u'logs/error.log')
 
-def log(str, filename="logs/schedulelog.txt",logs=True):
+def log(str, filename=u"logs/schedulelog.txt",logs=True):
     '''
     把字符串写入日志文件
     '''
