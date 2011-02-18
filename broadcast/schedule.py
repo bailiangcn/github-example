@@ -67,7 +67,7 @@ class movieFrame(wx.Frame):
         if mute:
             self.mplayarg = (u'-vo',u'xv', u'-af', u'volume=-200' )
         else:
-            self.mplayarg = (u'-vo',u'xv')
+            self.mplayarg = (u'-vo',u'xv', u'-fs')
             #self.mplayarg = (u'-vo',u'xv', u'-af', u'volume=-50' )
         self.mpc = mpc.MplayerCtrl(self, -1, u'mplayer', 
                 media_file, mplayer_args=self.mplayarg,
@@ -145,9 +145,12 @@ class movieFrame(wx.Frame):
         #如果没有正常取得视频文件的长度, 
         #或者媒体非正常停止
         #在视频文件停止播放后切换到下一个影片
-        log(u"in media finish curprogramid:"+unicode(self.par.curprogramid),logs=mcon.logs)
-        log(u"in media finish oldprogramid:"+unicode(self.par.oldprogramid),logs=mcon.logs)
-        if self.movielen ==0 or (self.par.oldprogramid == self.par.curprogramid):
+        log(u"in media finish curprogramid:"+unicode(
+            self.par.curprogramid),logs=mcon.logs)
+        log(u"in media finish oldprogramid:"+unicode(
+            self.par.oldprogramid),logs=mcon.logs)
+        if self.movielen ==0 or (
+                self.par.oldprogramid == self.par.curprogramid):
             log(u'媒体非正常停止播放'+self.moviename,logs=mcon.logs)
             log(u'媒体非正常停止播放:  '+self.moviename +u"    取得时长:"+unicode(
                 self.movielen), filename=u'logs/error.log',logs=mcon.logs)
@@ -210,19 +213,12 @@ class MainFrame(wx.Frame):
         #定义面板
         panel = wx.Panel(self, -1)
 
-        #self.win3=movieFrame(self,mute=True)
-
-        button = wx.Button(panel, 1003, u"退出")
-        button.SetPosition((215, 15))
-        self.Bind(wx.EVT_BUTTON, self.OnCloseMe, button)
-        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
-
-        #创建一个检测配置文件更改的定时器
+        #创建一个检测配置文件更改和退出的定时器
         self.timer = wx.Timer(self)
         self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
         self.timer.Start(mcon.during)
 
-        self.Show()
+        self.Show(False)
 
     def PreLoad(self):
         "预读文件"
@@ -245,10 +241,12 @@ class MainFrame(wx.Frame):
             self.buffer1.mpc.Pause()
             self.buffer0.mpc.Pause()
             self.buffer0.Hide()
-            log(u"影片长度:"+unicode(self.buffer1.movielen),logs=mcon.logs)
+            log(u"影片长度:"+unicode(self.buffer1.movielen),
+                    logs=mcon.logs)
             self.buffer1.movietime.Start(
                     self.buffer1.movielen-mcon.cutclip,True)
-            log(u'0 号缓冲区准备预读文件:'+self.ml.getnextfile(1),logs=mcon.logs)
+            log(u'0 号缓冲区准备预读文件:'+self.ml.getnextfile(1),
+                    logs=mcon.logs)
             self.buffer0.loadMovie(self.ml.getnextfile(1))
         else:
             #第二视频窗口
@@ -257,10 +255,12 @@ class MainFrame(wx.Frame):
             self.buffer0.mpc.Pause()
             self.buffer1.mpc.Pause()
             self.buffer1.Hide()
-            log(u"影片长度:"+unicode(self.buffer0.movielen),logs=mcon.logs)
+            log(u"影片长度:"+unicode(self.buffer0.movielen),
+                    logs=mcon.logs)
             self.buffer0.movietime.Start(
                     self.buffer0.movielen-mcon.cutclip,True)
-            log(u'1 号缓冲区准备预读文件:'+self.ml.getnextfile(1),logs=mcon.logs)
+            log(u'1 号缓冲区准备预读文件:'+self.ml.getnextfile(1),
+                    logs=mcon.logs)
             self.buffer1.loadMovie(self.ml.getnextfile(1))
         self.curbuffer=not self.curbuffer
 
@@ -288,23 +288,18 @@ class MainFrame(wx.Frame):
             self.mmtime = tmptime
             mcon.reload()
             self.ChangeMovie()
-
-
-
-    def OnCloseMe(self, event):
-        self.Close(True)
-
-    def OnCloseWindow(self, event):
-        if self.buffer0 != None:
-            self.buffer0.mpc.Quit()
-            self.buffer0.mpc.Destroy()
-            self.buffer0.Destroy()
-        if self.buffer1 != None:
-            self.buffer1.mpc.Quit()
-            self.buffer1.mpc.Destroy()
-            self.buffer1.Destroy()
-
-        self.Destroy()
+        #检查是否存在exit 文件, 如果有退出系统
+        if os.path.isfile('exit'):
+            os.remove('exit')
+            if self.buffer0 != None:
+                self.buffer0.mpc.Quit()
+                self.buffer0.mpc.Destroy()
+                self.buffer0.Destroy()
+            if self.buffer1 != None:
+                self.buffer1.mpc.Quit()
+                self.buffer1.mpc.Destroy()
+                self.buffer1.Destroy()
+            self.Destroy()
 
 #---------------------------------------------------------------------------
 
