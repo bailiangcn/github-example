@@ -91,7 +91,11 @@ class movieFrame(wx.Frame):
         '''
         if self.pause:
             #读取节目时长
-            self.moviename=self.mpc.filename
+            self.moviename = ''
+            try:
+                self.moviename=self.mpc.filename
+            except Exception, ex:
+                errlog(u'开始取播放文件名称出现错误', ex, sys.exc_info())
             log(u'媒体播放事件开始'+self.moviename,logs=mcon.logs)
             self.mpc.Pause()
             self.mpc.Osd(0)
@@ -129,7 +133,6 @@ class movieFrame(wx.Frame):
             self.pause=True
             self.par.PreLoad()
 
-
     def OnTimerEvent(self,evt):
         log(u'影片计时器时间到,开始准备调用DoNext()',logs=mcon.logs)
         self.par.curprogramid += 1
@@ -149,13 +152,14 @@ class movieFrame(wx.Frame):
             self.par.curprogramid),logs=mcon.logs)
         log(u"in media finish oldprogramid:"+unicode(
             self.par.oldprogramid),logs=mcon.logs)
-        if self.movielen ==0 or (
-                self.par.oldprogramid == self.par.curprogramid):
-            log(u'媒体非正常停止播放'+self.moviename,logs=mcon.logs)
-            log(u'媒体非正常停止播放:  '+self.moviename +u"    取得时长:"+unicode(
-                self.movielen), filename=u'logs/error.log',logs=mcon.logs)
-            self.par.curprogramid += 1
-            self.par.DoNext()
+        if not self.par.listchanged:
+            if self.movielen ==0 or (
+                    self.par.oldprogramid == self.par.curprogramid):
+                log(u'媒体非正常停止播放'+self.moviename,logs=mcon.logs)
+                log(u'媒体非正常停止播放:  '+self.moviename +u"    取得时长:"+unicode(
+                    self.movielen), filename=u'logs/error.log',logs=mcon.logs)
+                self.par.curprogramid += 1
+                self.par.DoNext()
         #保存当前播放节目id
         self.par.oldprogramid=self.par.curprogramid
 
@@ -227,12 +231,12 @@ class MainFrame(wx.Frame):
 
     def DoNext(self):
         "播放下一个影片"
-        if not self.listchanged:
-            #播放列表如果没有变化
+        if self.listchanged:
+            self.listchanged=False
+        else:
+            #播放列表如果变化
             log(u'播放列表未变化,调用ml.beginnext()',logs=mcon.logs)
             self.ml.beginnext()
-        else:
-            self.listchanged=False
 
         if self.curbuffer:
             #第一视频窗口
@@ -271,9 +275,16 @@ class MainFrame(wx.Frame):
             #如果立即生效
             self.dropmovie=True
         if self.curbuffer:
+            self.buffer1.mpc.Stop()
+            log(u'节目单发生变化, 1号缓冲区准备预读文件:'+self.ml.getnextfile(),
+                    logs=mcon.logs)
             self.buffer1.loadMovie(self.ml.getnextfile())
         else:
+            self.buffer0.mpc.Stop()
+            log(u'节目单发生变化, 0号缓冲区准备预读文件:'+self.ml.getnextfile(),
+                    logs=mcon.logs)
             self.buffer0.loadMovie(self.ml.getnextfile())
+        self.curprogramid += 1
 
         
 
@@ -283,7 +294,7 @@ class MainFrame(wx.Frame):
         '''
         #查询时间标签是否更改
         tmptime=os.stat(mcon.movielist).st_mtime
-        if self.mmtime != tmptime:
+        if self.mmtime != tmptime  and not self.listchanged:
             self.listchanged=True
             self.mmtime = tmptime
             mcon.reload()
