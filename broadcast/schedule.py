@@ -38,10 +38,9 @@ class movieConf(object):
         self.cutclip=int(self.cp.get('timer','cutclip'))
         self.moviepath=self.cp.get('movie','moviepath')
         self.movielist=self.cp.get('movie','movielist')
-        self.immediately=int(self.cp.get('movie','immediately'))
         self.logs=(self.cp.get('logs','log')=='1')
     def reload(self):
-        self.immediately=int(self.cp.get('movie','immediately'))
+        self.logs=(self.cp.get('logs','log')=='1')
 
 #------------------------------------------------------------
 class movieFrame(wx.Frame):
@@ -109,20 +108,12 @@ class movieFrame(wx.Frame):
             except Exception, ex:
                 errlog(u'开始取播放文件时长出现错误', ex, sys.exc_info())
 
-            log(u'影片长度:'+unicode(self.movielen) ,logs=mcon.logs)
+            log(u'影片长度:'+unicode(str(self.movielen)) ,logs=mcon.logs)
             self.mpc.Seek(0, 2)
             self.mpc.FrameStep()
             self.Hide()
             self.SetSize(wx.Size(mcon.winw,mcon.winh))
 
-            if self.par.dropmovie:
-                log("into pass",logs=mcon.logs)
-                log("now begin-->"+self.mpc.filename,logs=mcon.logs)
-                log("set timelen:%s" % self.movielen,logs=mcon.logs)
-                self.par.dropmovie=False
-                self.par.buffer0.movietime.Stop()
-                self.par.buffer1.movietime.Stop()
-                self.par.DoNext()
         else:
             #第一个播放的节目
             log(u'第一个播放的节目 ',logs=mcon.logs)
@@ -130,7 +121,7 @@ class movieFrame(wx.Frame):
             self.movietime.Start(self.movielen-mcon.cutclip,True)
             self.moviename=self.mpc.filename
             log(u'开始播放影片:'+self.moviename ,logs=mcon.logs)
-            log(u'影片长度:'+unicode(self.movielen) ,logs=mcon.logs)
+            log(u'影片长度:'+unicode(str(self.movielen)) ,logs=mcon.logs)
             self.pause=True
             self.par.PreLoad()
 
@@ -197,7 +188,6 @@ class MainFrame(wx.Frame):
         #定义播放列表变化标志
         self.listchanged=False
         #定义紧急切换节目标识
-        self.dropmovie=False
 
         #定义2个播放窗口,用于切换播出
         log(u'定义2个播放窗口,用于切换播出',logs=mcon.logs)
@@ -277,9 +267,6 @@ class MainFrame(wx.Frame):
         #播放列表发生变化
         log(u'开始 ChangeMovie()',  logs=mcon.logs)
         self.ml.reload()
-        if mcon.immediately != 0:
-            #如果立即生效
-            self.dropmovie=True
         if self.curbuffer:
             self.buffer1.mpc.Stop()
             log(u'节目单发生变化, 1号缓冲区准备预读文件:'+self.ml.getnextfile(),
@@ -329,7 +316,7 @@ if __name__ == '__main__':
     except Exception, ex:
         errlog(u'配置文件错误', ex, sys.exc_info())
     log(u"\n\n***************开始运行程序***************\n\n",logs=mcon.logs)
-    app = wx.App(redirect=True)
+    app = wx.App(redirect=False)
     b = MainFrame()
     app.MainLoop()
 

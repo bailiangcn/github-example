@@ -1,4 +1,6 @@
 #!/bin/bash
 
-#DISPLAY=:0.1 
+touch exit
+sleep 3
+
 python schedule.py &
