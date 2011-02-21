@@ -93,7 +93,7 @@ class movieFrame(wx.Frame):
             log(u'媒体播放事件开始',logs=mcon.logs)
             self.moviename = ''
             try:
-                self.moviename=self.mpc.filename
+                self.moviename=unicode(self.mpc.filename, 'utf-8')
             except Exception, ex:
                 errlog(u'开始取播放文件名称出现错误', ex, sys.exc_info())
             log(u'媒体播放事件开始'+self.moviename,logs=mcon.logs)
@@ -117,11 +117,17 @@ class movieFrame(wx.Frame):
         else:
             #第一个播放的节目
             log(u'第一个播放的节目 ',logs=mcon.logs)
-            self.movielen=self.mpc.GetTimeLength()*1000
-            self.movietime.Start(self.movielen-mcon.cutclip,True)
-            self.moviename=self.mpc.filename
-            log(u'开始播放影片:'+self.moviename ,logs=mcon.logs)
-            log(u'影片长度:'+unicode(str(self.movielen)) ,logs=mcon.logs)
+            try:
+                self.movielen=self.mpc.GetTimeLength()*1000
+                self.movietime.Start(self.movielen-mcon.cutclip,True)
+                log(u'影片长度:'+unicode(str(self.movielen)) ,logs=mcon.logs)
+            except Exception, ex:
+                errlog(u'开始取播放文件长度时出现错误', ex, sys.exc_info())
+            try:
+                self.moviename=unicode(self.mpc.filename, 'utf-8')
+                log(u'开始播放影片:'+self.moviename ,logs=mcon.logs)
+            except Exception, ex:
+                errlog(u'开始取播放文件名称出现错误', ex, sys.exc_info())
             self.pause=True
             self.par.PreLoad()
 
