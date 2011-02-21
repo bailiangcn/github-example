@@ -31,5 +31,11 @@ git clone git://github.com/bailiangcn/github-example.git www
 git pull origin develop
 git checkout develop
 cd www/broadcast/
-python schedule.py 
 
+使用方法: 
+保证当前目录是www/broadcast/
+播放节目  ./play 
+更改节目单  ./modilist 
+停止播放  ./stop 
+重启播放系统或立即中断当前播放节目,使节目单生效
+./rest
