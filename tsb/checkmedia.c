@@ -70,7 +70,7 @@ void check188or204(int bsize, unsigned char *temp, int *res)
 void fb(unsigned c)
 {
 	for (int i = 0; i < 8; i++) {
-		if (i % 4 == 0)
+		if (i % 8 == 4)
 			printf(" ");
 		putchar(((c & 1 << 7) == 0) ? '0' : '1');
 		c <<= 1;
@@ -87,7 +87,7 @@ void print_ts(int bsize, unsigned char *data)
 {
 	for (int i = 0; i < bsize; i++) {
 		if (data[i] != 0xff) {
-			printf("%d==>%x (", i, data[i]);
+			printf("%2d==>0x%02x (", i, data[i]);
 			fb(data[i]);
 			printf(")\n");
 		}
@@ -127,7 +127,7 @@ void split_ts(int bsize, unsigned char *data)
 	printf("payload_unit_start_indicator:%d\n",
 	       tsp.payload_unit_start_indicator);
 	printf("tarnsport_priority:%d\n", tsp.transport_priority);
-	printf("tarnsport_pid:0x%x\n", tsp.pid);
+	printf("tarnsport_pid:0x%02x\n", tsp.pid);
 	printf("transport_scrambling_control:%d\n",
 	       tsp.transport_scrambling_control);
 	printf("adaption_field_control:%d\n", tsp.adaption_field_control);
@@ -162,7 +162,7 @@ void split_ts(int bsize, unsigned char *data)
 			printf("network_PID:%ld\n", tempvala);
 		else
 			printf("program_map_PID:%ld\n", tempvala);
-		printf("CRC:0x%x%x%x%x", data[17], data[18], data[19],
+		printf("CRC:0x%02x%02x%02x%02x", data[17], data[18], data[19],
 		       data[20]);
 	}
 }
