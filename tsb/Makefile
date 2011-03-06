@@ -1,10 +1,13 @@
-tsb: checkmedia.o tsb.o
-	gcc -std=c99 tsb.o checkmedia.o -o tsb
-checkmedia.o: checkmedia.c checkmedia.h
-	gcc -std=c99 -c checkmedia.c 
-tsb.o: tsb.c checkmedia.h
-	gcc -std=c99 -c tsb.c 
+obj = checkmedia.o tsb.o 
+CFLAGS= -std=c99 -g -ggdb
 
-clean:
-	-rm tsb *.o
+tsb: $(obj)
+	gcc $(CFLAGS) $(obj) -o tsb
+checkmedia.o: checkmedia.h
+	gcc $(CFLAGS) -c checkmedia.c 
+tsb.o:  checkmedia.h
+	gcc $(CFLAGS) -c tsb.c 
+
 .PHONY:clean
+clean:
+	-rm tsb $(obj)

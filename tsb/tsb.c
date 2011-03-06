@@ -46,32 +46,33 @@ int main(int argc, char *argv[])
 	if (bsize > 188) {
 		check188or204(bsize, temp, syn);
 		switch (syn[0]) {
-		case 0:
-			printf("未找到同步\n");
-			break;
-		case 188:
-		case 204:
-			printf("找到%d同步符号,起始位置:%d \n",
-			       syn[0], syn[1]);
-			offset_packet = 0;
-			printf("第%d个包:\n", offset_packet);
-			p = &temp[syn[1] + syn[0] * offset_packet];
-			print_ts(syn[0], p);
-			tsp = split_ts(syn[0], p);
-			if (tsp.sync_byte == 0x47)
-				print_ts_head(tsp);
-			else
+			case 0:
+				printf("未找到同步\n");
 				break;
-			if (tsp.pid == 0x00) {
-				ts_pat = ana_ts_pat(syn[0], p);
-				if (ts_pat.table_id == 0x00)
-					print_pat_head(ts_pat);
-			}
-			break;
+			case 188:
+			case 204:
+				printf("找到%d同步符号,起始位置:%d \n",
+						syn[0], syn[1]);
+				offset_packet = 0;
+				printf("第%d个包:\n", offset_packet);
+				p = &temp[syn[1] + syn[0] * offset_packet];
+				print_ts(syn[0], p);
+				tsp = split_ts(syn[0], p);
+				if (tsp.sync_byte == 0x47)
+					print_ts_head(tsp);
+				else
+					break;
+				if (tsp.pid == 0x00) {
+					ts_pat = ana_ts_pat(syn[0], p);
+					if (ts_pat.table_id == 0x00)
+						print_pat_head(ts_pat);
+				}
+				break;
 
 		}
 		if (get_ts_packet(pf_position, 0, syn, temp, fp) == 0)
 			print_ts(syn[0], p);
+
 	}
 
 	fclose(fp);

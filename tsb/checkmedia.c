@@ -20,7 +20,7 @@
 #include <stdbool.h>
 #include "checkmedia.h"
 
-/* 
+/*
  * ===  FUNCTION  ===========================================================
  *         Name:  check188or204
  *  Description:  判断一个数组是否是188或者204格式
@@ -66,7 +66,7 @@ void check188or204(int bsize, unsigned char *temp, int *res)
 	return;
 }
 
-/* 
+/*
  * ===  FUNCTION  ===========================================================
  *         Name:  fb
  *  Description:  二进制显示一个8位的数字
@@ -82,7 +82,7 @@ void fb(unsigned c)
 	}
 }
 
-/* 
+/*
  * ===  FUNCTION  ===========================================================
  *         Name:  print_ts
  *  Description:  用16进制方式显示二进制数据
@@ -100,7 +100,7 @@ void print_ts(int bsize, unsigned char *data)
 	printf("\n");
 }
 
-/* 
+/*
  * ===  FUNCTION  ===========================================================
  *         Name:  split_ts
  *  Description:  解析一个ts包,返回一个包头结构
@@ -118,24 +118,24 @@ struct ts_packet split_ts(int bsize, unsigned char *data)
 		tsp.sync_byte = 0;
 		return tsp;
 	}
-	/* 
+	/*
 	 * 对包头部分进行解析
 	 */
 	tsp.transport_error_indicator = (data[1] & (1 << 7)) ? 1 : 0;
 	tsp.payload_unit_start_indicator = (data[1] & (1 << 6)) ? 1 : 0;
 	tsp.transport_priority = (data[1] & (1 << 5));
 	tsp.pid = data[1] & 0x1F;
-	tsp.pid = tsp.pid << 8 + data[2];
+	tsp.pid = (tsp.pid << 8) + data[2];
 	tsp.transport_scrambling_control = ((data[3] >> 6) & 0x3);
 	tsp.adaption_field_control = ((data[3] >> 4) & 0x3);
 	tsp.continuity_counter = (data[3] & 0xF);
-	/* 
+	/*
 	 * 对实际携带数据进行解析
 	 */
 	return tsp;
 }
 
-/* 
+/*
  * ===  FUNCTION  ============================================================
  *         Name:  ana_ts_pat
  *  Description:  解析pat表格
@@ -170,7 +170,7 @@ struct ts_pat_packet ana_ts_pat(int bsize, unsigned char *data)
 	return ts_pat;
 }
 
-/* 
+/*
  * ===  FUNCTION  ============================================================
  *         Name:  print_ts_head
  *  Description:  打印ts表头结构
@@ -191,7 +191,7 @@ void print_ts_head(struct ts_packet tsp)
 	printf("continuity_counter:%d\n", tsp.continuity_counter);
 }
 
-/* 
+/*
  * ===  FUNCTION  ============================================================
  *         Name:  print_pat_head
  *  Description:  打印pat表格结构
@@ -217,7 +217,7 @@ void print_pat_head(struct ts_pat_packet ts_pat)
 		printf("program_map_PID:%d\n", ts_pat.np_pid);
 }
 
-/* 
+/*
  * ===  FUNCTION  ============================================================
  *         Name:  get_ts_packet
  *  Description:  返回指定顺序的ts的包,如果不在内存当中自动读文件
