@@ -23,16 +23,23 @@
 
 int main(int argc, char *argv[])
 {
-	FILE *fp;
-	unsigned long long int *pf_position, f_position = 0;
+	TS188 ts188;
+	FILE *fp;		//视频文件
+	char filename[256] = "1.ts";	//默认的视频文件名
+	unsigned long long int *pf_position, f_position = 0;	//文件的当前位置
 	pf_position = &f_position;
-	unsigned char *p, temp[BUFFERLEN] = { 0 };
-	int offset_packet, bsize = 0;
-	char filename[256] = "1.ts";
-	int syn[2] = { 0 };
-	struct ts_packet tsp;
-	struct ts_pat_packet ts_pat;
 
+	unsigned char *p, temp[BUFFERLEN] = { 0 };	//文件流的临时缓冲区
+	int offset_packet, bsize = 0;
+	//int syn[2] = { 0 };  //检测文件的返回结果
+	unsigned int packet_len = 0;	//当前文件的包长度
+	unsigned int packet_position = 0;	//当前文件的偏移值
+	struct ts_packet tsp;	//传输流分组层报头结构
+	struct ts_pat_packet ts_pat;	//PAT表头结构
+
+	/* 
+	 * 如果没有输入文件名,使用默认文件名
+	 */
 	if (argc == 2)
 		strcpy(filename, argv[1]);
 	fp = fopen(filename, "rb");
@@ -44,35 +51,24 @@ int main(int argc, char *argv[])
 	bsize = fread(temp, sizeof(unsigned char), sizeof(temp), fp);
 	printf("%s的%d字节被读取\n", filename, bsize);
 	if (bsize > 188) {
-		check188or204(bsize, temp, syn);
-		switch (syn[0]) {
-			case 0:
-				printf("未找到同步\n");
-				break;
-			case 188:
-			case 204:
-				printf("找到%d同步符号,起始位置:%d \n",
-						syn[0], syn[1]);
-				offset_packet = 0;
-				printf("第%d个包:\n", offset_packet);
-				p = &temp[syn[1] + syn[0] * offset_packet];
-				print_ts(syn[0], p);
-				tsp = split_ts(syn[0], p);
-				if (tsp.sync_byte == 0x47)
-					print_ts_head(tsp);
-				else
-					break;
-				if (tsp.pid == 0x00) {
-					ts_pat = ana_ts_pat(syn[0], p);
-					if (ts_pat.table_id == 0x00)
-						print_pat_head(ts_pat);
+		check188or204(bsize, temp, &packet_len, &packet_position);
+		switch (packet_len) {
+		case 0:
+			printf("未找到同步\n");
+			break;
+		case 188:
+		case 204:
+			printf("检测该文件属于%d格式\n", packet_len);
+			for (int i; i < 10; i++) {
+				if (get_188_packet
+				    (ts188, bsize, temp, &packet_position,
+				     fp)) {
+					print_ts(188, ts188);
 				}
-				break;
+			}
+			break;
 
 		}
-		if (get_ts_packet(pf_position, 0, syn, temp, fp) == 0)
-			print_ts(syn[0], p);
-
 	}
 
 	fclose(fp);

@@ -26,44 +26,72 @@
  *  Description:  判断一个数组是否是188或者204格式
  *                bsize 数组的长度
  *                temp  数组的实际数据指针
- *				  返回一个数组res
- *				  res[0] = 0 文件未检测到同步
- *				  res[0] = 188 检测到188同步,起始位置 res[1]
- *				  res[0] = 204 检测到204同步,起始位置 res[1]
+ *
+ *				  packet_len = 0 文件未检测到同步
+ *				  packet_len = 188 检测到188同步,起始位置 packet_position
+ *				  packet_len = 204 检测到204同步,起始位置 packet_position
  * ==========================================================================
  */
-void check188or204(int bsize, unsigned char *temp, int *res)
+void check188or204(int bsize, unsigned char *temp, unsigned int *packet_len,
+		   unsigned int *packet_position)
 {
-	int fisrtsynpos = 0;
-	int checkok = 0;
+	bool checkok = false;
 
 	for (int i = 0; i < bsize; i++) {
 		if (temp[i] == 0x47) {
+			checkok = true;
+			//检查后续几个同步
 			for (int j = 1; j <= SYNTIMES; j++) {
 				if (temp[i + 188 * j] != 0x47) {
-					checkok = 1;
+					checkok = false;
 				}
 			}
-			if (checkok == 0) {
-				res[0] = 188;
-				res[1] = i;
+			if (checkok) {
+				*packet_len = 188;
+				*packet_position = i;
 				return;
 			}
+			//如果不是188字节
+			checkok = true;
 			for (int j = 1; j <= SYNTIMES; j++) {
 				if (temp[i + 204 * j] != 0x47) {
-					checkok = 1;
+					checkok = false;
 				}
 			}
-			if (checkok == 0) {
-				res[0] = 204;
-				res[1] = i;
+			if (checkok) {
+				*packet_len = 204;
+				*packet_position = i;
 				return;
 			}
 		}
 	}
 
-	res[0] = 0;
+	*packet_len = 0;
 	return;
+}
+
+/* 
+ * ===  FUNCTION  ===========================================================
+ *         Name:  get_188_packet
+ *  Description:  返回一个188字长的指针,如果当前包不在内存,自动读取文件
+ * ==========================================================================
+ */
+
+bool get_188_packet(TS188 ts188, int bsize, unsigned char *temp,
+		    unsigned int *packet_position, FILE * fp)
+{
+	if ((*packet_position + 188) < bsize) {
+		if (*(temp + *packet_position) == 0x47) {
+			memcpy(ts188, temp + *packet_position, 188);
+			*packet_position += 188;
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		printf("will read file");
+	}
+	return false;
 }
 
 /*
@@ -109,7 +137,7 @@ void print_ts(int bsize, unsigned char *data)
 struct ts_packet split_ts(int bsize, unsigned char *data)
 {
 	struct ts_packet tsp;
-	unsigned char tempindi = 0;
+	//      unsigned char tempindi = 0;
 	printf("解析开始:\n");
 	if (data[0] == 0x47) {
 		tsp.sync_byte = 0x47;
@@ -161,9 +189,9 @@ struct ts_pat_packet ana_ts_pat(int bsize, unsigned char *data)
 		ts_pat.last_section_number = data[12];
 		ts_pat.program_number = (data[13] << 8) + data[14];
 		ts_pat.np_pid = ((data[15] & 0x1F) << 8) + data[16];
-/* 		printf("CRC:0x%02x%02x%02x%02x\n", data[17], data[18], data[19],
- * 		       data[20]);
- */
+		/*              printf("CRC:0x%02x%02x%02x%02x\n", data[17], data[18], data[19],
+		 *                     data[20]);
+		 */
 	} else {
 		ts_pat.table_id = 0xff;
 	}

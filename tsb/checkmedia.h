@@ -15,6 +15,7 @@
  *
  * ==========================================================================
  */
+#include <stdbool.h>
 
 #ifndef CHECKMEDIA_H
 #define CHECKMEDIA_H
@@ -60,14 +61,22 @@ struct ts_pat_packet {
  *                bsize 数组的长度
  *                temp  数组的实际数据指针
  *                返回一个数组res
- *                res[0] = 0 文件未检测到同步
- *                res[0] = 188 检测到188同步,起始位置 res[1]
- *                res[0] = 204 检测到204同步,起始位置 res[1]
+ *				  packet_len = 0 文件未检测到同步
+ *				  packet_len = 188 检测到188同步,起始位置 packet_position
+ *				  packet_len = 204 检测到204同步,起始位置 packet_position
  */
-void check188or204(int bsize, unsigned char *temp, int *res);
+void check188or204(int bsize, unsigned char *temp, unsigned int *packet_len,
+		   unsigned int *packet_position);
+/* 
+ *  Description:  返回一个188字长的指针,如果当前包不在内存,自动读取文件
+ */
+
+bool get_188_packet(TS188 ts188,int bsize, unsigned char *temp,
+			   unsigned int *packet_position, FILE * fp);
 /* 
  *  Description:  二进制显示一个8位的数字
  */
+// void get_ts_packet(packet_len,)
 void fb(unsigned c);
 /* 
  *  Description:  用16进制方式显示二进制数据
