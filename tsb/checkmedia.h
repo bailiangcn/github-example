@@ -65,14 +65,14 @@ struct ts_pat_packet {
  *				  packet_len = 188 检测到188同步,起始位置 packet_position
  *				  packet_len = 204 检测到204同步,起始位置 packet_position
  */
-void check188or204(int bsize, unsigned char *temp, unsigned int *packet_len,
-		   unsigned int *packet_position);
+void check188or204(int bsize, unsigned char *temp,
+		   unsigned int *packet_len, unsigned int *packet_position);
 /* 
  *  Description:  返回一个188字长的指针,如果当前包不在内存,自动读取文件
  */
 
-bool get_188_packet(TS188 ts188,int bsize, unsigned char *temp,
-			   unsigned int *packet_position, FILE * fp);
+bool get_188_packet(TS188 ts188, int order, int bsize, unsigned char *temp,
+		    unsigned int *packet_position, FILE * fp);
 /* 
  *  Description:  二进制显示一个8位的数字
  */

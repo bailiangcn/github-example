@@ -77,21 +77,42 @@ void check188or204(int bsize, unsigned char *temp, unsigned int *packet_len,
  * ==========================================================================
  */
 
-bool get_188_packet(TS188 ts188, int bsize, unsigned char *temp,
+bool get_188_packet(TS188 ts188, int order, int bsize, unsigned char *temp,
 		    unsigned int *packet_position, FILE * fp)
 {
-	if ((*packet_position + 188) < bsize) {
-		if (*(temp + *packet_position) == 0x47) {
-			memcpy(ts188, temp + *packet_position, 188);
+	bool syn = true;
+	for (int i = 0; i < order; i++) {
+		if ((*packet_position + 188) < bsize) {	/* 不需要读入文件 */
+			//memcpy(ts188, temp + *packet_position, 188);
 			*packet_position += 188;
-			return true;
-		} else {
-			return false;
+			if (*(temp + *packet_position) == 0x47) {
+				syn = true;
+			} else {
+				syn = false;
+			}
+		} else {	/* 需要读入文件 */
+			printf("will read file\n");
+			unsigned char newstream[BUFFERLEN] = { 0 };	/* 文件流的临时缓冲区 */
+			int newsize = 0;
+			newsize =
+			    fread(newstream, sizeof(unsigned char),
+				  sizeof(newstream), fp);
+			if (newsize > 188) {	/* 读文件错误或者太短 */
+				memcpy(temp, temp + *packet_position,
+				       1024 - *packet_position);
+				memcpy(temp + (1024 - *packet_position),
+				       newstream, *packet_position);
+				*packet_position = 0;
+				if (*(temp + *packet_position) == 0x47) {	/* 同步正常 */
+					syn = true;
+				} else {	/* 同步失败 */
+					syn = false;
+				}
+			}
 		}
-	} else {
-		printf("will read file");
 	}
-	return false;
+	memcpy(ts188, temp + *packet_position, 188);
+	return syn;
 }
 
 /*
@@ -120,7 +141,7 @@ void print_ts(int bsize, unsigned char *data)
 {
 	for (int i = 0; i < bsize; i++) {
 		if (data[i] != 0xff) {
-			printf("%2d==>0x%02x (", i, data[i]);
+			printf("%2d==>0x%02X (", i, data[i]);
 			fb(data[i]);
 			printf(")\n");
 		}
