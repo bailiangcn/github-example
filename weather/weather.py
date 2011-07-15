@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
-# vim:ts=4:sw=4:ft=vim:expandtab:set fdm=indent:
+# vim:ts=4:sw=4:ft=python:expandtab:set fdm=indent:
 
 """
 根据网页生成数据广播需要的天气预报网页
