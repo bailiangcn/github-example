@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
+# vim:ts=4:sw=4:ft=python:expandtab:set fdm=indent:
 
 
 """ 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # AUTHOR:  BaiLiang , bailiangcn@gmail.com
+# vim:ts=4:sw=4:ft=vim:expandtab:set fdm=indent:
 
 """
 根据网页生成数据广播需要的天气预报网页
@@ -577,8 +578,10 @@ def xmlToHtml(xmlfilename):
     '''
     #相应参数:如果网址参数发生变化, 修改以下部分
     ############################################
-    TEMPFILENAME = "template/temp.htm"
-    RESULTFILENAME ="html/index.htm" 
+    #TEMPFILENAME = "template/temp.htm"
+    TEMPFILENAME = "template/temp2.htm"
+    #RESULTFILENAME ="html/index.htm" 
+    RESULTFILENAME ="html/index2.htm" 
     ############################################
 
     #读入天气预报xml文件
