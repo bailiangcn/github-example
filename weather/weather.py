@@ -816,10 +816,10 @@ def sendattachmail (address, sub, mailstr):
     mailpwd = 'password2011'
 
     msg = MIMEMultipart()
-    att = MIMEText(open(r'html/index.htm', 'rb').read(),
+    att = MIMEText(open(r'html/index2.htm', 'rb').read(),
             'base64', 'utf-8')
     att['content-type'] = 'application/octet-stream'
-    att['content-disposition'] = 'attachment;filename="index.htm"'
+    att['content-disposition'] = 'attachment;filename="index2.htm"'
     msg.attach(att)
 
     body = MIMEText(mailstr, _charset='utf-8')
