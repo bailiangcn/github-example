@@ -201,10 +201,8 @@ def getWeather1():
             theWeather = daytr[3].text
             weadata[2] += theWeather
             #温度
-            gradehighstr=daytr[4].findAll("strong")
-            theHighGrade = gradehighstr[0].text + gradehighstr[1].text
-            gradelowerstr=daytr[10].findAll("strong")
-            theLowerGrade = gradelowerstr[0].text + gradelowerstr[1].text
+            theHighGrade = daytr[4].b.strong.string
+            theLowerGrade = daytr[10].span.strong.string
             weadata[3] =  theLowerGrade + u'/'  + theHighGrade  
             #风向
             weadata[4] = daytr[5].text + daytr[6].text
@@ -218,10 +216,8 @@ def getWeather1():
             theWeather = daytr[3].text
             weadata[6] += theWeather
             #温度
-            gradehighstr=daytr[4].findAll("strong")
-            theHighGrade = gradehighstr[0].text + gradehighstr[1].text
-            gradelowerstr=daytr[10].findAll("strong")
-            theLowerGrade = gradelowerstr[0].text + gradelowerstr[1].text
+            theHighGrade = daytr[4].b.strong.string
+            theLowerGrade = daytr[10].span.strong.string
             weadata[7] =  theLowerGrade + u'/'  + theHighGrade  
 
             #取得第三天信息
@@ -233,10 +229,8 @@ def getWeather1():
             theWeather = daytr[3].text
             weadata[9] += theWeather
             #温度
-            gradehighstr=daytr[4].findAll("strong")
-            theHighGrade = gradehighstr[0].text + gradehighstr[1].text
-            gradelowerstr=daytr[10].findAll("strong")
-            theLowerGrade = gradelowerstr[0].text + gradelowerstr[1].text
+            theHighGrade = daytr[4].b.strong.string
+            theLowerGrade = daytr[10].span.strong.string
             weadata[10] =  theLowerGrade + u'/'  + theHighGrade  
 
             listToxml(weadata, "template/wea1.xml")
