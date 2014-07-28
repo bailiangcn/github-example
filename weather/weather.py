@@ -654,7 +654,7 @@ def transPicId(souname):
     resname = "".join((str(num), ".png"))
     return (resname)
 
-def diffDayAndWeather(temstr):
+def diffDayAndWeather(temstr, debug=False):
     '''
     输入一个日期天气的字符串, 返回一个日期天气的列表
     例子 输入 '1月26日 多云',  返回 ['1月', '26日','多云', '星期三']
@@ -663,7 +663,10 @@ def diffDayAndWeather(temstr):
     restem1 = restem0[0].split(u"月")
     month = int(restem1[0])
     day = int(restem1[1][0:-1])
-    year = datetime.date.today().year
+    if debug:
+        year = 2011
+    else:
+        year = datetime.date.today().year
     week = datetime.date(year, month, day).isoweekday()
     weekdict = {1:u'一', 2:u'二', 3:u'三',
             4:u'四', 5:u'五', 6:u'六',7:u'日'}

@@ -9,16 +9,15 @@
 
 __revision__ = '0.1'
 
-
-
 import sys
 import os
 
 sys.path.append(os.curdir)
 sys.path.append(os.path.join(os.pardir, ''))
 
-from unittest import TestCase
+from unittest import TestCase, skip
 import weather
+
 
 class simpleTest(TestCase):
 
@@ -31,7 +30,7 @@ class simpleTest(TestCase):
     def getWeather1(self):
         '''
         测试从
-        http://www.weather.com.cn/html/weather/101050901.shtml 
+        http://www.weather.com.cn/html/weather/101050901.shtml
         取得天气数据(html格式)
         '''
         weather.getWeather1()
@@ -53,24 +52,24 @@ class simpleTest(TestCase):
         测试根据列表变量生成xml文件
         listToxml(soulist)
         '''
-        soulist = [u'0', u'2011/01/25 22:11:52',u'1月26日 多云', 
-                u'-28℃/-18℃', u'北风微风转西风微风', u'1.gif',
-                u'1月27日 晴', u'-28℃/-18℃', u'0.gif',
-                u'1月28日 晴', u'-29℃/-18℃', u'0.gif']
+        soulist = [u'0', u'2011/01/25 22:11:52', u'1月26日 多云',
+                   u'-28℃/-18℃', u'北风微风转西风微风', u'1.gif',
+                   u'1月27日 晴', u'-28℃/-18℃', u'0.gif',
+                   u'1月28日 晴', u'-29℃/-18℃', u'0.gif']
         weather.listToxml(soulist, 'template/testwea.xml')
 
+    @skip("coding")
     def testxmlToList(self):
         '''
         测试读取xml文件生成html文件
         xmlToList()
         '''
-        wishvalue = [u'1', u'2011/1/28 9:44:38', 
-        u'1月28日 多云', u'-29℃/-19℃', u'西北风3-4级', u'1.gif', 
-        u'1月29日 多云转晴', u'-28℃/-20℃', u'1.gif', u'1月30日 晴', 
-        u'-27℃/-17℃', u'0.gif']
-        resvalue=weather.xmlToList('./template/wea0')
+        wishvalue = [u'1', u'2011/1/28 9:44:38',
+                     u'1月28日 多云', u'-29℃/-19℃', u'西北风3-4级', u'1.gif',
+                     u'1月29日 多云转晴', u'-28℃/-20℃', u'1.gif', u'1月30日 晴',
+                     u'-27℃/-17℃', u'0.gif']
+        resvalue = weather.xmlToList('./template/wea0')
         self.assertEqual(wishvalue, resvalue)
-
 
     def xmlToHtml(self):
         '''
@@ -83,34 +82,35 @@ class simpleTest(TestCase):
         '''
         测试输入超长字符串自动断行
         '''
-        knownValues= ((u'西风微风转西北风微风', 
-            u'西风微风'), 
-            (u'西风转西北风', u'西风'), 
-            (u'西风', u'西风'), 
-            (u'西风西北微风', u'西风西<br>北微风'), 
-            (u'西风西北微风西风西北微风西风转西北微风', 
-             u'西风西北微<br>风西风西北'), 
-            )
+        knownValues = ((u'西风微风转西北风微风',
+                       u'西风微风'),
+                      (u'西风转西北风', u'西风'),
+                      (u'西风', u'西风'),
+                      (u'西风西北微风', u'西风西<br>北微风'),
+                      (u'西风西北微风西风西北微风西风转西北微风',
+                       u'西风西北微<br>风西风西北'),
+                       )
         for soustr, resstr in knownValues:
-            wishres=weather.insertBr(soustr)
+            wishres = weather.insertBr(soustr)
             self.assertEqual(wishres, resstr)
 
     def testdiffDayAndWeather(self):
         '''
         测试diffDayAndWeather()能否正常返回元组
         '''
-        knownValues= ((u'1月26日 多云', 
-            [u'1月', u'26日',u'多云', u'星期三']), 
-                )
+        knownValues = ((u'1月26日 多云',
+                       [u'1月', u'26日', u'多云', u'星期三']),
+                       )
         for temstr, wishres in knownValues:
-            result = weather.diffDayAndWeather(temstr)
+            result = weather.diffDayAndWeather(temstr, True)
             self.assertEqual(wishres, result)
+
     def testdiffTem(self):
         '''
         测试diffTem()能否正常返回元组
         '''
-        knownValues= (('-28℃/-18℃', ['-28℃','-18℃']), 
-                )
+        knownValues = (('-28℃/-18℃', ['-28℃', '-18℃']),
+                       )
         for temstr, wishres in knownValues:
             result = weather.diffTem(temstr)
             self.assertEqual(wishres, result)
@@ -119,28 +119,28 @@ class simpleTest(TestCase):
         '''
         测试log函数记录日志功能
         '''
-        res=weather.log('开始日志记录')
+        res = weather.log('开始日志记录')
         self.assertEqual(res, True)
 
     def testtransPicId(self):
         '''
         测试transPicId能否正确转换为本地图片名称
         '''
-        knownValues= (('d00.png',  '0.png'),
-                ('d00.gif',  '0.png'), 
-                ('d00.png',  '0.png'), 
-                ('d0.gif',  '0.png'), 
-                ('0.gif',  '0.png'), 
-                ('a_0.gif',  '0.png'), 
-                ('b_0.gif',  '0.png'), 
-                ('d10.png',  '10.png'),
-                ('d10.gif',  '10.png'), 
-                ('d10.png',  '10.png'), 
-                ('d10.gif',  '10.png'), 
-                ('10.gif',  '10.png'), 
-                ('a_10.gif',  '10.png'), 
-                ('b_10.gif',  '10.png'), 
-                )
+        knownValues = (('d00.png',  '0.png'),
+                      ('d00.gif',  '0.png'),
+                      ('d00.png',  '0.png'),
+                      ('d0.gif',  '0.png'),
+                      ('0.gif',  '0.png'),
+                      ('a_0.gif',  '0.png'),
+                      ('b_0.gif',  '0.png'),
+                      ('d10.png',  '10.png'),
+                      ('d10.gif',  '10.png'),
+                      ('d10.png',  '10.png'),
+                      ('d10.gif',  '10.png'),
+                      ('10.gif',  '10.png'),
+                      ('a_10.gif',  '10.png'),
+                      ('b_10.gif',  '10.png'),
+                       )
         for souname, wishres in knownValues:
             result = weather.transPicId(souname)
             self.assertEqual(wishres, result)
@@ -149,8 +149,8 @@ class simpleTest(TestCase):
         '''
         测试isChinese()能否判断汉字
         '''
-        knownValues=((u'中',True),('e',False),
-                ('中',False))
+        knownValues = ((u'中', True), ('e', False),
+                       ('中', False))
         for souchr, wishres in knownValues:
             result = weather.isChinese(souchr)
             self.assertEqual(wishres, result)
@@ -159,27 +159,27 @@ class simpleTest(TestCase):
         '''
         测试zhLjust()能否正确根据中文填充空格
         '''
-        knownValues=(
-            ((u'中',4),u'中 '),
-            ((u'e中f  ',6),u'e中f '),
-            )
+        knownValues = (
+            ((u'中', 4), u'中 '),
+            ((u'e中f  ', 6), u'e中f '),
+        )
         for souchr, wishres in knownValues:
-            result = weather.zhLjust(souchr[0],souchr[1])
+            result = weather.zhLjust(souchr[0], souchr[1])
             self.assertEqual(wishres, result)
-
 
     def testsendsimplemail(self):
         '''
         测试sendsimplemail()发送邮件功能
         '''
-        weather.sendsimplemail(['bailiangcn@gmail.com','bailiangcn@163.com'], 
-                '群发邮件测试', '兔年吉祥\n新年快乐')
-    def testsendattachmail(self):
-        weather.sendattachmail('bailiangcn@gmail.com', 
-                '测试附件','希望顺利' )
+        weather.sendsimplemail(
+            ['bailiangcn@gmail.com', 'bailiangcn@163.com'],
+            '群发邮件测试', '兔年吉祥\n新年快乐')
 
-        
+    def testsendattachmail(self):
+        weather.sendattachmail('bailiangcn@163.com',
+                               '测试附件', '希望顺利')
+
+
 if '__main__' == __name__:
     import unittest
     unittest.main()
-
