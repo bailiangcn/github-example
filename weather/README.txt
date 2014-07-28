@@ -12,7 +12,7 @@ python 2.6 版本以上
 
     cd ~
     git clone git://github.com/bailiangcn/github-example.git www
-    mkdir logs
+    mkdir ~/www/weather/logs
 
 2、确认时区正确，如果错误
     ubuntu　下面手动设置时区的命令
