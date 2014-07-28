@@ -15,7 +15,7 @@ import os
 sys.path.append(os.curdir)
 sys.path.append(os.path.join(os.pardir, ''))
 
-from unittest import TestCase, skip
+from unittest import TestCase
 import weather
 
 
@@ -58,17 +58,16 @@ class simpleTest(TestCase):
                    u'1月28日 晴', u'-29℃/-18℃', u'0.gif']
         weather.listToxml(soulist, 'template/testwea.xml')
 
-    @skip("coding")
     def testxmlToList(self):
         '''
         测试读取xml文件生成html文件
         xmlToList()
         '''
-        wishvalue = [u'1', u'2011/1/28 9:44:38',
-                     u'1月28日 多云', u'-29℃/-19℃', u'西北风3-4级', u'1.gif',
-                     u'1月29日 多云转晴', u'-28℃/-20℃', u'1.gif', u'1月30日 晴',
-                     u'-27℃/-17℃', u'0.gif']
-        resvalue = weather.xmlToList('./template/wea0')
+        wishvalue = [u'0', u'2011/01/25 22:11:52', u'1月26日 多云',
+                     u'-28℃/-18℃', u'北风微风转西风微风', u'1.gif',
+                     u'1月27日 晴', u'-28℃/-18℃', u'0.gif',
+                     u'1月28日 晴', u'-29℃/-18℃', u'0.gif']
+        resvalue = weather.xmlToList('./template/testwea0.xml')
         self.assertEqual(wishvalue, resvalue)
 
     def xmlToHtml(self):
