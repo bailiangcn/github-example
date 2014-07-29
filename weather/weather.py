@@ -177,19 +177,23 @@ def getWeather1(html_sou=""):
             sock = urllib.urlopen(URL)
             strhtml = sock.read()
         else:
-            os.system('rm template/wea1.xml')
+            outfile = './template/wea1.xml'
+            if os.path.exists(outfile):
+                commstr = 'rm %s' % outfile
+                os.system(commstr)
             with open(html_sou, 'r') as f:
                 strhtml = f.read()
         soup = BeautifulSoup(strhtml)
+        content_7d = soup.find("div", {"id": "7d"})
+        daylist = content_7d.findAll("li")
         #判断是否是夜间
-        wealist = soup.find("div", "weatherYubaoBox").findAll(
-            "table", "yuBaoTable")
-        if len(wealist) == 4:
-            nightnum = 1
-        else:
-            nightnum = 0
         #取得当日日期
-        daystr = soup.find("div", "weatherYubao").find("h1", "weatheH1").text
+        daystr = daylist[0].find("h1").text
+        # 判断是否正常解码，防止格式变换
+        if daystr != u'今天':
+            raise IOError
+        curdaystr = daylist[0].find("h2").text[:-1]
+        import ipdb; ipdb.set_trace()
         strday = re.search(r'\d{4}-\d{1,2}-\d{1,2}', daystr).group()
         firstDay = datetime.datetime.strptime(strday, '%Y-%m-%d'
                                               ) + datetime.timedelta(nightnum)
