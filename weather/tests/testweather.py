@@ -17,15 +17,19 @@ sys.path.append(os.path.join(os.pardir, ''))
 
 from unittest import TestCase
 import weather
+import filecmp
 
 
 class simpleTest(TestCase):
 
-    def getWeather0(self):
+    def testgetWeather0(self):
         '''
         测试从www.webxml.com.cn 取得天气数据(xml格式)
         '''
-        weather.getWeather0()
+        soufile = './tests/data/weather_0_20140729.xml'
+        weather.getWeather0(soufile)
+        self.assertTrue(filecmp.cmp('./template/wea0.xml',
+                                './tests/data/weares_0_20140729.xml'))
 
     def getWeather1(self):
         '''

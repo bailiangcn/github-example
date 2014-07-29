@@ -86,7 +86,7 @@ from email.MIMEMultipart import MIMEMultipart
 #                                                          #
 ############################################################
 
-def getWeather0():
+def getWeather0(xml_sou=""):
     '''
     从www.webxml.com.cn 取得天气数据(xml格式)
     直接保存为xml格式
@@ -114,8 +114,13 @@ def getWeather0():
     ############################################
     try:
         # 获取网页源文件
-        sock = urllib.urlopen(URL)
-        strxml = sock.read()
+        if xml_sou == "":
+            sock = urllib.urlopen(URL)
+            strxml = sock.read()
+        else:
+            os.system('rm template/wea0.xml')
+            with open(xml_sou, 'r') as f:
+                strxml = f.read()
         dom=xml.dom.minidom.parseString(strxml)
         root=dom.documentElement
         #验证xml的第二个string元素是大庆, 如果是表示数据正常
