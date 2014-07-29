@@ -31,13 +31,16 @@ class simpleTest(TestCase):
         self.assertTrue(filecmp.cmp('./template/wea0.xml',
                                 './tests/data/weares_0_20140729.xml'))
 
-    def getWeather1(self):
+    def testgetWeather1(self):
         '''
         测试从
         http://www.weather.com.cn/html/weather/101050901.shtml
         取得天气数据(html格式)
         '''
-        weather.getWeather1()
+        soufile = './tests/data/weather_1_20140729.html'
+        weather.getWeather1(soufile)
+        self.assertTrue(filecmp.cmp('./template/wea0.xml',
+                                './tests/data/weares_0_20140729.xml'))
 
     def testgetWeather2(self):
         '''
