@@ -45,19 +45,13 @@ class simpleTest(TestCase):
         #self.assertTrue(filecmp.cmp('./template/wea0.xml',
                                 #'./tests/data/weares_0_20140729.xml'))
 
-    def testnewgetWeather2(self):
-        '''
-        测试从qq.ip138.com 取得天气数据(html格式)
-        '''
-        weather.newgetWeather2()
-
     def testgetWeather2(self):
         '''
         测试从qq.ip138.com 取得天气数据(html格式)
         '''
         soufile = './tests/data/weather_2_20140730.html'
-        #weather.getWeather2(soufile)
-        weather.getWeather2()
+        weather.getWeather2(soufile)
+        #weather.getWeather2()
         outfile = './template/wea2.xml'
         self.assertTrue(os.path.exists(outfile), "output error found")
         correct_res = './tests/data/weares_2_20140730.xml'
@@ -203,6 +197,16 @@ class simpleTest(TestCase):
         weather.sendattachmail('bailiangcn@163.com',
                                '测试附件', '希望顺利')
 
+    def testreverseTemp(self):
+        '''
+        测试 reverseTemp()
+        '''
+        knownValues = (
+            (u'27℃～20℃', u'20℃/27℃'),
+        )
+        for souchr, wishres in knownValues:
+            result = weather.reverseTemp(souchr)
+            self.assertEqual(wishres, result)
 
 if '__main__' == __name__:
     import unittest

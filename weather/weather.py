@@ -205,7 +205,6 @@ def getWeather1(html_sou=""):
         weadata[6] = unicode(nextDay.month)+u'月'+unicode(nextDay.day)+u'日 '
         weadata[9] = unicode(lastDay.month)+u'月'+unicode(lastDay.day)+u'日 '
 
-        import ipdb; ipdb.set_trace()
         #取得有关天气的标签
         if len(wealist) == 3 or nightnum == 1:
             #取得第一天信息
@@ -265,7 +264,7 @@ def getWeather1(html_sou=""):
         print "error"
         errlog('getWeather1', ex, sys.exc_info())
 
-def newgetWeather2(html_sou=""):
+def getWeather2(html_sou=""):
     '''
         从qq.ip138.com 取得天气数据(html格式), 输出为xml格式
     '''
@@ -277,6 +276,7 @@ def newgetWeather2(html_sou=""):
     ############################################
 
     weadata = []
+    outfile = './template/wea2.xml'
     for i in range(12):
         weadata.append(u'')
     try:
@@ -285,7 +285,6 @@ def newgetWeather2(html_sou=""):
             sock = urllib.urlopen(URL)
             strhtml = sock.read()
         else:
-            outfile = './template/wea2.xml'
             if os.path.exists(outfile):
                 commstr = 'rm %s' % outfile
                 os.system(commstr)
@@ -312,104 +311,27 @@ def newgetWeather2(html_sou=""):
         weadata[6] += theWeathers[2].text
         weadata[9] += theWeathers[3].text
 
-        # 获取温度信息
-        import ipdb; ipdb.set_trace()
-
-    except Exception, ex:
-        #如果错误, 记入日志
-        print "error"
-        errlog('getWeather1', ex, sys.exc_info())
-
-def getWeather2(html_sou=""):
-    '''
-        从qq.ip138.com 取得天气数据(html格式), 输出为xml格式
-    '''
-    #相应参数:如果网址参数发生变化, 修改以下部分
-    ############################################
-
-    URL = "http://qq.ip138.com/weather/heilongjiang/DaQing.htm"
-
-    ############################################
-
-    reDay = re.compile(r'(?<=日期).*星期.+?(?=</tr>)',
-                       re.I | re.S | re.U)
-    reWeather = re.compile(r'(?<=align\="center">天气</td>).+?(?=</tr)',
-                           re.I | re.S | re.U)
-    reTemperature = re.compile(r'(?<=align\="center">气温</td>).+?(?=</tr)',
-                               re.I | re.S | re.U)
-    reWind = re.compile(r'(?<=align\="center">风向</td>).+?(?=</tr)',
-                        re.I | re.S | re.U)
-    rePic = reWeather
-    reEachDay = re.compile(r'(\d{4}-\d{1,2}-\d{1,2})', re.I | re.S | re.U)
-
-    weadata = []
-    for i in range(12):
-        weadata.append(u'')
-    try:
-        #获取网页源文件
-        if html_sou == "":
-            sock = urllib.urlopen(URL)
-            strhtml = sock.read()
-        else:
-            outfile = './template/wea2.xml'
-            if os.path.exists(outfile):
-                commstr = 'rm %s' % outfile
-                os.system(commstr)
-            with open(html_sou, 'r') as f:
-                strhtml = f.read()
-
-
-        import ipdb; ipdb.set_trace()
-
-        strhtml = unicode(strhtml, 'gb2312',
-                          'ignore').encode('utf-8', 'ignore')
-
-        #soufile = './tests/data/weather_2_script_20140730.html'
-        #with open(soufile, 'w') as f:
-            #f.write(strhtml)
-
-        # 正则表达式取得各段
-        dayPara = re.findall(reDay, strhtml)
-        weatherPara = re.findall(reWeather, strhtml)
-        temperaturePara = re.findall(reTemperature, strhtml)
-        windPara = re.findall(reWind, strhtml)
-        picPara = re.findall(rePic, strhtml)
-        #获取日期
-        theDays = re.findall(reEachDay, dayPara[0])
-        firstDay = datetime.datetime.strptime(theDays[1], '%Y-%m-%d')
-        nextDay = firstDay + datetime.timedelta(1)
-        lastDay = firstDay + datetime.timedelta(2)
-        weadata[0] = u'2'
-        weadata[1] = unicode(theDays[0].replace('-', '/'))
-        weadata[2] = unicode(firstDay.month)+u'月'+unicode(firstDay.day)+u'日 '
-        weadata[6] = unicode(nextDay.month)+u'月'+unicode(nextDay.day)+u'日 '
-        weadata[9] = unicode(lastDay.month)+u'月'+unicode(lastDay.day)+u'日 '
-
-        #获取天气概况
-        theWeathers = re.findall(r'(?<=br/>).+?(?=</td)', weatherPara[0])
-        weadata[2] += unicode(theWeathers[1].decode('utf-8'))
-        weadata[6] += unicode(theWeathers[2] .decode('utf-8'))
-        weadata[9] += unicode(theWeathers[3] .decode('utf-8'))
-        # 获取温度信息
-        # [0] 当前温度 [1]明日最高 [2]明日最低[3]后日最高[4]后日最低
-        theGrades = re.findall('(-?\d+℃)', temperaturePara[0])
-        weadata[3] = unicode(theGrades[2].decode('utf-8')
-                             ) + u'/' + unicode(theGrades[3].decode('utf-8'))
-        weadata[7] = unicode(theGrades[4].decode('utf-8')
-                             ) + u'/' + unicode(theGrades[5].decode('utf-8'))
-        weadata[10] = unicode(theGrades[6].decode('utf-8')
-                              ) + u'/' + unicode(theGrades[7].decode('utf-8'))
-        #获取风向
-        # [0] 当前风向 [1]明日 [2]后日
-        theWinds = re.findall(r'(?<=td>).+?(?=</td>)', windPara[0])
-        weadata[4] = unicode(theWinds[1].decode('utf-8'))
         #获取天气图标
-        thePics = re.findall(r'/image/(..\.gif)"', picPara[0])
-        weadata[5] = unicode(thePics[1].decode('utf-8'))
-        weadata[8] = unicode(thePics[2].decode('utf-8'))
-        weadata[11] = unicode(thePics[3].decode('utf-8'))
+        picname = theWeathers[1].findAll('img')[-1]['src']
+        weadata[5] = os.path.basename(picname)
+        picname = theWeathers[2].findAll('img')[-1]['src']
+        weadata[8] = os.path.basename(picname)
+        picname = theWeathers[3].findAll('img')[-1]['src']
+        weadata[11] = os.path.basename(picname)
 
-        listToxml(weadata, "template/wea2.xml")
+        # 获取温度信息
+        templist = content_7d[2].findAll('td')
+        weadata[3] = reverseTemp(templist[1].text)
+        weadata[7] = reverseTemp(templist[2].text)
+        weadata[10] = reverseTemp(templist[3].text)
+
+        #获取风向
+        windlist = content_7d[3].findAll('td')
+        weadata[4] = windlist[1].text
+        #weadata[8] = windlist[2].text
+        #weadata[11] = windlist[3].text
+
+        listToxml(weadata, outfile)
         log('weather2获取天气信息成功', 'logs/running.log')
     except Exception, ex:
         #如果错误, 记入日志
@@ -418,6 +340,17 @@ def getWeather2(html_sou=""):
         log('weather2获取xml文件失败', 'logs/running.log')
         return False
     return True
+
+def reverseTemp(tstr):
+    '''
+    把温度字符串前后颠倒后返回
+
+     27℃～20℃   -->    20℃/27℃
+     '''
+    tempstr = tstr.split("～".decode('utf-8'))
+    tempstr.reverse()
+    res = '/'.join(tempstr)
+    return res
 
 
 def GetWeather8():
