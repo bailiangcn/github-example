@@ -29,7 +29,7 @@ class simpleTest(TestCase):
         soufile = './tests/data/weather_0_20140729.xml'
         weather.getWeather0(soufile)
         self.assertTrue(filecmp.cmp('./template/wea0.xml',
-                                './tests/data/weares_0_20140729.xml'))
+                                    './tests/data/weares_0_20140729.xml'))
 
     def testgetWeather1(self):
         '''
@@ -39,16 +39,32 @@ class simpleTest(TestCase):
         '''
         soufile = './tests/data/weather_1_20140729.html'
         weather.getWeather1(soufile)
+        #weather.getWeather1()
         outfile = './template/wea1.xml'
         self.assertTrue(os.path.exists(outfile), "output error found")
         #self.assertTrue(filecmp.cmp('./template/wea0.xml',
                                 #'./tests/data/weares_0_20140729.xml'))
 
+    def testnewgetWeather2(self):
+        '''
+        测试从qq.ip138.com 取得天气数据(html格式)
+        '''
+        weather.newgetWeather2()
+
     def testgetWeather2(self):
         '''
         测试从qq.ip138.com 取得天气数据(html格式)
         '''
+        soufile = './tests/data/weather_2_20140730.html'
+        #weather.getWeather2(soufile)
         weather.getWeather2()
+        outfile = './template/wea2.xml'
+        self.assertTrue(os.path.exists(outfile), "output error found")
+        correct_res = './tests/data/weares_2_20140730.xml'
+        if not filecmp.cmp(outfile, correct_res):
+            commstr = 'diff %s %s' % (outfile, correct_res)
+            os.system(commstr)
+            self.fail("result have error!")
 
     def getWeather9(self):
         '''

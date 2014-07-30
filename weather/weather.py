@@ -186,25 +186,26 @@ def getWeather1(html_sou=""):
         soup = BeautifulSoup(strhtml)
         content_7d = soup.find("div", {"id": "7d"})
         daylist = content_7d.findAll("li")
-        #判断是否是夜间
         #取得当日日期
         daystr = daylist[0].find("h1").text
         # 判断是否正常解码，防止格式变换
         if daystr != u'今天':
             raise IOError
         curdaystr = daylist[0].find("h2").text[:-1]
-        import ipdb; ipdb.set_trace()
-        strday = re.search(r'\d{4}-\d{1,2}-\d{1,2}', daystr).group()
-        firstDay = datetime.datetime.strptime(strday, '%Y-%m-%d'
-                                              ) + datetime.timedelta(nightnum)
+        if html_sou == "":
+            firstDay = datetime.datetime.today()
+        else:
+            strday = html_sou[-13:-5]
+            firstDay = datetime.datetime.strptime(strday,'%Y%m%d')
         nextDay = firstDay + datetime.timedelta(1)
         lastDay = firstDay + datetime.timedelta(2)
         weadata[0] = u'1'
-        weadata[1] = unicode(strday.replace('-', '/'))
+        weadata[1] = unicode(firstDay.strftime("%Y/%m/%d"))
         weadata[2] = unicode(firstDay.month)+u'月'+unicode(firstDay.day)+u'日 '
         weadata[6] = unicode(nextDay.month)+u'月'+unicode(nextDay.day)+u'日 '
         weadata[9] = unicode(lastDay.month)+u'月'+unicode(lastDay.day)+u'日 '
 
+        import ipdb; ipdb.set_trace()
         #取得有关天气的标签
         if len(wealist) == 3 or nightnum == 1:
             #取得第一天信息
@@ -264,8 +265,62 @@ def getWeather1(html_sou=""):
         print "error"
         errlog('getWeather1', ex, sys.exc_info())
 
+def newgetWeather2(html_sou=""):
+    '''
+        从qq.ip138.com 取得天气数据(html格式), 输出为xml格式
+    '''
+    #相应参数:如果网址参数发生变化, 修改以下部分
+    ############################################
 
-def getWeather2():
+    URL = "http://qq.ip138.com/weather/heilongjiang/DaQing.htm"
+
+    ############################################
+
+    weadata = []
+    for i in range(12):
+        weadata.append(u'')
+    try:
+        # 获取网页源文件
+        if html_sou == "":
+            sock = urllib.urlopen(URL)
+            strhtml = sock.read()
+        else:
+            outfile = './template/wea2.xml'
+            if os.path.exists(outfile):
+                commstr = 'rm %s' % outfile
+                os.system(commstr)
+            with open(html_sou, 'r') as f:
+                strhtml = f.read()
+        soup = BeautifulSoup(strhtml)
+        content_7d = soup.find('table',{'border':'1'}).findAll('tr')
+
+        #获取日期
+        daystr = content_7d[0].findAll('th')[1].text
+        firstDay = datetime.datetime.strptime(daystr[:9], '%Y-%m-%d')
+        nextDay = firstDay + datetime.timedelta(1)
+        lastDay = firstDay + datetime.timedelta(2)
+
+        weadata[0] = u'2'
+        weadata[1] = unicode(firstDay.strftime("%Y/%m/%d"))
+        weadata[2] = unicode(firstDay.month)+u'月'+unicode(firstDay.day)+u'日 '
+        weadata[6] = unicode(nextDay.month)+u'月'+unicode(nextDay.day)+u'日 '
+        weadata[9] = unicode(lastDay.month)+u'月'+unicode(lastDay.day)+u'日 '
+
+        #获取天气概况
+        theWeathers = content_7d[1].findAll('td')
+        weadata[2] += theWeathers[1].text
+        weadata[6] += theWeathers[2].text
+        weadata[9] += theWeathers[3].text
+
+        # 获取温度信息
+        import ipdb; ipdb.set_trace()
+
+    except Exception, ex:
+        #如果错误, 记入日志
+        print "error"
+        errlog('getWeather1', ex, sys.exc_info())
+
+def getWeather2(html_sou=""):
     '''
         从qq.ip138.com 取得天气数据(html格式), 输出为xml格式
     '''
@@ -292,10 +347,26 @@ def getWeather2():
         weadata.append(u'')
     try:
         #获取网页源文件
-        sock = urllib.urlopen(URL)
-        strhtml = sock.read()
+        if html_sou == "":
+            sock = urllib.urlopen(URL)
+            strhtml = sock.read()
+        else:
+            outfile = './template/wea2.xml'
+            if os.path.exists(outfile):
+                commstr = 'rm %s' % outfile
+                os.system(commstr)
+            with open(html_sou, 'r') as f:
+                strhtml = f.read()
+
+
+        import ipdb; ipdb.set_trace()
+
         strhtml = unicode(strhtml, 'gb2312',
                           'ignore').encode('utf-8', 'ignore')
+
+        #soufile = './tests/data/weather_2_script_20140730.html'
+        #with open(soufile, 'w') as f:
+            #f.write(strhtml)
 
         # 正则表达式取得各段
         dayPara = re.findall(reDay, strhtml)

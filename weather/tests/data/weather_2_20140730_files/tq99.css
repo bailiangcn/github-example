@@ -1,0 +1,32 @@
+BODY{margin-top:15px;font-family:"宋体",Arial;font-size:16px;TEXT-ALIGN:center;}
+
+DIV{margin:0px auto;}
+IMG{border:0px;}
+ul,li,ol {list-style: none;}
+div img{vertical-align:middle}
+
+A:link {
+	COLOR: #1c5f82; TEXT-DECORATION: none
+}
+A:visited {
+	COLOR: #1c5f82; TEXT-DECORATION: none
+}
+A:hover {
+	COLOR: #cc5533; TEXT-DECORATION: underline
+}
+.subt {
+	COLOR: #aa3333; FONT-FAMILY: "宋体"; FONT-SIZE: 9pt
+}
+
+#phonezip {width:520px;margin-right:auto;margin-left:auto;}
+#phonezip ul li{list-style:none;line-height:150%;text-align:left;}
+
+#Title{line-height:36px;font-size:16px;}
+#ProvList{width:420px;margin:5px auto;}/*天气首页省份列表宽度*/
+#CityList{width:420px;margin:5px auto;}/*天气省份页城市列表宽度*/
+
+.red,a.red:visited,a.red:link,a.red:hover{color:#f00; text-decoration:none;}
+.green,a.green:visited,a.green:link,a.green:hover{color:#008000; text-decoration:none;}
+.blue,a.blue:visited,a.blue:link,a.blue:hover{color:#0353ce; text-decoration:none;}
+
+.tdc1{COLOR: #ffffff;font-size:12px;}
