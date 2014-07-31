@@ -66,7 +66,6 @@
 __revision__ = '0.1'
 
 import os
-import re
 import urllib
 import sys
 import datetime
@@ -137,10 +136,10 @@ def getWeather0(xml_sou=""):
                 weatherlist.append(getText(eachstr))
             resultlist = [u'0', weatherlist[4].replace("-", "/"),
                           weatherlist[6], weatherlist[5], weatherlist[7],
-                          weatherlist[8], weatherlist[13],
-                          weatherlist[12], weatherlist[15],
+                          weatherlist[9], weatherlist[13],
+                          weatherlist[12], weatherlist[16],
                           weatherlist[18], weatherlist[17],
-                          weatherlist[20]]
+                          weatherlist[21]]
             listToxml(resultlist, FILENAME)
             log('weather0获取天气信息成功', 'logs/running.log')
         else:
@@ -192,12 +191,12 @@ def getWeather1(html_sou=""):
         # 判断是否正常解码，防止格式变换
         if daystr != u'今天':
             raise IOError
-        curdaystr = daylist[0].find("h2").text[:-1]
+        #curdaystr = daylist[0].find("h2").text[:-1]
         if html_sou == "":
             firstDay = datetime.datetime.today()
         else:
             strday = html_sou[-13:-5]
-            firstDay = datetime.datetime.strptime(strday,'%Y%m%d')
+            firstDay = datetime.datetime.strptime(strday, '%Y%m%d')
 
         nextDay = firstDay + datetime.timedelta(1)
         lastDay = firstDay + datetime.timedelta(2)
@@ -213,9 +212,9 @@ def getWeather1(html_sou=""):
         thirdDW = daylist[2]
 
         #获取天气概况
-        weadata[2] += firstDW.find("p","wea").text
-        weadata[6] += secondDW.find("p","wea").text
-        weadata[9] += thirdDW.find("p","wea").text
+        weadata[2] += firstDW.find("p", "wea").text
+        weadata[6] += secondDW.find("p", "wea").text
+        weadata[9] += thirdDW.find("p", "wea").text
 
         #获取天气图标
         picname = firstDW.findAll('big')[-1]['class']
@@ -237,16 +236,18 @@ def getWeather1(html_sou=""):
         weadata[10] = ''.join((lowtem, u'℃/', uppertem, u'℃'))
 
         #获取风向
-        weadata[4] = firstDW.find("p","win").findAll("span")[-1]['title']
+        wind = firstDW.find("p", "win")
+        weadata[4] = ''.join((wind.findAll("span")[-1]['title'],
+                             wind.find("i").text))
 
         listToxml(weadata, "template/wea1.xml")
         log('weather1获取天气信息成功', 'logs/running.log')
-
 
     except Exception, ex:
         #如果错误, 记入日志
         print "error"
         errlog('getWeather1', ex, sys.exc_info())
+
 
 def getWeather2(html_sou=""):
     '''
@@ -275,7 +276,7 @@ def getWeather2(html_sou=""):
             with open(html_sou, 'r') as f:
                 strhtml = f.read()
         soup = BeautifulSoup(strhtml)
-        content_7d = soup.find('table',{'border':'1'}).findAll('tr')
+        content_7d = soup.find('table', {'border': '1'}).findAll('tr')
 
         #获取日期
         daystr = content_7d[0].findAll('th')[1].text
@@ -324,6 +325,7 @@ def getWeather2(html_sou=""):
         log('weather2获取xml文件失败', 'logs/running.log')
         return False
     return True
+
 
 def reverseTemp(tstr):
     '''

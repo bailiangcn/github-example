@@ -20,8 +20,8 @@ import time
 #生成页面的顺序, 可以调整ORDER的顺序,
 #表示生成的优先选用顺序
 ############################################
-#ORDER = [u'0', u'2']
-ORDER = [u'2']
+ORDER = [u'2', u'1', u'0']
+#ORDER = [u'2']
 #ORDER = [u'0', u'9', u'1', u'2']
 #管理员邮箱, 可自行添加(但注意可能出现126认为是垃圾邮件)
 MAILLIST = ['bailiangcn@163.com','test2011@126.com']
@@ -73,7 +73,6 @@ else:
                     zhLjust(nowlist[10],20),zhLjust(nowlist[11],20)
                     ))
             mess += tempstr
-
 for order in ORDER:
     filename = u'template/wea' + order + u'.xml'
     if filename in allwealist:
