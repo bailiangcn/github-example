@@ -42,8 +42,8 @@ class simpleTest(TestCase):
         #weather.getWeather1()
         outfile = './template/wea1.xml'
         self.assertTrue(os.path.exists(outfile), "output error found")
-        #self.assertTrue(filecmp.cmp('./template/wea0.xml',
-                                #'./tests/data/weares_0_20140729.xml'))
+        self.assertTrue(filecmp.cmp('./template/wea1.xml',
+                                './tests/data/weares_1_20140729.xml'))
 
     def testgetWeather2(self):
         '''
@@ -158,6 +158,8 @@ class simpleTest(TestCase):
                       ('10.gif',  '10.png'),
                       ('a_10.gif',  '10.png'),
                       ('b_10.gif',  '10.png'),
+                      ('d01',  '1.png'),
+                      ('n01',  '1.png'),
                        )
         for souname, wishres in knownValues:
             result = weather.transPicId(souname)

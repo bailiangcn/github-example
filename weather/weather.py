@@ -186,6 +186,7 @@ def getWeather1(html_sou=""):
         soup = BeautifulSoup(strhtml)
         content_7d = soup.find("div", {"id": "7d"})
         daylist = content_7d.findAll("li")
+
         #取得当日日期
         daystr = daylist[0].find("h1").text
         # 判断是否正常解码，防止格式变换
@@ -197,67 +198,50 @@ def getWeather1(html_sou=""):
         else:
             strday = html_sou[-13:-5]
             firstDay = datetime.datetime.strptime(strday,'%Y%m%d')
+
         nextDay = firstDay + datetime.timedelta(1)
         lastDay = firstDay + datetime.timedelta(2)
+
         weadata[0] = u'1'
         weadata[1] = unicode(firstDay.strftime("%Y/%m/%d"))
         weadata[2] = unicode(firstDay.month)+u'月'+unicode(firstDay.day)+u'日 '
         weadata[6] = unicode(nextDay.month)+u'月'+unicode(nextDay.day)+u'日 '
         weadata[9] = unicode(lastDay.month)+u'月'+unicode(lastDay.day)+u'日 '
 
-        #取得有关天气的标签
-        if len(wealist) == 3 or nightnum == 1:
-            #取得第一天信息
-            daytr = wealist[nightnum].findAll("td")
-            #图片
-            thePic = os.path.basename(daytr[2].img['src'])
-            weadata[5] = thePic
-            #天气
-            theWeather = daytr[3].text
-            weadata[2] += theWeather
-            #温度
-            theHighGrade = daytr[4].b.strong.string
-            theLowerGrade = daytr[10].span.strong.string
-            weadata[3] = theLowerGrade + u'/' + theHighGrade
-            #风向
-            weadata[4] = daytr[5].text + daytr[6].text
+        firstDW = daylist[0]
+        secondDW = daylist[1]
+        thirdDW = daylist[2]
 
-            #取得第二天信息
-            daytr = wealist[nightnum+1].findAll("td")
-            #图片
-            thePic = os.path.basename(daytr[2].img['src'])
-            weadata[8] = thePic
-            #天气
-            theWeather = daytr[3].text
-            weadata[6] += theWeather
-            #温度
-            theHighGrade = daytr[4].b.strong.string
-            theLowerGrade = daytr[10].span.strong.string
-            weadata[7] = theLowerGrade + u'/' + theHighGrade
+        #获取天气概况
+        weadata[2] += firstDW.find("p","wea").text
+        weadata[6] += secondDW.find("p","wea").text
+        weadata[9] += thirdDW.find("p","wea").text
 
-            #取得第三天信息
-            daytr = wealist[nightnum+2].findAll("td")
-            #图片
-            thePic = os.path.basename(daytr[2].img['src'])
-            weadata[11] = thePic
-            #天气
-            theWeather = daytr[3].text
-            weadata[9] += theWeather
-            #温度
-            theHighGrade = daytr[4].b.strong.string
-            theLowerGrade = daytr[10].span.strong.string
-            weadata[10] = theLowerGrade + u'/' + theHighGrade
+        #获取天气图标
+        picname = firstDW.findAll('big')[-1]['class']
+        weadata[5] = picname.split(' ')[-1]
+        picname = secondDW.findAll('big')[-1]['class']
+        weadata[8] = picname.split(' ')[-1]
+        picname = thirdDW.findAll('big')[-1]['class']
+        weadata[11] = picname.split(' ')[-1]
 
-            listToxml(weadata, "template/wea1.xml")
-            log('weather1获取天气信息成功', 'logs/running.log')
+        # 获取温度信息
+        lowtem = firstDW.find("p", "tem tem2").span.text
+        uppertem = firstDW.find("p", "tem tem1").span.text
+        weadata[3] = ''.join((lowtem, u'℃/', uppertem, u'℃'))
+        lowtem = secondDW.find("p", "tem tem2").span.text
+        uppertem = secondDW.find("p", "tem tem1").span.text
+        weadata[7] = ''.join((lowtem, u'℃/', uppertem, u'℃'))
+        lowtem = thirdDW.find("p", "tem tem2").span.text
+        uppertem = thirdDW.find("p", "tem tem1").span.text
+        weadata[10] = ''.join((lowtem, u'℃/', uppertem, u'℃'))
 
-        else:
-            log('weather1获取html文件失败')
-            log(strhtml)
-            log('weather1获取html文件失败', 'logs/running.log')
-            return False
+        #获取风向
+        weadata[4] = firstDW.find("p","win").findAll("span")[-1]['title']
 
-        return True
+        listToxml(weadata, "template/wea1.xml")
+        log('weather1获取天气信息成功', 'logs/running.log')
+
 
     except Exception, ex:
         #如果错误, 记入日志
