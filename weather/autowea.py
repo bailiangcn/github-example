@@ -17,11 +17,15 @@ import weather
 from weather import zhLjust
 import time
 
+import ConfigParser
 #生成页面的顺序, 可以调整ORDER的顺序,
 #表示生成的优先选用顺序
 ############################################
-ORDER = [u'2', u'1', u'0']
-#ORDER = [u'2']
+
+cf=ConfigParser.ConfigParser()
+cf.read("config.ini")
+ORDER = cf.get("host","order").decode('utf-8').split(' ')
+
 #ORDER = [u'0', u'9', u'1', u'2']
 #管理员邮箱, 可自行添加(但注意可能出现126认为是垃圾邮件)
 MAILLIST = ['bailiangcn@163.com', 'test2011@126.com']
