@@ -87,6 +87,7 @@ from email.MIMEMultipart import MIMEMultipart
 
 def getWeather0(xml_sou=""):
     '''
+    http://webservice.webxml.com.cn/WebServices/Weatherwebservice.asmx/getWeatherbyCityName?theCityName=50842
     从www.webxml.com.cn 取得天气数据(xml格式)
     直接保存为xml格式
     来源格式说明:
